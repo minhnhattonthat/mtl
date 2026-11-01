@@ -458,7 +458,8 @@ function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.rem
   t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 3500); }
 
 async function api(path, opts) {
-  const r = await fetch(SNAPSHOT ? `api/${path.split("?")[0].split("/").pop()}.json?t=${Date.now()}` : path, opts);  // ?t= skips the Pages cache const j = await r.json().catch(() => ({}));
+  const r = await fetch(SNAPSHOT ? `api/${path.split("?")[0].split("/").pop()}.json?t=${Date.now()}` : path, opts);  // ?t= skips the Pages cache
+  const j = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(j.message || j.error || r.statusText); return j;
 }
 

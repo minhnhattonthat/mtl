@@ -740,7 +740,7 @@
    "state": "running",
    "system": "psx",
    "title": "Momotarou Matsuri: Ishikawa Rokuemon no Maki",
-   "updated": 1793539431.900335,
+   "updated": 1793541264.911592,
    "waiting": "- (resolved, D9) reviews: the run brief allows a fresh read-only pass, so the repo's in-session `reviewer` /\n    `visual-qa` agents do the phase 6/8/9 verdicts.\n  - Quiz keys M510D/227, 229, 238 look factually off in the JP (kept; game scores .0). Non-blocking.\n  - GUI keyboard input in `tools/pcsx/` not proven by hand (headless-only runs).\n  Non-blocking; check when playtesting.",
    "worked": 0.0
   },
