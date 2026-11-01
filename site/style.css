@@ -17,7 +17,7 @@ img { display: block; }
 
 .topline { height: 6px; background: linear-gradient(90deg, var(--gold), var(--orange) 60%, var(--bar) 60.5%); }
 .nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 64px; padding: 0 24px; background: var(--bar); }
-.logo { text-decoration: none; font: 800 22px/1 system-ui, sans-serif; letter-spacing: .04em;
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; font: 800 22px/1 system-ui, sans-serif; letter-spacing: .04em;
   background: linear-gradient(90deg, #ff4fa0, var(--gold) 50%, #3fd0ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .logo small { display: block; margin-top: 4px; font: 500 10px/1 system-ui, sans-serif; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); -webkit-text-fill-color: var(--muted); }
 .links-top { display: flex; gap: 24px; font-size: 14px; font-weight: 700; }
