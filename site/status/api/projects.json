@@ -621,14 +621,14 @@
     "9": [
      {
       "agent": "opencode:opencode-go/gpt-6-luna",
-      "calls": 2,
-      "last": 1793573008.2032735,
+      "calls": 3,
+      "last": 1793573586.0647116,
       "role": "fallback"
      },
      {
       "agent": "claude",
-      "calls": 4,
-      "last": 1793572932.9646232,
+      "calls": 5,
+      "last": 1793573543.2275643,
       "role": "phase"
      },
      {
@@ -642,13 +642,13 @@
    "name": "kuro-no-ken-blade-of-the-darkness-en",
    "next": "",
    "phase": 9,
-   "released": 1793573425.059905,
+   "released": 1793574138.215544,
    "resets_at": null,
    "since": 1793529305.3993227,
    "state": "running",
    "system": "psx",
    "title": "Kuro no Ken: Blade of the Darkness",
-   "updated": 1793572871.0611794,
+   "updated": 1793573446.2796316,
    "waiting": "- (non-blocking) Running the downloaded jPSXdec jar (`work/dl/jp/`) was refused by the auto-mode permission\n    check; needed later to decode/re-encode LOGO.STR if the prologue is FMV. A permission rule for\n    `java -jar tools/jpsxdec/jpsxdec.jar` would unblock it.\n  - (non-blocking) Title logo \u9ed2\u306e\u5263: default keep (D5); the disc's volume id is BLADE_OF_THE_DARKNESS\n    (official English subtitle), so an English subtitle line under the logo is the fallback plan.",
    "worked": 0.0
   },
