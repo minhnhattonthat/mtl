@@ -194,7 +194,6 @@
    "worked": 0.0
   },
   {
-   "done": "- Step 0: DeSmuME QA fork qa-2 in `tools/desmume/`, smoke boots the original ROM (title -> menu -> opening card),\n    Lua probe logs, pre-commit rejects a failing test, guard hook blocks `sed -i`, `rom.sha1` pinned, `tools/check.py`.\n  - Phase 1: `docs/re/` (archive, bbq, font, text, graphics). Text = Shift-JIS in .BBQ string tables (66,451\n    strings, one string per displayed line) + 351 arm9 strings; fonts NFTR 0336/0337 with ASCII; static graphics\n    sweep found 68 stage title cards + 6 UI screens + title subtitle/\u00a9 + credit card.\n  - Phase 2: `tools/debug/` warp tool on the game's own developer menu (script 0x1000) + the map-menu \u30c7\u30d0\u30c3\u30b0 item.\n    `warp_all.py` reaches all 291 scenes from cold boot with proof sheets; `work/states/<scene>.dst`.\n  - Phase 3: `ez.repack()` + `tools/build.py` give a byte-identical ROM (`tests/test_identity.py`), ~1 s a build.\n  - Phase 4: `tools/extract.py` -> `script/bbq/<ez index>_<name>.json` (328 tables) + `script/arm9.json` (351 strings);\n    `tools/insert.py` puts them back; roundtrip + coverage tests; BBQ insert and arm9 insert verified in-game.\n  - **Phase 5 (this session):**\n    - **Font/VWF: done, no new font ships.** The renderer honours each glyph's CWDH advance and adds 1 px\n      (measured: advance 6 -> 7 px pitch, 2 -> 3, 10 -> 11). `tools/font.py` sets every printable ASCII advance to\n      its ink width (space 3): all printable ASCII goes from 665 to 508 px (76 %), ~25 % more English per line. The\n      build installs the table in both fonts. Validated by a glyph torture line (every glyph draws, ink extent\n      matches `tools/font.py` `width()` to the pixel) and `tests/test_font.py`. Details `docs/re/font.md`.\n    - **arm9 growth: done.** `arm9.relocate()` moves long strings into the free ITCM autoload tail\n      (0x01FF9160, 28,320 bytes), growing the ITCM section and sliding the DTCM source + autoload list (kept\n      4-aligned) while rewriting the 4-byte literals; `insert.arm9_edit` falls back to it automatically. Verified\n      in-game (a moved string renders on the chart footer). `tests/test_arm9.py`. Details `docs/re/text.md`.\n    - **Marker build: done.** `tools/mark.py` marks 66,135 strings (`TTT:IIII|` + a 6 px-digit ruler), leaves 667\n      non-text strings alone in 5 classes (empty 317, blank 100, numeric 158, key 90, path 2 - a marked\n      `./EZ_DAT.BIN` black-screened the boot), and writes `work/marker/map.tsv`. A marker ROM with the ruler\n      reaches **291/291 scenes** (`work/qa/markers/`, ids visible in every text box) and an id-only build\n      (`--ruler 0`, `work/qa/markers_id/`) proves the same where text is centred (ids would be pushed out).\n    - **Width gate: started, 3 variants measured.** `tbl/windows.json` + `docs/re/width.md`: stage-card narration\n      180 px / 3 lines (x=33), command-menu row 130 px, chart footer hint 114 px. Measured with\n      `tools/textband.py` off ruler shots. **Story dialogue with a portrait is NOT reached by any warp yet** - that\n      is the phase 6 blocker (`tbl/windows.json` `story_dialogue` is a placeholder).\n    - **Warp tool hardened:** stage scenes boot straight into the stage-jump script 0x1002 (the dev menu ignores\n      input for ~1 s after it is drawn, which silently dropped presses and hung ~1 warp in 3); dev-menu scenes wait\n      180 frames. 291/291 scenes pass on both the marker build and the VWF build.",
    "models": {
     "1": [
      {
@@ -273,17 +272,15 @@
      }
     ]
    },
-   "name": "emblem-of-gundam-en",
-   "next": "",
-   "phase": 7,
+   "name": "held-12",
+   "phase": null,
    "released": null,
-   "resets_at": null,
-   "since": 1793484404.049137,
-   "state": "running",
+   "resets_at": 1793552797,
+   "since": null,
+   "state": "queued",
    "system": "nds",
-   "title": "Emblem of Gundam",
-   "updated": 1793534989.6372547,
-   "waiting": "(non-blocking) series logo art on stage cards (Gundam/08th/0080/0083/Zeta, with small\n  Japanese inside the logo) planned to stay as official logo art per D5; title katakana subtitle under the English\n  logo planned to be replaced by nothing or English. Staff roll (D2/D3, Hepburn, given name first,\n  `tools/dlg.py` CREDITS): readings guessed for \u91cd\u4fe1\u5eb7 Ko Shigenobu, \u83ef\u5357\u604b Ren Kanan, \u5c71\u672c\u771e\u751f Mao Yamamoto,\n  \u798f\u5bb6\u771f\u5e83 Masahiro Fuke, \u5c0f\u91ce\u525b Tsuyoshi Ono, \u4e45\u91ce\u7dbe\u5b50 Ayako Kuno, \u592a\u7530\u6771\u5b5d Harutaka Ota, \u7d4c\u585a\u6597\u8302 Tomo Kyozuka,\n  \u5c0f\u677e\u592e\u5178 Hisanori Komatsu, \u9ed2\u6fa4\u8c6a Go Kurosawa, \u91ce\u6fa4\u82bd\u4e0e Meyo Nozawa, \u677e\u7530\u5b99 Sora Matsuda, \u7530\u6751\u70c8 Retsu Tamura;\n  correct any you know (one edit in CREDITS).",
+   "title": "xxxxxxxxxxxxxxxx",
+   "updated": 1793570864.564381,
    "worked": 0.0
   },
   {
@@ -543,7 +540,7 @@
    "worked": 0.0
   },
   {
-   "done": "- Step 0: template, decisions D1-D7, dump pinned, PCSX-Redux + BIOS, hooks (see git history).\n  - Phase 1: no earlier fan patch exists (PS1 or PC-98). Recon notes in `docs/re/` (index `README.md`):\n    disc + PSMG/EM archives (verified, `tests/test_archives.py`), SCN bytecode interpreter + op 0x3b message +\n    operand readers + escapes, MES and SMX formats, EXE string ranges, SYSTEM.FNT structure, PAD30 image format,\n    static graphics sweep (472 images) with the graphics-text list G1-G5 in `docs/re/graphics.md`.\n  - `mkpsxiso -y layout.xml` on the unedited dump already gives the pinned sha1 (phase 3 just wires it as a test).\n  - Tools: `tools/mps.py`, `pad.py`, `re.py`, `sjstr.py`, `fnt.py` (draft). mkpsxiso/dumpsxiso 2.30 and armips\n    0.11.0 in `tools/` (gitignored).\n  - Phase 2: `tools/debug/` warp + tour (commands in AGENTS.md), notes `docs/re/scenes.md`, SCN disassembler\n    `tools/scn.py` (+ `tests/test_scn.py`). Scenes: every area x every progress value its dispatcher tests\n    (generated from `scenes_data.lua`), VIS 00-16, ending + credits, field menu + 6 sub-menus, item shop, inn,\n    random / boss / event fight. Warp = play the intro from cold boot, then set var 3 (the game's own area\n    change); tour saves `work/states/base_<cue>.sstate` at the intro's end and starts the other scenes there.\n    Tour on the original disc: 150/150 proofs ok; sheets reviewed (menus, shop, inn, 3 fight types, VIS, END\n    card all correct). Known limits (`docs/re/scenes.md`): area scenes use entrance 0, so some open on an empty\n    corner (02OLB dock, 05SKS black); ending credits show tile garbage over their backdrops in the warp (check\n    against a real ending before blaming the build).\n  - Phase 3: `tools/build.py` (check dump, unpack once, copy tree to `work/build/tree`, `edit()` hook - empty -\n    then mkpsxiso with the dump's layout; ~2 s). `tests/test_build.py`: repack of `work/orig/tree` = pinned sha1.\n    Build smoke ok. LBA-shift test (SCN.MPS +16 sectors, every later file shifted): `tools/debug/cd_seeks.lua`\n    shows all 122 seeks of boot + intro (XA, STR, MPS) follow the shift; warp tour on that disc 150/150 ok, proofs\n    differ from the original tour only in animation/typing timing. So files may grow freely (`docs/re/archives.md`).\n  - Phase 4: `tools/sctext.py` (cp932 + escape codec, byte-exact), `tools/scn.py` (walk with op-0x7b thread edges,\n    `assemble`/`rebuild` with relocation of every address operand and of data-table u16s), `tools/extract.py`\n    (`dump` writes `script/{scn,mes,smx}/*.json` + `script/exe.json`; `check` = roundtrip + coverage gate).\n    **12,230 strings in 245 files**: scn 11,141 (7,300 walked, ~2,500 message ops found by file scan, ~1,200 kana\n    runs for choice options/signs/banners), mes 374, smx 296, exe 112. Every entry roundtrips to its original bytes;\n    no message op and no kana run is left unextracted (15 % of SCN bytes are data tables/padding, `extract.py gaps`).\n    `tests/test_extract.py`: roundtrip + coverage + `test_rebuild_relocates` (grow a message in 5 files, file still\n    walks clean and every jump lands on an op). A rebuild-with-an-edit runs over all 218 SCN files:\n    215 stay clean, 3 do not (15MKR02A, 15MKR02C, 24UMB57 - a 0x52 handler value pointing into data, the same\n    form as the two known cases `tests/test_scn.py` tolerates). Glossary seeded with the\n    character/place/term names the script uses.",
+   "done": "- Step 0: template, decisions D1-D7, dump pinned, PCSX-Redux + BIOS, hooks (see git history).\n  - Phase 1: no earlier fan patch exists (PS1 or PC-98). Recon notes in `docs/re/` (index `README.md`):\n    disc + PSMG/EM archives (verified, `tests/test_archives.py`), SCN bytecode interpreter + op 0x3b message +\n    operand readers + escapes, MES and SMX formats, EXE string ranges, SYSTEM.FNT structure, PAD30 image format,\n    static graphics sweep (472 images) with the graphics-text list G1-G5 in `docs/re/graphics.md`.\n  - `mkpsxiso -y layout.xml` on the unedited dump already gives the pinned sha1 (phase 3 just wires it as a test).\n  - Tools: `tools/mps.py`, `pad.py`, `re.py`, `sjstr.py`, `fnt.py` (draft). mkpsxiso/dumpsxiso 2.30 and armips\n    0.11.0 in `tools/` (gitignored).\n  - Phase 2: `tools/debug/` warp + tour (commands in AGENTS.md), notes `docs/re/scenes.md`, SCN disassembler\n    `tools/scn.py` (+ `tests/test_scn.py`). Scenes: every area x every progress value its dispatcher tests\n    (generated from `scenes_data.lua`), VIS 00-16, ending + credits, field menu + 6 sub-menus, item shop, inn,\n    random / boss / event fight. Warp = play the intro from cold boot, then set var 3 (the game's own area\n    change); tour saves `work/states/base_<cue>.sstate` at the intro's end and starts the other scenes there.\n    Tour on the original disc: 150/150 proofs ok; sheets reviewed (menus, shop, inn, 3 fight types, VIS, END\n    card all correct). Known limits (`docs/re/scenes.md`): area scenes use entrance 0, so some open on an empty\n    corner (02OLB dock, 05SKS black); ending credits show tile garbage over their backdrops in the warp (check\n    against a real ending before blaming the build).\n  - Phase 3: `tools/build.py` (check dump, unpack once, copy tree to `work/build/tree`, `edit()` hook - empty -\n    then mkpsxiso with the dump's layout; ~2 s). `tests/test_build.py`: repack of `work/orig/tree` = pinned sha1.\n    Build smoke ok. LBA-shift test (SCN.MPS +16 sectors, every later file shifted): `tools/debug/cd_seeks.lua`\n    shows all 122 seeks of boot + intro (XA, STR, MPS) follow the shift; warp tour on that disc 150/150 ok, proofs\n    differ from the original tour only in animation/typing timing. So files may grow freely (`docs/re/archives.md`).\n  - Phase 4: `tools/sctext.py` (cp932 + escape codec, byte-exact), `tools/scn.py` (walk with op-0x7b thread edges,\n    `assemble`/`rebuild` with relocation of every address operand and of data-table u16s), `tools/extract.py`\n    (`dump` writes `script/{scn,mes,smx}/*.json` + `script/exe.json`; `check` = roundtrip + coverage gate).\n    **12,230 strings in 245 files** (11,916 after phase 5 removed non-text): scn 11,141 (7,300 walked, ~2,500 message ops found by file scan, ~1,200 kana\n    runs for choice options/signs/banners), mes 374, smx 296, exe 112. Every entry roundtrips to its original bytes;\n    no message op and no kana run is left unextracted (15 % of SCN bytes are data tables/padding, `extract.py gaps`).\n    `tests/test_extract.py`: roundtrip + coverage + `test_rebuild_relocates` (grow a message in 5 files, file still\n    walks clean and every jump lands on an op). A rebuild-with-an-edit runs over all 218 SCN files:\n    215 stay clean, 3 do not (15MKR02A, 15MKR02C, 24UMB57 - a 0x52 handler value pointing into data, the same\n    form as the two known cases `tests/test_scn.py` tolerates). Glossary seeded with the\n    character/place/term names the script uses.\n  - Phase 5 (done 2026-11-02). **Font** (`docs/re/font.md`): full-width glyphs 12 rows x 4 bytes, base-6;\n    half-width table 256 x 36 bytes, 8 px of 3 bits, **pixel x in bits 3x** (the first reading was mirrored; fixed).\n    The field/menu renderer (`0x80051904`) draws ASCII at 8 px; the build fills the punctuation the disc leaves\n    blank (`. , ' \" ;` etc., `fnt.patch_ascii`). **VIS/MES captions use the BIOS kanji font** (Krom2RawAdd):\n    `tools/asm/vis_ascii.asm` (armips, applied by `build.py`) rewrites the caption parser's tail so a byte < 0x80\n    is one 8 px glyph built from the SYSTEM.FNT half-width table; `tests/test_asm.py` runs it under unicorn;\n    in-game: VIS00 shows English (`work/qa/vis_ascii/`).\n    **Marker build** (`build.py --marker`): tour 150/150 ok (`work/qa/mtour/`) - field boxes, menus, shop, battle\n    banners, VIS captions all show ids (the old \"menu still Japanese\" was a warp from an original-disc state: a\n    state keeps that build's EXE). **Non-text removed** from `script/`: 312 SMX record \"strings\" (`E8 03`),\n    a bytecode run (02OLB 0x159), a binary run (25TOU 0x3e); 11,916 strings now (`test_no_binary_entries`).\n    **Width gate**: `data/windows.json` (chars/lines per variant, shot, engine flags). Field box 28 x 4 (27 on a\n    page's last line, auto-wrap, auto page), VIS 62 x 5 (no wrap), item name 18, description 22 x 2, battle\n    banner 26, system message 26, choice 14 in today's window. `@` is a field-renderer control (`@64` = '@').\n    Tools: `build.py --qa ID=TEXT [--data-runs]`, `tools/debug/boxes.py`, scene `choice_csl`.\n- **Engine items (now phase 7; translators were given the post-engine targets: menu 6, choice = JP bytes,\n  item 18, desc 2x22, sys 26)** (`data/windows.json` \"engine\"): (1) choice window sizing at 8 px per ASCII byte (op 7d handler) - else every\n  choice overflows; (2) wider field menu / item+magic tabs / battle command column (3 chars today; English labels\n  need ~7); (3) SMX pools keep JP byte lengths (names 4-14 B): relocate the pool's u16 offsets so names and\n  descriptions can grow; (4) EXE labels are fixed slots (relocate with lui/addiu refs); (5) SCN data runs\n  (24 choice options) are written in place only (`--data-runs`), so options must fit their JP byte length or\n  the 7d tables get relocated. Then the translator tooling (batch check/fit against `data/windows.json`) and\n  batches per `references/translation.md`. Not measured yet: battle item/magic lists (skill_name is a guess).",
    "models": {
     "0": [
      {
@@ -584,18 +581,74 @@
       "last": 1793537845.5212486,
       "role": "phase"
      }
+    ],
+    "5": [
+     {
+      "agent": "claude",
+      "calls": 2,
+      "last": 1793547062.051937,
+      "role": "phase"
+     }
+    ],
+    "6": [
+     {
+      "agent": "codex",
+      "calls": 1,
+      "last": 1793554252.058898,
+      "role": "review"
+     },
+     {
+      "agent": "claude",
+      "calls": 1,
+      "last": 1793549621.6057107,
+      "role": "phase"
+     }
+    ],
+    "7": [
+     {
+      "agent": "codex",
+      "calls": 1,
+      "last": 1793568017.2263062,
+      "role": "review"
+     },
+     {
+      "agent": "claude",
+      "calls": 1,
+      "last": 1793554517.560636,
+      "role": "phase"
+     }
+    ],
+    "9": [
+     {
+      "agent": "opencode:opencode/deepseek-v4.1-flash-free",
+      "calls": 1,
+      "last": 1793569954.0954497,
+      "role": "last-resort"
+     },
+     {
+      "agent": "opencode:opencode-go/gpt-6-luna",
+      "calls": 1,
+      "last": 1793569471.0577292,
+      "role": "fallback"
+     },
+     {
+      "agent": "claude",
+      "calls": 2,
+      "last": 1793569414.1280284,
+      "role": "phase"
+     }
     ]
    },
    "name": "kuro-no-ken-blade-of-the-darkness-en",
    "next": "",
-   "phase": 4,
-   "released": null,
+   "phase": 9,
+   "released": 1793569935.8595476,
    "resets_at": null,
    "since": 1793529305.3993227,
    "state": "running",
    "system": "psx",
-   "title": "Kuro no Ken - Blade of the Darkness (Japan)",
-   "updated": 1793537808.0242474,
+   "title": "Kuro no Ken: Blade of the Darkness",
+   "updated": 1793569349.6971116,
    "waiting": "- (non-blocking) Running the downloaded jPSXdec jar (`work/dl/jp/`) was refused by the auto-mode permission\n    check; needed later to decode/re-encode LOGO.STR if the prologue is FMV. A permission rule for\n    `java -jar tools/jpsxdec/jpsxdec.jar` would unblock it.\n  - (non-blocking) Title logo \u9ed2\u306e\u5263: default keep (D5); the disc's volume id is BLADE_OF_THE_DARKNESS\n    (official English subtitle), so an English subtitle line under the logo is the fallback plan.",
    "worked": 0.0
   },
@@ -680,7 +733,6 @@
    "worked": 0.0
   },
   {
-   "done": "",
    "models": {
     "6": [
      {
@@ -713,8 +765,8 @@
     "8": [
      {
       "agent": "codex",
-      "calls": 27,
-      "last": 1793541469.932589,
+      "calls": 44,
+      "last": 1793563267.1954749,
       "role": "phase"
      },
      {
@@ -731,17 +783,15 @@
      }
     ]
    },
-   "name": "momotarou-matsuri-ishikawa-rokuemon-no-maki-en",
-   "next": "",
-   "phase": 8,
-   "released": null,
+   "name": "held-35",
+   "phase": 9,
+   "released": 1793570928.294744,
    "resets_at": null,
-   "since": 1793524735.4725196,
-   "state": "running",
+   "since": null,
+   "state": "stopped",
    "system": "psx",
-   "title": "Momotarou Matsuri: Ishikawa Rokuemon no Maki",
-   "updated": 1793541264.911592,
-   "waiting": "- (resolved, D9) reviews: the run brief allows a fresh read-only pass, so the repo's in-session `reviewer` /\n    `visual-qa` agents do the phase 6/8/9 verdicts.\n  - Quiz keys M510D/227, 229, 238 look factually off in the JP (kept; game scores .0). Non-blocking.\n  - GUI keyboard input in `tools/pcsx/` not proven by hand (headless-only runs).\n  Non-blocking; check when playtesting.",
+   "title": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "updated": 1793570955.7412176,
    "worked": 0.0
   },
   {
@@ -1091,7 +1141,7 @@
  "slots": {
   "retro": {
    "max": 3,
-   "used": 3
+   "used": 1
   }
  }
 }
