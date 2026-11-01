@@ -1,0 +1,39 @@
+{
+ "items": [
+  {
+   "dir": "psp",
+   "folder": false,
+   "name": "xxxxxxxxxxxx",
+   "preset": "default",
+   "ready": true
+  },
+  {
+   "dir": "psx",
+   "folder": true,
+   "name": "xxxxxxxxxxxx",
+   "preset": "default",
+   "ready": true
+  },
+  {
+   "dir": "snes",
+   "folder": false,
+   "name": "xxxxxxxxxxxx",
+   "preset": "default",
+   "ready": true
+  },
+  {
+   "dir": "psx",
+   "folder": true,
+   "name": "xxxxxxxxxxxx",
+   "preset": "default",
+   "ready": true
+  }
+ ],
+ "systems": [
+  "snes",
+  "gba",
+  "nds",
+  "ps1",
+  "psp"
+ ]
+}

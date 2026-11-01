@@ -1,0 +1,887 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Translation Works</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* palette: matches minhnhattonthat.github.io/mtl (dark only) */
+:root {
+  --floor:#2b2b2b; --floor-2:#1f1f1f; --plate:#333; --rivet:#444; --ink:#eee; --dim:#a8a8a8;
+  --hazard:#ffb400; --flow:#3fd0ff; --stop:#ff4d6d; --ship:#06d6a0; --wait:#ff4fa0; --shu:#ff6a00;
+  --wave: rgba(238,238,238,.035);
+}
+* { box-sizing:border-box; }
+html, body { margin:0; }
+body { background:var(--floor); color:var(--ink); font:14px/1.5 "Zen Kaku Gothic New", system-ui, sans-serif; min-height:100vh; }
+h1, h2, .num, .tag, button, .lamp-label { font-family:"Zen Maru Gothic", system-ui, sans-serif; }
+h2 small { font-size:12px; color:var(--shu); margin-left:6px; letter-spacing:.1em; text-transform:none; text-shadow:none; }
+button { font-size:13px; font-weight:700; letter-spacing:.02em; cursor:pointer; color:var(--ink); background:var(--rivet);
+  border:0; border-radius:4px; padding:4px 10px; }
+button:hover { filter:brightness(1.15); } button:disabled { opacity:.35; cursor:default; filter:none; }
+:focus-visible { outline:2px solid var(--hazard); outline-offset:2px; }
+
+/* top bar */
+.top { display:flex; align-items:center; gap:24px; flex-wrap:wrap; padding:14px 20px; border-bottom:3px solid var(--hazard);
+  background:var(--floor-2); }
+.mark { display:flex; align-items:center; gap:10px; }
+.mark h1 { margin:0; font-size:22px; letter-spacing:.04em; }
+.gear { width:28px; height:28px; color:var(--hazard); }
+.spin .gear { animation: spin 6s linear infinite; }
+.view #inbox .t, .view .holding .t { color:transparent; background:#000; border-radius:2px; user-select:none; }  /* view page hides unreleased game names */
+.lamps { display:flex; gap:8px; align-items:center; margin-left:auto; }
+.lamp { width:14px; height:14px; border-radius:50%; background:var(--rivet); box-shadow: inset 0 -2px 0 rgba(0,0,0,.25); }
+.lamp.on { background:var(--ship); box-shadow: 0 0 10px var(--ship); animation: blink 2.4s ease-in-out infinite; }
+.lamp-label { color:var(--dim); font-size:13px; margin-left:4px; }
+
+/* production line */
+.line { display:grid; grid-template-columns: 230px minmax(380px, 1fr) 230px 220px; gap:0; padding:18px 12px 24px;
+  align-items:stretch; position:relative; }
+.belt { position:absolute; left:12px; right:12px; top:52px; height:6px; border-radius:3px; opacity:.55;
+  background: repeating-linear-gradient(90deg, var(--rivet) 0 14px, transparent 14px 22px); }
+.flowing .belt { background: repeating-linear-gradient(90deg, var(--flow) 0 14px, transparent 14px 22px); animation: belt 1.2s linear infinite; }
+.station { position:relative; margin:0 8px; min-width:0; display:flex; flex-direction:column; }
+.station > .lane:last-child { flex:1; }  /* stretch the bottom lane so every column ends level */
+.station > header { display:flex; align-items:baseline; gap:8px; height:40px; }
+.station h2 { margin:0; font-size:15px; letter-spacing:.03em; }
+.station .num { color:var(--dim); font-size:13px; }
+.lane { margin-top:22px; min-height:120px; border-radius:6px; padding:8px; display:flex; flex-direction:column; gap:8px;
+  background:color-mix(in srgb, var(--floor-2) 70%, transparent); border:2px dashed transparent; transition: border-color .15s, background .15s; }
+.lane.droppable.drag-on { border-color:var(--rivet); }
+.lane.droppable.hover { border-color:var(--hazard); background:color-mix(in srgb, var(--hazard) 10%, var(--floor-2)); }
+.lane .hint { color:var(--dim); font-size:12.5px; text-align:center; padding:14px 6px; }
+.sub { font-family:"Zen Maru Gothic"; font-size:13px; color:var(--dim); margin:4px 2px -2px; display:flex; justify-content:space-between; }
+
+/* hopper (inbox) */
+.hopper { border:2px dashed var(--rivet); border-radius:6px; padding:12px; text-align:center; cursor:pointer; transition: all .15s;
+  background: repeating-linear-gradient(-45deg, transparent 0 10px, color-mix(in srgb, var(--hazard) 6%, transparent) 10px 20px); }
+.hopper.hover { border-color:var(--hazard); transform:scale(1.02); }
+.hopper strong { display:block; font-family:"Zen Maru Gothic"; font-size:15px; }
+.hopper small { color:var(--dim); }
+.hopper-opts { display:flex; gap:6px; margin-top:8px; }
+.hopper-opts select, .hopper-opts input { font:inherit; font-size:12.5px; min-width:0; flex:1; padding:3px 5px; border-radius:4px;
+  border:1px solid var(--rivet); background:var(--plate); color:var(--ink); }
+#inbox { display:flex; flex-direction:column; gap:8px; }
+.upbar { height:6px; border-radius:3px; background:var(--rivet); overflow:hidden; margin-top:8px; }
+.upbar i { display:block; height:100%; width:0; background:var(--hazard); transition: width .2s; }
+
+/* crate: small card */
+.crate { background:var(--plate); border-radius:5px; padding:8px 10px; border-left:4px solid var(--rivet); position:relative;
+  box-shadow: 0 2px 0 rgba(0,0,0,.18); cursor:grab; }
+.crate[draggable=false], .bay[draggable=false] { cursor:default; }
+.view .holding .sub, .view #waiting, .view #parked, .view #hopper, .view .hopper-opts, .view .agents-btn, .view button[data-act], .view #confirm { display:none !important; }
+.view #queue { margin-top:22px !important; flex:1; overflow:auto; }  /* stands in for the hidden bottom lane */
+.crate.dragging { opacity:.4; }
+.crate.drop-before { box-shadow: 0 -3px 0 var(--hazard); } .crate.drop-after { box-shadow: 0 3px 0 var(--hazard); }
+.crate .name { font-weight:600; font-size:13px; overflow-wrap:anywhere; }
+.crate .meta { color:var(--dim); font-size:12px; margin-top:2px; }
+.crate .acts { display:flex; gap:4px; margin-top:6px; }
+.crate.queued { border-left-color:var(--hazard); } .crate.paused, .crate.pausing { border-left-color:var(--flow); }
+.crate.stopped, .crate.stopping { border-left-color:var(--stop); } .crate.waiting { border-left-color:var(--wait); }
+.chip { display:inline-block; margin-right:6px; padding:0 6px; font:700 10px/1.6 system-ui, sans-serif; color:#fff; background:#666; border-radius:3px; vertical-align:1px; }
+.chip--SNES { background:#6a4c93; } .chip--GBA { background:#3a0ca3; } .chip--NDS { background:#5c677d; }
+.chip--PS1 { background:#003791; } .chip--PSP { background:#111; }
+.crate.built { border-left-color:var(--ship); padding:5px 8px; }
+.crate.rom { border-left-color:var(--hazard); padding-right:40px; }
+.crate.rom .pos { position:absolute; right:10px; top:50%; translate:0 -50%; font:800 22px/1 system-ui, sans-serif; color:var(--hazard); opacity:.8; }
+.ticks { display:grid; grid-template-columns:repeat(10,1fr); gap:2px; margin-top:6px; }
+.ticks i { height:4px; border-radius:1px; background:var(--rivet); }
+.ticks i.on { background:var(--ink); opacity:.7; }
+.arrive { animation: arrive .6s cubic-bezier(.2,.9,.3,1.3); }
+
+/* machine bay: running card */
+.bay { background:var(--plate); border-radius:8px; padding:14px 16px 16px; position:relative; overflow:hidden; cursor:grab;
+  border:2px solid var(--rivet); }
+.bay.running { border-color: color-mix(in srgb, var(--ship) 60%, var(--rivet)); }
+.bay.pausing, .bay.stopping { border-color:var(--hazard); }
+.bay .head { display:flex; align-items:center; gap:10px; }
+.bay .name { font-family:"Zen Maru Gothic"; font-weight:700; font-size:17px; overflow-wrap:anywhere; }
+.bay .clock { margin-left:auto; font-family:"Zen Maru Gothic"; color:var(--dim); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.track { position:relative; margin:24px 4px 18px; height:30px; }
+.rail { position:absolute; left:0; right:0; top:11px; height:8px; border-radius:4px; background:var(--rivet); overflow:hidden; }
+/* fill ends at the current dot's centre: --r = dot radius, --f = phase / last phase */
+.rail i { --r:15px; --pct:calc(var(--r) + (100% - 2 * var(--r)) * var(--f)); position:absolute; inset:0 auto 0 0; width:var(--pct); border-radius:4px; transition: width 1s cubic-bezier(.2,.8,.2,1), height 1s cubic-bezier(.2,.8,.2,1);
+  /* electric arc: jagged spark tile over a deep-blue charge; vertical tile + direction on the mobile line */
+  --a:90deg;
+  --spark:var(--spark-h, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='8'%3E%3Cg fill='none'%3E%3Cpolyline points='0,4 5,1 9,6 14,2 19,7 24,3 29,6 34,1 40,4' stroke='rgb(63,208,255)' stroke-width='2.6' opacity='.7'/%3E%3Cpolyline points='0,4 5,1 9,6 14,2 19,7 24,3 29,6 34,1 40,4' stroke='white' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E"));
+  background: var(--spark) 0 0 / 40px 100% repeat-x, linear-gradient(var(--a), #0b2a6b, #1e63d6); }
+.bay.running .rail { box-shadow: 0 0 10px color-mix(in srgb, var(--flow) 60%, transparent); }
+.bay.running .rail i { animation: arc .45s steps(5) infinite, zap 1.3s linear infinite; }
+.stops { position:absolute; inset:0; display:flex; justify-content:space-between; }
+.stop-dot { width:30px; height:30px; border-radius:50%; display:grid; place-items:center; font-family:"Zen Maru Gothic"; font-size:13px;
+  font-weight:700; background:var(--floor-2); border:2px solid var(--rivet); color:var(--dim); position:relative; z-index:1; }
+.stop-dot.done { background:#1e63d6; border-color:var(--flow); color:#fff; box-shadow:0 0 6px color-mix(in srgb, var(--flow) 55%, transparent); }
+.stop-dot.now { background:#0b2a6b; border-color:var(--flow); color:#fff; }
+.bay.running .stop-dot.now::after { content:""; position:absolute; inset:-7px; border-radius:50%; border:2px solid var(--flow);
+  animation: ping 1.8s ease-out infinite; }
+/* model per phase: icon under each phase dot/tick, tap one to list its models below */
+.stop-dot { padding:0; cursor:pointer; }
+.stop-dot.picked { box-shadow:0 0 0 2px #fff, 0 0 8px var(--flow); }
+.stop-dot .mi { position:absolute; top:calc(100% + 3px); left:50%; transform:translateX(-50%); font-size:12px; line-height:1; white-space:nowrap; }
+.ticks .tk { all:unset; display:grid; justify-items:center; align-content:start; gap:3px; cursor:pointer; font-size:10px; line-height:1; min-height:8px; }
+.ticks .tk:focus-visible { outline:2px solid var(--hazard); }
+.ticks .tk i { width:100%; height:4px; border-radius:1px; background:var(--rivet); }
+.ticks .tk.on i { background:var(--ink); opacity:.7; }
+.ticks .tk.picked i { background:var(--shu); opacity:1; }
+.mi sup, .tk sup { font-size:8px; }
+.models { margin-top:6px; color:var(--dim); font-size:12px; line-height:1.6; overflow-wrap:anywhere; }
+.models b { color:var(--ink); font-weight:500; }
+@media (max-width: 400px) {
+  .track { height:24px; } .rail { top:8px; } .rail i { --r:12px; } .stop-dot { width:24px; height:24px; font-size:11px; }
+}
+/* phase name above the picked dot (all of them on the vertical mobile line) */
+.stop-dot .pn { position:absolute; bottom:calc(100% + 7px); left:50%; transform:translateX(-50%); font-size:10px; line-height:1;
+  white-space:nowrap; color:var(--dim); font-weight:400; }
+.stop-dot.picked .pn, .stop-dot.now .pn { color:var(--ink); font-weight:500; }
+.stop-dot:first-child .pn { left:0; transform:none; } .stop-dot:last-child .pn { left:auto; right:0; transform:none; }
+@media (max-width: 640px) {
+  .track { height:auto; margin:10px 0; }
+  .rail { left:9px; right:auto; top:0; bottom:0; width:8px; height:auto; }
+  .rail i { width:100%; height:var(--pct); --a:180deg; --r:13px;
+    --spark:var(--spark-v, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='40'%3E%3Cg fill='none'%3E%3Cpolyline points='4,0 1,5 6,9 2,14 7,19 3,24 6,29 1,34 4,40' stroke='rgb(63,208,255)' stroke-width='2.6' opacity='.7'/%3E%3Cpolyline points='4,0 1,5 6,9 2,14 7,19 3,24 6,29 1,34 4,40' stroke='white' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E"));
+    background-size: 100% 40px, auto; background-repeat: repeat-y, no-repeat; }
+  .stops { position:relative; flex-direction:column; gap:6px; }
+  .stop-dot { width:26px; height:26px; font-size:11px; }
+  .stop-dot .pn, .stop-dot:nth-child(n) .pn { font-size:11px; bottom:auto; top:50%; left:calc(100% + 10px); right:auto; transform:translateY(-50%); }
+  .stop-dot .mi { top:50%; left:calc(100% + 96px); transform:translateY(-50%); }
+}
+.bay .acts { display:flex; gap:6px; margin-top:8px; }
+.bay.free { cursor:default; border-style:dashed; display:grid; place-items:center; min-height:150px; color:var(--dim); text-align:center;
+  background: repeating-linear-gradient(-45deg, transparent 0 12px, color-mix(in srgb, var(--rivet) 25%, transparent) 12px 24px); }
+.bay.free strong { font-family:"Zen Maru Gothic"; font-size:16px; color:var(--ink); display:block; }
+.floor-lanes { display:flex; flex-direction:column; gap:12px; }
+
+/* dock: shipped */
+
+.chev { position:absolute; top:44px; right:-14px; width:20px; height:22px; color:var(--dim); z-index:2; }
+.flowing .chev { color:var(--flow); animation: nudge 1.2s ease-in-out infinite; }
+
+.btn-stop { background:var(--stop); color:#fff; } .btn-go { background:var(--ship); color:#0d2614; } .btn-pause { background:var(--flow); color:#04252a; }
+
+.agents-btn { margin-top:6px; font-size:12px; padding:2px 8px; }
+#agents-dlg { background:var(--plate); color:var(--ink); border:2px solid var(--hazard); border-radius:8px; padding:16px;
+  max-width:min(440px, calc(100vw - 32px)); }
+#agents-dlg::backdrop { background:rgba(0,0,0,.5); }
+#agents-dlg h2 { margin:0 0 10px; font-size:17px; overflow-wrap:anywhere; }
+#agents-dlg form { display:grid; gap:6px; }
+#agents-dlg label { display:grid; grid-template-columns:150px 1fr; align-items:center; gap:8px; font-size:13px; }
+#agents-dlg input, #agents-dlg select { font:inherit; font-size:13px; padding:4px 6px; border-radius:4px; min-width:0;
+  border:1px solid var(--rivet); background:var(--floor-2); color:var(--ink); }
+#agents-dlg select:disabled { opacity:.6; }
+#agents-dlg .row { display:flex; gap:8px; justify-content:flex-end; margin-top:10px; }
+#confirm { position:fixed; inset:auto 16px 16px auto; max-width:min(380px, calc(100vw - 32px)); background:var(--plate); border:2px solid var(--stop);
+  border-radius:8px; padding:14px; box-shadow:0 10px 30px rgba(0,0,0,.35); display:none; z-index:10; }
+#confirm.show { display:block; animation: arrive .3s; }
+#confirm p { margin:0 0 10px; }
+#toast { position:fixed; left:50%; bottom:16px; transform:translateX(-50%); background:var(--ink); color:var(--floor);
+  padding:8px 16px; border-radius:6px; font-weight:500; display:none; z-index:11; max-width:calc(100vw - 32px); }
+#toast.show { display:block; animation: arrive .3s; }
+
+/* japanese factory skin: seigaiha waves, washi lanes, vermilion torii line */
+body { padding-bottom:84px; background-color:var(--floor);
+  --c:var(--floor); --w:var(--wave);
+  background-image:
+    radial-gradient(circle at 100% 150%, var(--c) 24%, var(--w) 24% 28%, var(--c) 28% 36%, var(--w) 36% 40%, transparent 40%),
+    radial-gradient(circle at 0 150%, var(--c) 24%, var(--w) 24% 28%, var(--c) 28% 36%, var(--w) 36% 40%, transparent 40%),
+    radial-gradient(circle at 50% 100%, var(--w) 10%, var(--c) 10% 23%, var(--w) 23% 30%, var(--c) 30% 43%, var(--w) 43% 50%, var(--c) 50% 63%, var(--w) 63% 71%, transparent 71%),
+    radial-gradient(circle at 100% 50%, var(--w) 5%, var(--c) 5% 15%, var(--w) 15% 20%, var(--c) 20% 29%, var(--w) 29% 34%, var(--c) 34% 44%, var(--w) 44% 49%, transparent 49%),
+    radial-gradient(circle at 0 50%, var(--w) 5%, var(--c) 5% 15%, var(--w) 15% 20%, var(--c) 20% 29%, var(--w) 29% 34%, var(--c) 34% 44%, var(--w) 44% 49%, transparent 49%);
+  background-size:100px 50px; background-attachment:fixed; }
+.top { position:relative; border-bottom:0; }
+.top::after { content:""; position:absolute; left:0; right:0; bottom:-7px; height:7px;
+  background:linear-gradient(var(--shu) 0 4px, transparent 4px 5px, var(--shu) 5px); opacity:.9; }
+.mark h1 { letter-spacing:.12em; font-weight:700; }
+.mark h1 small { display:block; font-size:11px; letter-spacing:.5em; color:var(--shu); margin-top:-2px; }
+.station h2 { letter-spacing:.06em; color:var(--ink); padding-left:8px; border-left:3px solid var(--shu); }
+.lane { border:1px solid color-mix(in srgb, var(--ink) 8%, transparent); border-radius:10px;
+  background:color-mix(in srgb, var(--floor-2) 88%, transparent); }
+.lane.droppable.drag-on, .lane.droppable.hover { border-style:dashed; border-width:1px; }
+.crate { border-radius:8px; transition: transform .2s, box-shadow .2s; box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 10%, transparent); }
+.crate:hover { transform:translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,.12); }
+.bay { border-radius:12px; border-width:1px; }
+.bay.running { box-shadow: 0 6px 22px rgba(0,0,0,.14); }
+.hopper { border-radius:10px; background:transparent; }
+.mark .gear { color:var(--shu); }
+.belt { height:8px; opacity:.8; }
+.pkg { position:absolute; top:-12px; left:0; width:14px; height:11px; border-radius:2px; background:var(--hazard);
+  box-shadow: inset 0 -3px 0 rgba(0,0,0,.28), 0 0 8px color-mix(in srgb, var(--hazard) 50%, transparent);
+  animation: travel 11s linear infinite paused; }
+.pkg:nth-child(2n) { background:var(--flow); box-shadow: inset 0 -3px 0 rgba(0,0,0,.28), 0 0 8px color-mix(in srgb, var(--flow) 50%, transparent); }
+.pkg:nth-child(3n) { background:var(--wait); width:10px; }
+.pkg:nth-child(1) { animation-delay:0s } .pkg:nth-child(2) { animation-delay:-1.4s } .pkg:nth-child(3) { animation-delay:-2.9s }
+.pkg:nth-child(4) { animation-delay:-4.1s } .pkg:nth-child(5) { animation-delay:-5.6s } .pkg:nth-child(6) { animation-delay:-6.8s }
+.pkg:nth-child(7) { animation-delay:-8.3s } .pkg:nth-child(8) { animation-delay:-9.6s }
+.flowing .pkg { animation-play-state:running; }
+
+/* mascot */
+.w.mascot { width:36px; height:54px; flex:none; }
+.w .fin1, .w .fin2 { animation: hover 1.1s ease-in-out infinite alternate; } .w .fin2 { animation-delay:-.55s; }  /* hands float free of the body */
+.mascot .fin2 { transform-origin:20.4px 23px; }
+.busy .mascot .fin2 { animation: wave .7s ease-in-out infinite alternate; }
+.mascot .eye, .w .eye { transform-box:fill-box; transform-origin:center; animation: blinkeye 4s infinite; }
+.bubble { position:relative; font-family:"Zen Maru Gothic"; font-size:13px; padding:5px 10px; border-radius:8px; max-width:260px; transform:translateY(-16px);
+  background:var(--plate); border:1px solid color-mix(in srgb, var(--flow) 50%, transparent); color:var(--ink); }
+#say::after { content:""; display:inline-block; width:6px; height:1em; margin-left:2px; vertical-align:-.12em;
+  background:var(--flow); animation: caret 1s steps(1) infinite; }
+@keyframes caret { 50% { opacity:0; } }
+/* comic tail toward the mascot: outline triangle, plate-filled triangle on top covering the bubble's edge */
+.bubble::before, .bubble::after { content:""; position:absolute; clip-path:polygon(100% 0, 100% 65%, 0 100%); }
+.bubble::before { left:-13px; bottom:2px; width:14px; height:14px; background:color-mix(in srgb, var(--flow) 50%, transparent); }
+.bubble::after { left:-10.5px; bottom:4px; width:12px; height:11px; background:var(--plate); }
+
+/* workers: crew in each bay, crowd walking the floor */
+.w { width:24px; height:36px; display:block; overflow:visible; }
+.crew { display:flex; gap:4px; margin-left:auto; align-self:flex-end; }
+.crew .w, .walker .w { width:30px; height:45px; }
+.bay .acts { align-items:flex-end; }
+.bay.running .crew .w { animation: bob .45s ease-in-out infinite alternate; }
+.bay.running .crew .w + .w { animation-delay:-.2s; }
+/* per-phase workbench scene beside the crew; frozen unless the bay is running */
+.scene { width:84px; height:60px; flex:none; align-self:flex-end; overflow:visible; }
+.scene .m { fill:var(--dim); } .scene .k { fill:var(--floor-2); stroke:var(--dim); stroke-width:1.5; }
+.scene .h { fill:var(--hazard); } .scene .f { fill:var(--flow); } .scene .p { fill:var(--wait); } .scene .s { fill:var(--stop); } .scene .g { fill:var(--ship); }
+.scene text { font:700 12px "Zen Maru Gothic", sans-serif; fill:#fff; text-anchor:middle; }
+.bay:not(.running) .scene .a { animation-play-state:paused; }
+.scene .wrench { transform-origin:30px 26px; animation: ratchet .8s ease-in-out infinite alternate; }
+.scene .lens { animation: peek 1.8s ease-in-out infinite alternate; }
+.scene .bug { animation: crawl 2.6s ease-in-out infinite alternate; }
+.scene .cross { animation: blink .5s steps(2) infinite; }
+.scene .scanl { filter:drop-shadow(0 0 3px var(--flow)); animation: scanY 1.3s ease-in-out infinite alternate; }
+.scene .up { animation: rise 1.8s ease-in infinite; } .scene .up + .up { animation-delay:-.6s; } .scene .up + .up + .up { animation-delay:-1.2s; }
+.scene .g1 { transform-origin:20px 30px; animation: spin 3s linear infinite; }
+.scene .g2 { transform-origin:43px 15px; animation: spin 2.3s linear infinite reverse; }
+.scene .say { animation: talk 2.4s ease-in-out infinite; } .scene .say + .say { animation-delay:-1.2s; }
+.scene .nud { animation: nudge 1.2s ease-in-out infinite; }
+.scene .drop { animation: drop 1.6s ease-in infinite; }
+.scene .tick { animation: tick 3s ease infinite backwards; } .scene .t1 { animation-delay:.5s; } .scene .t2 { animation-delay:1s; }
+.scene .rocket { animation: bob .5s ease-in-out infinite alternate; }
+.scene .flame { transform-origin:30px 31px; animation: flick .15s ease-in-out infinite alternate; }
+.scene .star { animation: fall 1s linear infinite; } .scene .star + .star { animation-delay:-.4s; } .scene .star + .star + .star { animation-delay:-.75s; }
+#crowd { position:fixed; left:0; right:0; bottom:0; height:76px; overflow:hidden; z-index:4; pointer-events:none;
+  background:linear-gradient(transparent, color-mix(in srgb, var(--floor-2) 92%, transparent) 45%); }
+.walker { --t:var(--d); position:absolute; left:0; animation: walk var(--t) linear infinite; animation-delay:var(--dl); }
+.walker.back { animation-direction:reverse; }
+.walker .w { animation: bob .3s ease-in-out infinite alternate; }
+/* package carried on the head; a pair holds it out front and passes it to the bot ahead once per trip */
+.walker.back .w { scale:-1 1; }  /* profile bots face where they walk */
+.walker .box { position:absolute; left:6px; top:-9px; width:18px; height:12px; border-radius:2px;
+  background:linear-gradient(90deg, transparent 7px, rgba(255,255,255,.35) 7px 11px, transparent 11px), var(--hazard);
+  box-shadow: inset 0 -3px 0 rgba(0,0,0,.3); animation: bob .3s ease-in-out infinite alternate; }
+.walker:nth-child(8n+1) .box { background-color:var(--flow); }
+.walker.pair { animation:none; width:30px; height:45px; }
+.walker.pair .w { position:absolute; left:0; bottom:0; }
+.walker.pair .taker { transform-origin:12px 18px; }  /* flip about the body centre, not the box-inclusive bbox */
+.walker.pair .arm { transform-origin:10.4px 23px; }
+.walker.pair .w, .walker.pair .taker, .walker.pair .arm, .walker.pair .box-a, .walker.pair .box-b { animation:var(--k) var(--t) linear infinite; animation-delay:var(--dl); }
+.walker.pair .gv { --k:giverun; } .walker.pair .tk { --k:takerrun; } .walker.pair .taker { --k:turn; }
+.walker.pair .giver .arm { --k:give; } .walker.pair .taker .arm { --k:take; } .walker.pair .box-a { --k:boxA; } .walker.pair .box-b { --k:boxB; }
+/* tired bot: sweats more as it slows to a stop, wipes its forehead (fin swaps for a wiping fin), then runs off dry */
+.walker.tired { animation-name:tiredrun; }
+.walker.tired .fin1, .walker.tired .wipe, .walker.tired .sweat { animation:var(--k) var(--t) linear infinite; animation-delay:var(--dl); }
+.walker.tired .fin1 { --k:finhide; } .walker.tired .wipe { --k:wipe; } .walker.tired .sweat { --k:sweat; }
+.walker.tired .sweat path { transform-box:fill-box; transform-origin:50% 0; animation: bead 2.2s ease-in infinite; }
+.walker.tired .sweat path:nth-child(2) { animation-delay:-.8s; } .walker.tired .sweat path:nth-child(3) { animation-delay:-1.5s; }
+/* tripping bot: sprints, trips and falls flat forward, lies a beat, gets back up and sprints off */
+@property --amp { syntax:"<number>"; inherits:true; initial-value:1; }
+.walker.trip { animation-name:triprun, tripamp; } @property --b { syntax:"<length>"; inherits:false; initial-value:0px; }
+/* var() inside keyframes isn't re-read per frame, so the bob animates --b and the gate multiplies it here */
+.walker.trip .w { animation-name:tbob; animation-duration:.16s; translate:0 calc(var(--amp) * var(--b)); }
+.walker.trip .tumble { transform-origin:17px 34px; animation:tumble var(--t) linear infinite; animation-delay:var(--dl); }
+/* eyes swap for > < squeezed shut from the fall until it gets up */
+.walker.trip .eye, .walker.trip .squint { animation:tripeye var(--t) linear infinite; animation-delay:var(--dl); }
+.walker.trip .squint { animation-name:squint; }
+.busy .walker { --t:calc(var(--d) * .55); }
+
+@keyframes sweep { from { transform:translateY(-140px); } to { transform:translateY(100vh); } }
+@keyframes scan { from { transform:translateX(-100%); } to { transform:translateX(260%); } }
+@keyframes travel { from { left:0; } to { left:calc(100% - 14px); } }
+@keyframes walk { from { transform:translateX(-100px); } to { transform:translateX(calc(100vw + 40px)); } }
+@keyframes bob { to { transform:translateY(-2px); } }
+@keyframes tiredrun { 0% { transform:translateX(-100px); animation-timing-function:cubic-bezier(.3,.6,.6,1); }
+  38%, 52% { transform:translateX(var(--tx, 40vw)); animation-timing-function:ease-in; } 100% { transform:translateX(calc(100vw + 40px)); } }
+/* trip: foot catches at 38% and the body pitches forward in one accelerating motion while momentum carries it on, then it slams flat */
+@keyframes triprun { 0% { transform:translateX(-100px); } 38% { transform:translateX(var(--tx, 42vw)); animation-timing-function:cubic-bezier(.2,.7,.4,1); }
+  46%, 69% { transform:translateX(calc(var(--tx, 42vw) + 34px)); animation-timing-function:ease-in; } 100% { transform:translateX(calc(100vw + 40px)); } }
+@keyframes tumble { 0%, 38% { transform:rotate(0); animation-timing-function:cubic-bezier(.5,0,.9,.6); } 42.5% { transform:rotate(96deg); }
+  44% { transform:translateY(-1px) rotate(84deg); } 45.5%, 64% { transform:rotate(90deg); animation-timing-function:ease-in-out; } 69%, 100% { transform:rotate(0); } }
+/* hover bob switched off from the fall until it is back on its feet */
+@keyframes tripamp { 0%, 37.9%, 69.1%, 100% { --amp:1; } 38%, 69% { --amp:0; } }
+@keyframes tbob { to { --b:-2px; } }
+@keyframes tripeye { 0%, 38.9%, 65.1%, 100% { opacity:1; } 39%, 65% { opacity:0; } }
+@keyframes squint { 0%, 38.9%, 65.1%, 100% { opacity:0; } 39%, 65% { opacity:1; } }
+@keyframes finhide{ 0%, 39.9%, 50.1%, 100% { opacity:1; } 40%, 50% { opacity:0; } }
+@keyframes wipe { 0%, 39.9%, 50.1%, 100% { opacity:0; } 40%, 44%, 48% { opacity:1; transform:translateX(-2px); } 42%, 46%, 50% { opacity:1; transform:translateX(3px); } }
+@keyframes sweat { 0%, 6% { opacity:0; } 20% { opacity:.4; } 36%, 43% { opacity:1; } 47%, 100% { opacity:0; } }
+/* sweat beads up in place, swells, then slides a little down the head and dries off */
+@keyframes bead { 0% { transform:scale(.2); opacity:0; } 15% { opacity:.9; } 55% { transform:scale(1); opacity:.9; } 90% { transform:translateY(2.5px) scale(.9, 1.1); opacity:.7; } 100% { transform:translateY(3px) scale(.8); opacity:0; } }
+@keyframes hover { from { transform:translateY(.6px); } to { transform:translateY(-.9px); } }
+/* handover pair, one trip: the giver walks at one steady speed from far offscreen; the slower taker ahead is caught
+   at 33-37% (starts 100px ahead, a bit slower; 40px ahead and same pace while handing over), then speeds off and leaves by 65%.
+   taker keyframes = giver position (-400px + t * (100vw + 440px)) + 40px at 33% and 37%; its exit curve starts at
+   0.6x its average speed (the giver is ~0.45x of it), so the giver never catches it again, then accelerates */
+@keyframes giverun { from { transform:translateX(-400px); } to { transform:translateX(calc(100vw + 40px)); } }
+@keyframes takerrun { 0% { transform:translateX(-300px); } 33% { transform:translateX(calc(33vw - 214.8px)); }
+  37% { transform:translateX(calc(37vw - 197.2px)); animation-timing-function:cubic-bezier(.4,.24,.8,.6); } 65%, 100% { transform:translateX(calc(100vw + 60px)); } }
+@keyframes turn { 0%, 32.4% { transform:scaleX(1); } 32.5%, 37.4% { transform:scaleX(-1); } 37.5%, 100% { transform:scaleX(1); } }
+@keyframes give { 0%, 33% { transform:rotate(-75deg); } 35% { transform:translateX(7px) rotate(-75deg); } 37%, 100% { transform:rotate(0); } }
+@keyframes take { 0%, 32.5% { transform:rotate(0); } 34%, 35% { transform:translateX(7px) rotate(-75deg); } 37%, 100% { transform:rotate(-75deg); } }
+@keyframes boxA { 0%, 33% { transform:translateX(0); opacity:1; } 35% { transform:translateX(10px); opacity:1; } 35.1%, 100% { opacity:0; } }
+@keyframes boxB { 0%, 34.9% { transform:translateX(10px); opacity:0; } 35% { transform:translateX(10px); opacity:1; } 37%, 100% { transform:translateX(0); opacity:1; } }
+@keyframes wave { from { transform:rotate(-10deg); } to { transform:rotate(28deg); } }
+@keyframes ratchet { from { transform:rotate(-28deg); } to { transform:rotate(22deg); } }
+@keyframes peek { to { transform:translate(14px, 8px); } }
+@keyframes crawl { to { transform:translateX(24px); } }
+@keyframes scanY { from { transform:translateY(0); } to { transform:translateY(30px); } }
+@keyframes rise { from { transform:translateY(0); opacity:1; } to { transform:translateY(-26px); opacity:0; } }
+@keyframes talk { 0%, 45% { opacity:1; } 55%, 100% { opacity:.25; } }
+@keyframes drop { 0% { transform:translateY(0); opacity:1; } 60% { transform:translateY(24px); opacity:1; } 80%, 100% { transform:translateY(32px); opacity:0; } }
+@keyframes tick { 0%, 15% { opacity:0; } 25%, 85% { opacity:1; } 100% { opacity:0; } }
+@keyframes flick { from { transform:scaleY(.7); } to { transform:scaleY(1.15); } }
+@keyframes fall { from { transform:translateY(-6px); opacity:0; } 30% { opacity:1; } to { transform:translateY(46px); opacity:0; } }
+@keyframes blinkeye { 0%, 94%, 100% { transform:scaleY(1); } 97% { transform:scaleY(.1); } }
+@keyframes spin { to { transform:rotate(360deg); } }
+@keyframes belt { to { background-position: 22px 0; } }
+@keyframes arc { to { background-position: 40px 40px, 0 0; } }
+@keyframes zap { 0%, 100% { filter:none; } 8% { filter:brightness(1.7); } 14% { filter:brightness(.8); } 40% { filter:brightness(1.3); }
+  62% { filter:none; } 70% { filter:brightness(1.9); } 74% { filter:brightness(.85); } }
+@keyframes ping { from { transform:scale(.8); opacity:1; } to { transform:scale(1.5); opacity:0; } }
+@keyframes blink { 50% { opacity:.55; } }
+@keyframes nudge { 50% { transform:translateX(4px); } }
+@keyframes arrive { from { transform:translateY(-10px) scale(.96); opacity:0; } }
+
+@media (min-width: 1101px) {  /* the floor sets the row height; other columns scroll their bottom lane instead of growing it */
+  .station:not(.floor) { height:0; min-height:100%; }
+  .station:not(.floor) > .lane:last-child { overflow:auto; }
+}
+@media (max-width: 1100px) {
+  .line { grid-template-columns: 1fr 1fr; gap:16px 0; padding:16px 8px; }
+  .floor { grid-column: 1 / -1; order:-1; }
+  .belt, .chev { display:none; }
+  .lane { margin-top:6px; }
+}
+@media (max-width: 640px) { .line { grid-template-columns: 1fr; } .top { padding:12px 16px; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs><radialGradient id="shell" cx=".38" cy=".3" r=".8"><stop offset="0" stop-color="#fff"/><stop offset=".65" stop-color="#eef1f5"/><stop offset="1" stop-color="#c3cad4"/></radialGradient>
+    <radialGradient id="visor" cx=".4" cy=".25" r=".9"><stop offset="0" stop-color="#2a2d33"/><stop offset="1" stop-color="#050607"/></radialGradient></defs>
+  <symbol id="gear" viewBox="0 0 24 24"><path fill="currentColor" d="M10.3 1h3.4l.5 3a8 8 0 0 1 2.1.9l2.5-1.8 2.4 2.4-1.8 2.5c.4.7.7 1.4.9 2.1l3 .5v3.4l-3 .5a8 8 0 0 1-.9 2.1l1.8 2.5-2.4 2.4-2.5-1.8c-.7.4-1.4.7-2.1.9l-.5 3h-3.4l-.5-3a8 8 0 0 1-2.1-.9l-2.5 1.8-2.4-2.4 1.8-2.5a8 8 0 0 1-.9-2.1l-3-.5v-3.4l3-.5c.2-.7.5-1.4.9-2.1L3.2 5.5l2.4-2.4 2.5 1.8c.7-.4 1.4-.7 2.1-.9zM12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/></symbol>
+  <symbol id="chev" viewBox="0 0 20 22"><path fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M5 3l9 8-9 8"/></symbol>
+</svg>
+
+<div class="top" id="top">
+  <div class="mark"><svg class="gear"><use href="#gear"/></svg><h1>Translation Works<small lang="ja">翻訳工房</small></h1></div>
+  <svg class="mascot"></svg>
+  <div class="bubble" aria-hidden="true"><span id="say"></span></div>
+  <div class="lamps" id="lamps" aria-live="polite"></div></div>
+
+<div class="line" id="line">
+  <div class="belt" aria-hidden="true"><i class="pkg"></i><i class="pkg"></i><i class="pkg"></i><i class="pkg"></i><i class="pkg"></i><i class="pkg"></i><i class="pkg"></i><i class="pkg"></i></div>
+
+  <section class="station">
+    <header><h2>Hopper<small lang="ja">投入</small></h2><span class="num" id="n-inbox"></span></header>
+    <svg class="chev" aria-hidden="true"><use href="#chev"/></svg>
+    <div class="lane">
+      <label class="hopper" id="hopper">
+        <strong>Drop ROMs here</strong><small>or click to pick files</small>
+        <input id="files" type="file" multiple hidden>
+        <div class="upbar" id="upbar" hidden><i></i></div>
+      </label>
+      <div class="hopper-opts">
+        <select id="sys" aria-label="System: filters the list and sets where uploads go"><option value="">All systems</option></select>
+        <input id="folder" type="text" placeholder="Disc folder" aria-label="Disc folder, for cue+bin sets">
+        <button type="button" id="default-agents" title="Edit the default preset: every run without its own preset">Default agents</button>
+      </div>
+      <div id="inbox"></div>
+    </div>
+  </section>
+
+  <section class="station floor">
+    <header><h2>Machine floor<small lang="ja">工場</small></h2><span class="num" id="n-floor"></span></header>
+    <svg class="chev" aria-hidden="true"><use href="#chev"/></svg>
+    <div class="lane droppable floor-lanes" data-drop="resume" id="floor"></div>
+  </section>
+
+  <section class="station holding">
+    <header><h2>Holding<small lang="ja">保留</small></h2><span class="num" id="n-hold"></span></header>
+    <svg class="chev" aria-hidden="true"><use href="#chev"/></svg>
+    <div class="sub" style="margin-top:22px"><span>Queued</span></div>
+    <div class="lane" id="queue" style="margin-top:6px;min-height:60px"></div>
+    <div class="sub"><span>Waiting on you</span></div>
+    <div class="lane" id="waiting" style="margin-top:6px;min-height:60px"></div>
+    <div class="sub"><span>Parked</span></div>
+    <div class="lane droppable" data-drop="pause" id="parked" style="margin-top:6px;min-height:70px"></div>
+  </section>
+
+  <section class="station dock">
+    <header><h2>Shipping dock<small lang="ja">出荷</small></h2><span class="num" id="n-ship"></span></header>
+    <div class="lane" id="dock"></div>
+  </section>
+</div>
+
+<div id="crowd" aria-hidden="true"></div>
+
+<dialog id="agents-dlg" aria-labelledby="agents-title">
+  <h2 id="agents-title"></h2>
+  <form id="agents-form" method="dialog">
+    <label>Preset <select id="agents-preset"></select></label>
+    <div id="agents-fields"></div>
+    <div class="row"><button type="button" id="agents-cancel">Cancel</button><button type="submit" class="btn-go">Save</button></div>
+  </form>
+</dialog>
+<div id="confirm" role="alertdialog" aria-labelledby="confirm-text">
+  <p id="confirm-text"></p>
+  <div style="display:flex;gap:8px"><button class="btn-stop" id="confirm-yes">Stop now</button><button id="confirm-no">Keep running</button></div>
+</div>
+<div id="toast" role="status"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const SNAPSHOT = true;  // `harness publish` flips this: a static copy on GitHub Pages reading api/*.json
+const VIEW = SNAPSHOT || location.pathname === "/view";  // read-only page: no drag, no actions, no hopper
+if (VIEW) document.body.classList.add("view");
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const H = {"X-Harness": "1"};
+const PHASES = 10;  // status.md phases 0..9
+let data = {projects: [], slots: {}}, seen = {}, dragging = null, busy = false;
+
+const ALLOWED = {  // state -> actions it can take
+  running:["pause","stop"], pausing:["stop"], stopping:[], queued:["resume","pause","stop"],
+  paused:["resume"], stopped:["resume"], idle:["resume"], waiting:["resume"], built:["resume"] };
+const LABEL = {resume:"Run", pause:"Pause", stop:"Stop"};
+const BTN = {resume:"btn-go", pause:"btn-pause", stop:"btn-stop"};
+
+function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.remove("show"); void t.offsetWidth;
+  t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 3500); }
+
+async function api(path, opts) {
+  const r = await fetch(SNAPSHOT ? `api/${path.split("?")[0].split("/").pop()}.json?t=${Date.now()}` : path, opts);  // ?t= skips the Pages cache const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.message || j.error || r.statusText); return j;
+}
+
+const phaseOf = p => Math.max(0, Math.min(PHASES - 1, p.phase ?? 0));
+const ago = s => { const m = Math.floor((Date.now() / 1000 - s) / 60); return m < 60 ? `${m}m` : `${Math.floor(m / 60)}h ${m % 60}m`; };
+const arrive = p => seen[p.name] && seen[p.name] !== p.state ? " arrive" : "";
+const acts = p => ["resume","pause","stop"].filter(a => ALLOWED[p.state]?.includes(a))
+  .map(a => `<button class="${BTN[a]}" data-name="${esc(p.name)}" data-act="${a}">${LABEL[a]}</button>`).join("");
+const ticks = p => `<div class="ticks" aria-label="Phase ${p.phase ?? "?"} of ${PHASES - 1}">${
+  Array.from({length: PHASES}, (_, i) => `<button type="button" class="tk${i <= phaseOf(p) ? " on" : ""}${i === picked(p) ? " picked" : ""}"
+    ${pickAttrs(p, i)}><i></i>${mIcon(p, i)}</button>`).join("")}</div>`;
+
+const ROLE = {fallback: " (fallback)", "last-resort": " (last resort)", review: " (review)", phase: ""};
+const BRAND = {deepseek:["🐋","DS"], kimi:["🌙","Kimi"], glm:["🔷","GLM"], qwen:["🐉","Qwen"], gpt:["⚛️","GPT"], mimo:["🦊","MiMo"],
+  opus:["✴️","Opus"], sonnet:["✴️","Sonnet"], haiku:["✴️","Haiku"], claude:["✴️","Claude"], codex:["⚛️","Codex"]};
+// "opencode:opencode-go/deepseek-v4.1-flash" -> "🐋 DS flash", "claude:claude-opus-5-5:high" -> "✴️ Opus high"
+const words = model => model.replace(/^.*\//, "").replace(/^claude-/, "").split("-").map(t => t.replace(/[\d.]+/g, "")).filter(t => t.length > 1);
+const brand = spec => { const [agent, model = ""] = String(spec || "").split(":"); return words(model)[0] || agent; };
+function nick(spec) {
+  const [agent, model = "", effort = ""] = String(spec || "").split(":");
+  const w = words(model);
+  const [icon, name] = BRAND[w[0] || agent] || ["•", w[0] || agent];
+  return [icon, name, ...w.slice(1), effort].filter(Boolean).join(" ");
+}
+// which model ran each phase, from the run's models file: an icon per phase on the progress line,
+// and the picked phase (tap a dot; default the current one) listed in full below it
+const pick = {};  // project name -> picked phase
+const usedIn = (p, i) => (p.models || {})[i] || [];
+const picked = p => pick[p.name] ?? [...Array(phaseOf(p) + 1).keys()].reverse().find(i => usedIn(p, i).length) ?? phaseOf(p);
+const mIcon = (p, i) => { const es = usedIn(p, i);
+  return es.length ? esc(nick(es[0].agent).split(" ")[0]) + (es.length > 1 ? "<sup>+</sup>" : "") : ""; };
+const pickAttrs = (p, i) => { const t = `Phase ${esc(PHASE_LABELS[i])}: ${esc(usedIn(p, i).map(e => nick(e.agent)).join(", ") || "no model yet")}`;
+  return `data-pick="${esc(p.name)}" data-ph="${i}" aria-pressed="${i === picked(p)}" title="${t}" aria-label="${t}"`; };
+function models(p) {
+  if (!Object.keys(p.models || {}).length) return "";  // runs from before models were recorded
+  const i = picked(p), pre = usedIn(p, "?");
+  const fmt = es => es.map(e => `${esc(nick(e.agent))}${esc(ROLE[e.role] ?? "")} ×${e.calls}`).join(", ");
+  return `<div class="models"><b>Phase ${esc(PHASE_LABELS[i])}</b> · ${fmt(usedIn(p, i)) || "no model yet"}${pre.length ? `<br><b>Earlier</b> ${fmt(pre)}` : ""}</div>`;
+}
+document.addEventListener("click", e => { const b = e.target.closest("[data-pick]"); if (b) { pick[b.dataset.pick] = +b.dataset.ph; render(); } });
+
+// platform badge, colors match the public mtl site
+const chip = s => { const t = {psx:"PS1", ps1:"PS1"}[s] ?? (s || "").toUpperCase();
+  return t ? `<span class="chip chip--${esc(t)}">${esc(t)}</span>` : ""; };
+function crate(p, extra = "") {
+  if (VIEW && p.state === "built")  // the view page shows a shipped title's release date, not its phases
+    return `<div class="crate built${arrive(p)}" draggable="false" data-name="${esc(p.name)}">
+    <div class="name" title="${esc(p.name)}">${chip(p.system)}${esc(p.title || p.name)}</div>
+    <div class="meta">${p.released ? `Released ${new Date(p.released * 1000).toLocaleDateString([], {year:"numeric", month:"short", day:"numeric"})}` : "Released"}</div></div>`;
+  return `<div class="crate ${esc(p.state)}${arrive(p)}" draggable="${!VIEW}" data-name="${esc(p.name)}">
+    <div class="name"${VIEW ? "" : ` title="${esc(p.name)}"`}>${chip(p.system)}<span class="t">${esc(p.title || p.name)}</span></div><div class="meta">Phase ${p.phase ?? "?"}${extra}</div>
+    ${ticks(p)}${models(p)}${p.state === "built" ? "" : `<div class="acts">${acts(p)}</div>`}</div>`;
+}
+
+// little workers: glossy white bots, round head with a black visor and white oval eyes, ear pods,
+// twin antennas, egg body with fin arms (no legs, they hover); trim color on the ears and antenna tips
+const TRIM = ["#ff6a00", "#3fd0ff", "#06d6a0", "#ff4fa0", "#ffb400"];
+// antennas end at (7.2,-3.4) and (16.8,-3.4); a brand swaps the tips, or the whole pair (horns, ears)
+// tips drawn 1.6x so a brand's shape reads at bay size
+const TIP = (tip, x, y) => `<g transform="translate(${x} ${y}) scale(1.6) translate(${-x} ${-y})">${tip(x, y)}</g>`;
+const ANT = tip => `<path d="M8 3.8 7.2-2.6M16 3.8l.8-6.4" stroke="#aeb6c1" stroke-width=".8" stroke-linecap="round"/>${TIP(tip, 7.2, -3.4)}${TIP(tip, 16.8, -3.4)}`;
+const BOT = {
+  deepseek: ["#4d6bfe", t => ANT((x, y) => `<path d="M${x} ${y - 1.9}c1.5 1.7 1.2 3.1 0 3.1s-1.5-1.4 0-3.1z" fill="${t}"/>`)],  // whale-water drops
+  kimi: ["#a78bfa", t => ANT((x, y) => `<path d="M${x + .9} ${y - 1.6}a1.7 1.7 0 1 0 0 3.2a1.3 1.3 0 1 1 0-3.2z" fill="${t}"/>`)],  // crescent moons
+  glm: ["#3b82f6", t => ANT((x, y) => `<path d="M${x} ${y - 1.8}l1.4 1.8-1.4 1.8-1.4-1.8z" fill="${t}"/>`)],  // diamonds
+  qwen: ["#ef4444", t => `<path d="M6.2 4.6 3-3.6 9.6 3.1zM17.8 4.6 21-3.6 14.4 3.1z" fill="${t}"/>`],  // dragon horns
+  gpt: ["#10a37f", t => ANT((x, y) => `<circle cx="${x}" cy="${y}" r="1.5" fill="none" stroke="${t}" stroke-width=".7"/><circle cx="${x}" cy="${y}" r=".6" fill="${t}"/>`)],  // orbits
+  mimo: ["#ff6900", t => `<path d="M3.6 8.4 4-2.4 10.6 3.6zM20.4 8.4 20-2.4 13.4 3.6z" fill="${t}"/><path d="M5 5.4 5.3 1.2 8.2 3.8zM19 5.4 18.7 1.2 15.8 3.8z" fill="#fff" opacity=".7"/>`],  // fox ears
+  claude: ["#d97757", t => ANT((x, y) => `<path d="M${x} ${y - 1.8}v3.6M${x - 1.8} ${y}h3.6M${x - 1.3} ${y - 1.3}l2.6 2.6M${x + 1.3} ${y - 1.3}l-2.6 2.6" stroke="${t}" stroke-width=".8" stroke-linecap="round"/>`)],  // starbursts
+};
+BOT.opus = BOT.sonnet = BOT.haiku = BOT.claude; BOT.codex = ["#7c3aed", BOT.gpt[1]];  // GPT's orbits, own purple
+// side = profile facing right (footer walkers; flipped with CSS when walking left);
+// hold = markup held out front: drawn before the near hand so the hand grips it (arm classed so it can animate)
+function bot(i, b, side = false, hold = "") {
+  const t = BOT[b]?.[0] ?? TRIM[i % TRIM.length];
+  const top = BOT[b] ? BOT[b][1](t) : ANT((x, y) => `<circle cx="${x}" cy="${y}" r="1.1" fill="${t}"/>`);
+  const fins = hold ? `${hold}<g class="arm"><ellipse cx="10.4" cy="26.6" rx="1.4" ry="4" fill="url(#shell)" stroke="#c3cad4" stroke-width=".35"/></g>`
+    : side ? `<g class="fin1"><ellipse cx="10.4" cy="25.4" rx="1.3" ry="2.8" transform="rotate(-14 10.4 25.4)" fill="url(#shell)" stroke="#c3cad4" stroke-width=".35"/></g>`
+    : `<g class="fin1"><ellipse cx="3.2" cy="25.6" rx="1.3" ry="2.8" transform="rotate(18 3.2 25.6)" fill="url(#shell)"/></g>
+    <g class="fin2"><ellipse cx="20.8" cy="25.6" rx="1.3" ry="2.8" transform="rotate(-18 20.8 25.6)" fill="url(#shell)"/></g>`;
+  const face = side ? `<rect x="5.6" y="8.4" width="2.8" height="5.4" rx="1.4" fill="${t}"/>
+    <rect x="10.6" y="7" width="11" height="8.6" rx="4.3" fill="url(#visor)"/>
+    <ellipse class="eye" cx="15.2" cy="11.3" rx="1.4" ry="2.4" fill="#fff"/><ellipse class="eye" cx="19.4" cy="11.3" rx="1" ry="2.2" fill="#fff"/>`
+    : `<rect x="3.6" y="7" width="16.8" height="8.6" rx="4.3" fill="url(#visor)"/>
+    <ellipse class="eye" cx="9" cy="11.3" rx="1.55" ry="2.5" fill="#fff"/><ellipse class="eye" cx="15" cy="11.3" rx="1.55" ry="2.5" fill="#fff"/>`;
+  return `${top}
+    <ellipse cx="12" cy="34.8" rx="4" ry=".7" fill="#000" opacity=".25"/>${side ? "" : fins}
+    <path d="M7.6 21.4h8.8q1.9 0 1.4 1.9q-1 5-4.4 8q-1.4 2-2.8 0q-3.4-3-4.4-8q-.5-1.9 1.4-1.9z" fill="url(#shell)"/>${side ? fins : `
+    <rect x="1" y="8.4" width="2.6" height="5.4" rx="1.3" fill="${t}"/><rect x="20.4" y="8.4" width="2.6" height="5.4" rx="1.3" fill="${t}"/>`}
+    <rect x="2.4" y="2.6" width="19.2" height="17.2" rx="6" fill="url(#shell)"/>
+    ${face}`;
+}
+const worker = (i, b, side) => `<svg class="w" viewBox="0 0 24 36" aria-hidden="true">${bot(i, b, side)}</svg>`;
+// handover pair: two bots on their own paths (giverun steady, takerrun slow then fast); the taker turns to face the giver,
+// both hands meet in the middle, then it carries on. Each bot has its own box so the near hand overlaps it; the
+// swap happens at the meeting point.
+const BOX = c => `<g class="${c}"><rect x="14" y="20.5" width="8" height="6.5" rx=".8" fill="#ffb400"/>
+  <rect x="17.2" y="20.5" width="1.6" height="6.5" fill="#fff" opacity=".4"/><rect x="14" y="25.8" width="8" height="1.2" fill="#000" opacity=".25"/></g>`;
+const pairBots = i => `<svg class="w gv" viewBox="0 0 24 36" aria-hidden="true"><g class="giver">${bot(i, null, true, BOX("box-a"))}</g></svg>
+  <svg class="w tk" viewBox="0 0 24 36" aria-hidden="true"><g class="taker">${bot(i + 1, null, true, BOX("box-b"))}</g></svg>`;
+// small bead with a highlight, sitting on the head's surface
+const DROP = (x, y) => `<path d="M${x} ${y}c.75 1.1.75 1.9 0 1.9s-.75-.8 0-1.9z" fill="#bfe9ff" stroke="#5bb8e8" stroke-width=".25"/>`;
+const tiredBot = i => `<svg class="w" viewBox="0 0 24 36" aria-hidden="true">${bot(i, null, true)}
+  <g class="wipe"><ellipse cx="15" cy="5.4" rx="3" ry="1.3" fill="url(#shell)" stroke="#c3cad4" stroke-width=".35"/></g>
+  <g class="sweat">${DROP(12.2, 3.8)}${DROP(15.8, 3.4)}${DROP(19.2, 4)}</g></svg>`;
+const tripBot = i => `<svg class="w" viewBox="0 0 24 36" aria-hidden="true"><g class="tumble">${bot(i, null, true)}
+  <path class="squint" d="M14.4 10.1 16 11.3l-1.6 1.2M20 10.2l-1.2 1.1 1.2 1.1" fill="none" stroke="#fff" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round"/></g></svg>`;
+document.querySelector(".mascot").outerHTML = worker(0).replace('class="w"', 'class="w mascot"');
+// workbench scene per phase 0..9 (viewBox 60x50); elements with class "a" animate while running
+const CART = `<rect class="m" x="16" y="18" width="28" height="30" rx="2"/><rect class="k" x="20" y="22" width="20" height="13" rx="1"/>
+  <path d="M20 42h20" style="stroke:var(--floor-2)" stroke-width="2" stroke-dasharray="2 2"/>`;
+const SCENE = [
+  // 0 setup: wrench ratchets a bolt on the bench
+  `<rect class="m" x="6" y="42" width="48" height="6" rx="1"/><rect class="m" x="27" y="32" width="6" height="10"/>
+   <path class="h" d="M30 21l4.3 2.5v5L30 31l-4.3-2.5v-5z"/>
+   <g class="a wrench"><circle cx="30" cy="26" r="7" fill="none" style="stroke:var(--dim)" stroke-width="3"/><rect class="m" x="4" y="23.5" width="20" height="5" rx="2.5"/></g>`,
+  // 1 recon: magnifier sweeps a cartridge
+  CART + `<g class="a lens"><circle cx="22" cy="20" r="6" class="f" opacity=".25"/><circle cx="22" cy="20" r="7" fill="none" style="stroke:var(--flow)" stroke-width="2.5"/>
+   <path d="M27 25l6 6" style="stroke:var(--hazard)" stroke-width="3.5" stroke-linecap="round"/></g>`,
+  // 2 debug tool: bug crawls into the crosshair on screen
+  `<rect class="k" x="6" y="6" width="48" height="34" rx="3"/><rect class="m" x="26" y="40" width="8" height="5"/><rect class="m" x="18" y="45" width="24" height="3" rx="1"/>
+   <g class="a bug"><path d="M14 21l-3-2M14 25h-3M14 28l-3 2M22 21l3-2M22 25h3M22 28l3 2" style="stroke:var(--stop)" stroke-width="1.2"/>
+   <ellipse class="s" cx="18" cy="25" rx="4" ry="5"/><circle class="s" cx="18" cy="18.5" r="2.2"/></g>
+   <g class="a cross" fill="none" style="stroke:var(--flow)" stroke-width="1.5"><circle cx="42" cy="24" r="5"/><path d="M42 16v4M42 28v4M34 24h4M46 24h4"/></g>`,
+  // 3 identity: scan line passes over an ID card
+  `<rect class="k" x="6" y="10" width="48" height="32" rx="3"/><circle class="m" cx="18" cy="22" r="5"/><path class="m" d="M10 37a8 7 0 0 1 16 0z"/>
+   <rect class="m" x="30" y="18" width="18" height="3" rx="1.5"/><rect class="m" x="30" y="25" width="13" height="3" rx="1.5"/><rect class="m" x="30" y="32" width="16" height="3" rx="1.5"/>
+   <rect class="a scanl f" x="3" y="9" width="54" height="2" rx="1"/>`,
+  // 4 extract: assets float up out of the cartridge
+  `<rect class="a up h" x="18" y="24" width="6" height="6" rx="1"/><rect class="a up f" x="27" y="24" width="6" height="6" rx="1"/><rect class="a up p" x="36" y="24" width="6" height="6" rx="1"/>
+   <rect class="m" x="12" y="30" width="36" height="18" rx="2"/><rect class="k" x="16" y="30" width="28" height="4"/>`,
+  // 5 engine: meshing gears
+  `<rect class="m" x="4" y="44" width="52" height="4" rx="1"/>
+   <use class="a g1" href="#gear" x="6" y="16" width="28" height="28" style="color:var(--dim)"/><use class="a g2" href="#gear" x="32" y="4" width="22" height="22" style="color:var(--hazard)"/>`,
+  // 6 translate: あ bubble answers as A
+  `<g class="a say"><rect class="p" x="2" y="4" width="24" height="20" rx="5"/><path class="p" d="M8 23l-2 7 7-7z"/><text x="14" y="19">あ</text></g>
+   <g class="a say"><rect class="f" x="34" y="20" width="24" height="20" rx="5"/><path class="f" d="M52 39l2 7-7-7z"/><text x="46" y="35">A</text></g>
+   <path class="a nud" d="M24 32h8m-3-3 3 3-3 3" style="stroke:var(--dim)" stroke-width="2" fill="none"/>`,
+  // 7 insert: block drops into the cartridge slot
+  `<rect class="a drop f" x="22" y="4" width="16" height="12" rx="1.5"/>
+   <rect class="m" x="10" y="34" width="40" height="14" rx="2"/><rect class="a cross h" x="20" y="34" width="20" height="3"/>`,
+  // 8 QA: checklist ticks itself off
+  `<rect class="k" x="10" y="4" width="40" height="44" rx="3"/><rect class="m" x="22" y="1" width="16" height="6" rx="2"/>` +
+   [12, 24, 36].map((y, i) => `<rect x="15" y="${y}" width="8" height="8" rx="1.5" fill="none" style="stroke:var(--dim)" stroke-width="1.5"/>
+   <rect class="m" x="27" y="${y + 2.5}" width="${18 - i * 3}" height="3" rx="1.5"/>
+   <path class="a tick t${i}" d="M16 ${y + 4}l2.5 2.5 5-6" style="stroke:var(--ship)" stroke-width="2.2" fill="none" stroke-linecap="round"/>`).join(""),
+  // 9 release: rocket lifts off past streaking stars
+  `<circle class="a star m" cx="8" cy="4" r="1"/><circle class="a star m" cx="50" cy="4" r="1.2"/><circle class="a star m" cx="16" cy="4" r=".8"/>
+   <g class="a rocket"><path class="a flame h" d="M25 31h10l-5 11z"/><path d="M24 22l-5 10h5zM36 22l5 10h-5z" class="s"/>
+   <path d="M30 4c6 5 8 14 6 27H24c-2-13 0-22 6-27z" fill="#f6f8fb"/><circle class="f" cx="30" cy="16" r="3"/></g>`,
+];
+const scene = ph => `<svg class="scene" viewBox="0 0 60 50" aria-hidden="true">${SCENE[ph]}</svg>`;
+const CROWD = 16;
+// every 4th bot carries a package on its head; every 8th (from 4) is a pair passing one hand to hand mid-trip;
+// every 8th (from 2) is a tired one that stops to wipe its sweat; one (#6) sprints, trips and gets back up
+$("crowd").innerHTML = Array.from({length: CROWD}, (_, i) => { const pair = i % 8 === 4, tired = i % 8 === 2, trip = i === 6;
+  return `<div class="walker${i % 2 ? " back" : ""}${pair ? " pair" : ""}${tired ? " tired" : ""}${trip ? " trip" : ""}" style="--d:${(14 + (i * 7) % 11 + (pair || tired ? 6 : 0)) * (trip ? .55 : 1)}s;--dl:-${(i * 3.7) % 20}s;bottom:${(i * 5) % 16 + 4}px">${
+    pair ? pairBots(i) : tired ? tiredBot(i) : trip ? tripBot(i) : worker(i, null, true)}${i % 4 === 1 ? `<i class="box"></i>` : ""}</div>`; }).join("");
+// new trip/rest spot each lap; swapped at the lap boundary while offscreen, so no jump
+const respot = w => w.style.setProperty("--tx", `${28 + Math.random() * 28}vw`);
+$("crowd").querySelectorAll(".trip, .tired").forEach(respot);
+$("crowd").addEventListener("animationiteration", e => /^(trip|tired)run$/.test(e.animationName) && respot(e.target));
+
+// one bot per distinct model brand that worked this phase (max 2); two plain bots before any model is recorded
+const crew = (p, ph, seed) => { const bs = [...new Set(usedIn(p, ph).map(e => brand(e.agent)))].slice(0, 2);
+  return (bs.length ? bs : [null, null]).map((b, k) => worker(seed + k, b)).join(""); };
+function bay(p) {
+  const seed = [...p.name].reduce((a, c) => a + c.charCodeAt(0), 0);
+  const ph = phaseOf(p), f = ph / (PHASES - 1);
+  const verb = {pausing:"Pausing after this phase", stopping:"Stopping"}[p.state];
+  return `<div class="bay ${esc(p.state)}${arrive(p)}" draggable="${!VIEW}" data-name="${esc(p.name)}">
+    <div class="head"><div class="name" title="${esc(p.name)}">${chip(p.system)}${esc(p.title || p.name)}</div>
+      <div class="clock" title="Next: ${esc(p.waiting || p.next || "—")}">${verb ? esc(verb) : p.since ? `Running ${ago(p.since - (p.worked || 0))}` : "Running"}</div></div>
+    <div class="track" role="group" aria-label="Phase ${ph} of ${PHASES - 1}">
+      <div class="rail"><i style="--f:${f}"></i></div>
+      <div class="stops">${Array.from({length: PHASES}, (_, i) =>
+        `<button type="button" class="stop-dot ${i < ph ? "done" : i === ph ? "now" : ""}${i === picked(p) ? " picked" : ""}" ${pickAttrs(p, i)}>${i}<span class="pn">${esc(PHASE_LABELS[i].replace(/^\d+ /, ""))}</span><span class="mi">${mIcon(p, i)}</span></button>`).join("")}</div>
+    </div>
+    <div class="acts">${acts(p)}<span class="crew">${crew(p, ph, seed)}</span>${scene(ph)}</div></div>`;
+}
+
+// mascot's bubble: a random line for the floor's mood, typed out, swapped every 10s
+const CHEER = {
+  empty: () => ["Floor's quiet. Feed the hopper!", "All machines idle… drag a project in!", "Nothing running. Coffee break?",
+    "Empty floor, fresh start.", "The machines miss you."],
+  some: (n, free) => [`${n} machine${n > 1 ? "s" : ""} humming. Keep the ROMs coming!`, `${free} machine${free > 1 ? "s" : ""} still free. Room for more!`,
+    "Gears turning nicely.", "Every line translated is a line closer!", "Steady work, crew!", "Smells like progress in here."],
+  full: n => [`All ${n} machines busy. Full house!`, "Floor's packed. Nice work!", "Running at full capacity!",
+    "No free machines. The queue can wait.", "Everyone's on shift!"],
+  winding: () => ["Winding down…", "Wrapping up the last bits…", "Almost done, hang tight."],
+};
+let cheerKey = "", cheerLines = [], typing;
+function speak() {
+  const b = $("say"), pool = cheerLines.filter(l => l !== b.textContent);
+  const line = pool[Math.floor(Math.random() * pool.length)] ?? cheerLines[0];
+  let i = 0; clearInterval(typing);
+  typing = setInterval(() => { b.textContent = line.slice(0, ++i); if (i >= line.length) clearInterval(typing); }, 35);
+}
+setInterval(speak, 10000);
+
+function render() {
+  const by = s => data.projects.filter(p => s.includes(p.state));
+  const run = by(["running","pausing","stopping"]), q = by(["queued"]), wait = by(["waiting"]),
+        park = by(["paused","stopped","idle"]), ship = by(["built"]);
+  const max = Object.values(data.slots).reduce((a, s) => a + s.max, 0) || 3;
+  const used = Object.values(data.slots).reduce((a, s) => a + s.used, 0);
+  $("lamps").innerHTML = Array.from({length: max}, (_, i) => `<span class="lamp ${i < used ? "on" : ""}"></span>`).join("")
+    + `<span class="lamp-label">${used} of ${max} machines busy</span>`;
+  $("top").classList.toggle("spin", used > 0);
+  document.body.classList.toggle("busy", used > 0);
+  $("crowd").querySelectorAll(".walker").forEach((w, i) => w.hidden = i >= 5 + used * 4);  // more crew per busy machine
+  const mood = used >= max ? "full" : used ? "some" : run.length ? "winding" : "empty";
+  if (mood + used !== cheerKey) { cheerKey = mood + used; cheerLines = CHEER[mood](used, max - used); speak(); }
+  $("line").classList.toggle("flowing", run.some(p => p.state === "running"));
+
+  run.sort((a, b) => (a.since ?? Infinity) - (b.since ?? Infinity));  // oldest on the floor first
+  const free = Math.max(0, max - run.length);
+  $("floor").innerHTML = run.map(bay).join("") + Array.from({length: free}, () =>
+    `<div class="bay free"><div><strong>Machine free</strong>${VIEW ? "" : "Drag a project here to run it"}</div></div>`).join("");
+  $("queue").innerHTML = q.map(p => crate(p, p.resets_at ? ` · back at ${new Date(p.resets_at * 1000).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"})}` : "")).join("")
+    || `<div class="hint">Usage-limited and retrying runs wait here.</div>`;
+  $("waiting").innerHTML = wait.map(p => crate(p)).join("") || `<div class="hint">Nothing needs you.</div>`;
+  $("parked").innerHTML = park.map(p => crate(p)).join("") || `<div class="hint">Drop a running project to pause it after its phase. Stop now from its machine.</div>`;
+  if (VIEW) $("queue").innerHTML = [$("queue"), $("waiting"), $("parked")].map(l => l.innerHTML.includes('class="hint"') ? "" : l.innerHTML).join("")
+    || `<div class="hint">Nothing on hold.</div>`;  // the view page shows one Holding lane
+  $("dock").innerHTML = ship.map(p => crate(p)).join("");
+  $("n-ship").textContent = ship.length || "";
+  $("n-floor").textContent = `${run.length}/${max}`;
+  $("n-hold").textContent = q.length + wait.length + park.length || "";
+  seen = Object.fromEntries(data.projects.map(p => [p.name, p.state]));
+}
+
+const DIR = d => d === "psx" ? "ps1" : d;  // psx/ is an alias of ps1/
+let inboxData = {systems: [], items: []};
+function renderInbox(i = inboxData) {
+  inboxData = i;
+  const sys = $("sys"); if (sys.options.length < 2) sys.insertAdjacentHTML("beforeend", i.systems.map(s => `<option>${esc(s)}</option>`).join(""));
+  const shown = i.items.map((r, n) => ({...r, n})).filter(r => !sys.value || DIR(r.dir) === sys.value);
+  $("n-inbox").textContent = i.items.length ? (shown.length < i.items.length ? `${shown.length}/${i.items.length}` : i.items.length) : "";
+  $("inbox").innerHTML = shown.map(r => `<div class="crate rom" draggable="${r.ready && !VIEW}" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}"
+    title="${r.ready ? "Drag onto the machine floor to start now, or onto another ROM to change its place in line" : "Still uploading or settling (60s)"}">
+    <b class="pos" title="Place in line">${r.n + 1}</b><div class="name">${chip(r.dir)}<span class="t">${esc(r.name)}${r.folder ? "/" : ""}</span></div>
+    ${r.ready && r.preset === "default" ? "" : `<div class="meta">${[!r.ready && "settling", r.preset !== "default" && esc(r.preset)].filter(Boolean).join(" · ")}</div>`}
+    <button class="agents-btn" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}">Agents</button></div>`).join("")
+    || `<div class="hint">${i.items.length ? "No ROMs for this system." : "Inbox empty."}</div>`;
+}
+$("sys").onchange = () => renderInbox();
+
+// agent presets for a hopper ROM: saved beside it, moved into rom/agents.json when it starts
+const PHASE_LABELS = ["0 setup", "1 recon", "2 debug tool", "3 identity", "4 extract", "5 engine", "6 translate",
+  "7 insert", "8 QA", "9 release", "review"];
+let agentsFor = null;
+function fillAgents(preset) {
+  const map = inboxData.maps[preset];  // custom keeps what is picked
+  $("agents-fields").querySelectorAll("select").forEach(i => {
+    if (map) setPick(i, map[i.dataset.k] || "");
+    i.disabled = !!map && !!agentsFor;  // the default preset itself is edited from the Default agents button
+  });
+}
+function setPick(sel, v) {  // a spec outside config.CHOICES still shows
+  if (![...sel.options].some(o => o.value === v)) sel.add(new Option(nick(v), v));
+  sel.value = v;
+}
+const picks = () => ["", ...inboxData.choices].map(s =>
+  `<option value="${esc(s)}" title="${esc(s)}">${s ? esc(nick(s)) : "— config —"}</option>`).join("");
+function openAgents(dir, name) {  // no ROM: edit the default preset
+  const it = dir ? inboxData.items.find(r => r.dir === dir && r.name === name) : {preset: "default", agents: inboxData.maps.default};
+  if (!it) return;
+  agentsFor = dir ? {dir, name} : null;
+  $("agents-title").textContent = dir ? name : "Default preset: every run without its own";
+  $("agents-preset").innerHTML = (dir ? inboxData.presets : ["default"]).map(p => `<option ${p === it.preset ? "selected" : ""}>${esc(p)}</option>`).join("");
+  $("agents-fields").innerHTML = PHASE_LABELS.map((l, i) => {
+    const k = i < 10 ? String(i) : "review";
+    return `<label>${esc(l)}<select data-k="${k}">${picks()}</select></label>`;
+  }).join("");
+  $("agents-fields").querySelectorAll("select").forEach(i => setPick(i, it.agents[i.dataset.k] || ""));
+  fillAgents(it.preset);
+  $("agents-dlg").showModal();
+}
+$("agents-preset").onchange = e => fillAgents(e.target.value);
+$("agents-cancel").onclick = () => $("agents-dlg").close();
+$("agents-form").onsubmit = async e => {
+  e.preventDefault();
+  const phases = Object.fromEntries([...$("agents-fields").querySelectorAll("select")].map(i => [i.dataset.k, i.value]));
+  try {
+    toast((await api(agentsFor ? `/api/inbox/agents?${new URLSearchParams(agentsFor)}` : "/api/agents/default", {method: "POST",
+      headers: {...H, "Content-Type": "application/json"}, body: JSON.stringify({preset: $("agents-preset").value, phases})})).message);
+    $("agents-dlg").close();
+  } catch (err) { toast("Agents: " + err.message); }
+  refresh();
+};
+$("default-agents").onclick = () => openAgents();
+$("inbox").onclick = e => { const b = e.target.closest(".agents-btn"); if (b) openAgents(b.dataset.dir, b.dataset.rom); };
+
+async function startRom(dir, name) {
+  toast(`Starting ${name}: creating the repo…`);
+  try { toast((await api("/api/inbox/start?" + new URLSearchParams({dir, name}), {method:"POST", headers:H})).message); }
+  catch (e) { toast(`${name}: ${e.message}`); }
+  refresh();
+}
+
+async function refresh() {
+  if (busy || dragging) return; busy = true;
+  try {
+    const [p, i] = await Promise.all([api("/api/projects"), api("/api/inbox")]);
+    data = p; render(); renderInbox(i);
+  } catch (e) { toast("Can't reach the harness: " + e.message); }
+  finally { busy = false; }
+}
+
+// actions
+let pendingStop = null;
+async function act(name, action) {
+  const p = data.projects.find(x => x.name === name);
+  if (!p || !ALLOWED[p.state]?.includes(action)) return toast(`${name} can't ${LABEL[action].toLowerCase()} from ${p?.state}`);
+  if (action === "stop" && ["running","pausing"].includes(p.state) && pendingStop !== name) {
+    pendingStop = name; $("confirm-text").textContent = `Stop ${name} now? The current phase's worker is ended mid-work.`;
+    $("confirm").classList.add("show"); $("confirm-yes").focus(); return;
+  }
+  pendingStop = null; $("confirm").classList.remove("show");
+  try { toast(`${name}: ${(await api(`/api/project/${encodeURIComponent(name)}/${action}`, {method:"POST", headers:H})).message}`); }
+  catch (e) { toast(`${name}: ${e.message}`); }
+  refresh();
+}
+$("confirm-yes").onclick = () => act(pendingStop, "stop");
+$("confirm-no").onclick = () => { pendingStop = null; $("confirm").classList.remove("show"); };
+document.addEventListener("click", e => { const b = e.target.closest("button[data-act]"); if (b) act(b.dataset.name, b.dataset.act); });
+
+// drag projects between stations
+// dragging: a project name, or {dir, rom} for an inbox ROM (only the machine floor takes those)
+document.addEventListener("dragstart", e => {
+  const c = e.target.closest?.("[draggable=true][data-name], [draggable=true][data-rom]"); if (!c) return;
+  dragging = c.dataset.rom ? {dir: c.dataset.dir, rom: c.dataset.rom} : c.dataset.name;
+  c.classList.add("dragging"); e.dataTransfer.setData("text/plain", c.dataset.rom || c.dataset.name);
+  const p = data.projects.find(x => x.name === dragging);
+  document.querySelectorAll(".lane.droppable").forEach(l => l.classList.toggle("drag-on",
+    dragging.rom ? l.dataset.drop === "resume" : !!ALLOWED[p?.state]?.includes(l.dataset.drop)));
+});
+document.addEventListener("dragend", () => {
+  document.querySelectorAll(".dragging, .drag-on, .hover, .drop-before, .drop-after")
+    .forEach(x => x.classList.remove("dragging", "drag-on", "hover", "drop-before", "drop-after"));
+  dragging = null;
+});
+document.querySelectorAll(".lane.droppable").forEach(l => {
+  l.addEventListener("dragover", e => { if (dragging && l.classList.contains("drag-on")) { e.preventDefault(); l.classList.add("hover"); } });
+  l.addEventListener("dragleave", e => { if (!l.contains(e.relatedTarget)) l.classList.remove("hover"); });
+  l.addEventListener("drop", e => { e.preventDefault(); const n = dragging; l.classList.remove("hover");
+    if (n?.rom) startRom(n.dir, n.rom); else if (n) act(n, l.dataset.drop); });
+});
+
+// hopper: drop a ROM on another to reorder the line (saved as inbox/priority.txt)
+const inb = $("inbox"), after = (e, t) => e.clientY > t.getBoundingClientRect().top + t.offsetHeight / 2;
+const romTarget = e => dragging?.rom && e.target.closest(".crate.rom");
+inb.addEventListener("dragover", e => { const t = romTarget(e); if (!t) return; e.preventDefault();
+  inb.querySelectorAll(".drop-before, .drop-after").forEach(x => x.classList.remove("drop-before", "drop-after"));
+  t.classList.add(after(e, t) ? "drop-after" : "drop-before"); });
+inb.addEventListener("drop", async e => {
+  const t = romTarget(e); if (!t) return; e.preventDefault();
+  const items = [...inboxData.items], at = (dir, name) => items.findIndex(r => r.dir === dir && r.name === name);
+  const [moved] = items.splice(at(dragging.dir, dragging.rom), 1);
+  if (moved.dir === t.dataset.dir && moved.name === t.dataset.rom) return;
+  items.splice(at(t.dataset.dir, t.dataset.rom) + after(e, t), 0, moved);
+  renderInbox({...inboxData, items});
+  try { await api("/api/inbox/order", {method: "POST", headers: {...H, "Content-Type": "application/json"},
+    body: JSON.stringify({names: items.map(r => r.name)})}); }
+  catch (err) { toast("Reorder: " + err.message); }
+  refresh();
+});
+
+// hopper: drop files from the desktop to upload
+function put(file, q, onprog) {  // XHR for upload progress
+  return new Promise((ok, bad) => {
+    const x = new XMLHttpRequest(); x.open("PUT", "/api/inbox?" + new URLSearchParams(q)); x.setRequestHeader("X-Harness", "1");
+    x.upload.onprogress = e => onprog(e.loaded); x.onerror = () => bad(new Error("network error"));
+    x.onload = () => { let j = {}; try { j = JSON.parse(x.responseText); } catch {}
+      x.status < 300 ? ok(j) : bad(new Error(j.message || x.statusText)); };
+    x.send(file);
+  });
+}
+// system from extension when the filter is "All systems"; .iso/.pbp could be PS1 or PSP, so those need a pick
+const EXT = {sfc:"snes", smc:"snes", gba:"gba", nds:"nds", bin:"ps1", cue:"ps1", img:"ps1", chd:"ps1", cso:"psp"};
+async function upload(files) {
+  if (!files.length) return;
+  const roms = files.map(f => EXT[f.name.split(".").pop().toLowerCase()]).filter(Boolean);
+  const system = $("sys").value || (new Set(roms).size === 1 ? roms[0] : null);
+  if (!system) { $("files").value = ""; return toast("Pick a system first: can't tell it from these file types"); }
+  const bar = $("upbar"), fill = bar.firstElementChild, total = files.reduce((a, f) => a + f.size, 0) || 1; let done = 0;
+  bar.hidden = false; fill.style.width = "0";
+  try {
+    for (const f of files) {
+      await put(f, {system, folder: $("folder").value.trim(), name: f.name},
+                l => fill.style.width = `${(done + l) / total * 100}%`);
+      done += f.size;
+    }
+    toast(`Uploaded ${files.length} file${files.length > 1 ? "s" : ""} to ${system}`); $("folder").value = "";
+  } catch (err) { toast("Upload failed: " + err.message); }
+  finally { bar.hidden = true; $("files").value = ""; refresh(); }
+}
+const hop = $("hopper");
+$("files").onchange = () => upload([...$("files").files]);
+hop.addEventListener("dragover", e => { if (!dragging && e.dataTransfer.types.includes("Files")) { e.preventDefault(); hop.classList.add("hover"); } });
+hop.addEventListener("dragleave", () => hop.classList.remove("hover"));
+hop.addEventListener("drop", e => { e.preventDefault(); hop.classList.remove("hover"); upload([...e.dataTransfer.files]); });
+window.addEventListener("dragover", e => { if (!dragging) e.preventDefault(); });  // a missed drop must not open the ROM in the tab
+window.addEventListener("drop", e => { if (!dragging) e.preventDefault(); });
+
+refresh(); setInterval(refresh, 5000); setInterval(() => !dragging && render(), 30000);  // tick the run clocks
+
+// lightning: a fresh random jagged spark tile every flicker; ends pinned to mid so the tile repeats seamlessly
+// each rail gets its own bolt; root holds one too so freshly rendered rails never show the static fallback
+function bolt(el) {
+  const pts = [[0, 4]];
+  for (let x = 3 + Math.random() * 3; x < 37; x += 3 + Math.random() * 4) pts.push([+x.toFixed(1), +(1 + Math.random() * 6).toFixed(1)]);
+  pts.push([40, 4]);
+  const svg = (w, h, p) => `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${h}'><g fill='none'><polyline points='${p}' stroke='rgb(63,208,255)' stroke-width='${(2 + Math.random() * 1.4).toFixed(1)}' opacity='.7'/><polyline points='${p}' stroke='white' stroke-width='1'/></g></svg>`)}")`;
+  el.style.setProperty("--spark-h", svg(40, 8, pts.map(([x, y]) => `${x},${y}`).join(" ")));
+  el.style.setProperty("--spark-v", svg(8, 40, pts.map(([x, y]) => `${y},${x}`).join(" ")));
+}
+function spark() {
+  [document.documentElement, ...document.querySelectorAll(".bay.running .rail i")].forEach(bolt);
+  setTimeout(spark, 150 + Math.random() * 450);
+}
+spark();
+</script>
+</body>
+</html>
