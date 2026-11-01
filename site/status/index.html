@@ -655,6 +655,7 @@ function speak() {
   const b = $("say"), pool = cheerLines.filter(l => l !== b.textContent);
   const line = pool[Math.floor(Math.random() * pool.length)] ?? cheerLines[0];
   let i = 0; clearInterval(typing);
+  if (!line) return;  // no lines until the first render
   typing = setInterval(() => { b.textContent = line.slice(0, ++i); if (i >= line.length) clearInterval(typing); }, 35);
 }
 setInterval(speak, 10000);
