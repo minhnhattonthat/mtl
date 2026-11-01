@@ -713,8 +713,8 @@
     "8": [
      {
       "agent": "codex",
-      "calls": 26,
-      "last": 1793539653.81419,
+      "calls": 27,
+      "last": 1793541469.932589,
       "role": "phase"
      },
      {
@@ -945,7 +945,7 @@
    "since": null,
    "state": "idle",
    "system": "psx",
-   "title": "xxxxxxxxxxxx",
+   "title": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
    "updated": 1792646986.9799232,
    "worked": 0.0
   },
@@ -1022,7 +1022,7 @@
    "since": null,
    "state": "idle",
    "system": "nds",
-   "title": "xxxxxxxxxxxx",
+   "title": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
    "updated": 1792887817.0411215,
    "worked": 0.0
   },
@@ -1035,7 +1035,7 @@
    "since": null,
    "state": "idle",
    "system": "psx",
-   "title": "xxxxxxxxxxxx",
+   "title": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
    "updated": 1793110743.9282925,
    "worked": 0.0
   },
