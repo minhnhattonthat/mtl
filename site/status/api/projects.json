@@ -1053,8 +1053,8 @@
     "5": [
      {
       "agent": "claude",
-      "calls": 2,
-      "last": 1793644161.812458,
+      "calls": 3,
+      "last": 1793652846.939656,
       "role": "phase"
      }
     ]
@@ -1064,7 +1064,7 @@
    "phase": 5,
    "released": null,
    "resets_at": null,
-   "since": 1793613040.674665,
+   "since": 1793652846.912113,
    "state": "running",
    "system": "psx",
    "title": "Seireiki Rayblade (Japan)",
