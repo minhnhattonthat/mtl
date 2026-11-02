@@ -2,7 +2,7 @@
  "fixes": [],
  "projects": [
   {
-   "done": "- Step 0: repo, hooks, check, `rom.sha1`, PPSSPPHeadless boot route (`tools/routes/boot.txt`).\n  - Phase 1 (`docs/re/README.md` indexes it): no earlier patch exists (only a 2014 screenshot-guide blog). ISO/CPK layout,\n    CRILAYLA decompressor (`tools/crilayla.py`), unpacker (`tools/unpack.py`), GIM sweep (`tools/gimsweep.py`), plain EBOOT dumped\n    (`work/eboot/EBOOT.ELF`; headless ignores ppsspp.ini, the windowed `tools/ppsspp/` build did it).\n  - Text: Shift-JIS; script bytecode framing + 100-name table + jump word-offsets (`text.md`); ~13k dialogue lines (300k chars),\n    121 choices, 74 staff-roll pages, 9 UI tables, ~500 lyric fragments, 3 EBOOT save titles + SFO.\n  - Graphics survey: 744 Japanese GIMs (`docs/re/graphics-survey.tsv`), movies, XMB. Tests: `tests/test_formats.py`.\n  - Tour: `work/states/mainmenu.ppst` (STORY menu after boot.txt), `work/qa/tour1-3`.",
+   "done": "- Step 0: repo, hooks, check, `rom.sha1`, PPSSPPHeadless boot route (`tools/routes/boot.txt`; `menu.txt` = to top MENU).\n  - Phase 1 (`docs/re/README.md` indexes it): no earlier patch exists. ISO/CPK layout, CRILAYLA, unpacker, GIM sweep, plain\n    EBOOT (`work/eboot/EBOOT.ELF`). Text: Shift-JIS script bytecode (`text.md`), UI tables, EBOOT save titles. Graphics survey:\n    744 Japanese GIMs (`docs/re/graphics-survey.tsv`).\n  - Phase 2: `tools/debug/warp.py` + `scenes.tsv` (120 scenes: all 80 scene scripts by file name incl. endings, OPs, both\n    staff rolls; boot notices + title; every top/story/chapter/gallery/option/live screen; rhythm game play, pause, result;\n    ADV auto/menu/save/load/backlog/skip). Cold boot each (cached MENU state per ISO), everything unlocked by RAM pokes,\n    script warp = breakpoint on the script-name setter. Each run asserts the loaded script / entered sequence; proof shots\n    `work/qa/warp/<scene>/`. `--all` -> states in `work/states/warp/`. How it works: `docs/re/debug.md`.",
    "models": {
     "0": [
      {
@@ -19,18 +19,26 @@
       "last": 1793603752.0369737,
       "role": "phase"
      }
+    ],
+    "2": [
+     {
+      "agent": "claude",
+      "calls": 1,
+      "last": 1793603752.0369737,
+      "role": "phase"
+     }
     ]
    },
    "name": "bakumatsu-rock-ultra-soul-en",
    "next": "",
-   "phase": 1,
+   "phase": 2,
    "released": null,
    "resets_at": null,
    "since": 1793602315.5992105,
    "state": "running",
    "system": "psp",
    "title": "Bakumatsu Rock: Ultra Soul",
-   "updated": 1793603727.0711882,
+   "updated": 1793605500.388727,
    "waiting": "",
    "worked": 0.0
   },
