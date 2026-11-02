@@ -68,14 +68,29 @@ function showHero(p) {
 function renderFeatured() {
   const list = featured();
   if (!list.length) return $('hero').remove();
-  $('strip').replaceChildren(...list.map((p) => {
-    const b = el('button', { type: 'button', onclick: () => showHero(p) },
+  // Auto-advance every 6s; paused while hovered/focused and off for reduced motion (WCAG 2.2.2).
+  let i = 0, timer;
+  const go = (n) => { i = n % list.length; showHero(list[i]); };
+  const stop = () => clearInterval(timer);
+  const start = () => {
+    stop();
+    if (list.length > 1 && !matchMedia('(prefers-reduced-motion: reduce)').matches) timer = setInterval(() => go(i + 1), 6000);
+  };
+  for (const id of ['hero', 'strip']) {
+    $(id).addEventListener('mouseenter', stop);
+    $(id).addEventListener('mouseleave', start);
+    $(id).addEventListener('focusin', stop);
+    $(id).addEventListener('focusout', start);
+  }
+  $('strip').replaceChildren(...list.map((p, n) => {
+    const b = el('button', { type: 'button', onclick: () => go(n) },
       el('img', { src: p.cover, alt: '', loading: 'lazy' }),
       el('span', { textContent: p.title }));
     b.dataset.repo = p.repo;
     return b;
   }));
-  showHero(list[0]);
+  go(0);
+  start();
 }
 
 function render() {
@@ -95,7 +110,12 @@ $('platform').addEventListener('click', (e) => {
   render();
 });
 $('q').addEventListener('input', render);
-$('sort').addEventListener('change', render);
+// Remember sort across visits; storage can throw (private mode, blocked), so it's best-effort.
+$('sort').addEventListener('change', () => { try { localStorage.setItem('sort', $('sort').value); } catch {} render(); });
+try {
+  const saved = localStorage.getItem('sort');
+  if ([...$('sort').options].some((o) => o.value === saved)) $('sort').value = saved;
+} catch {}
 
 try {
   const res = await fetch('projects.json', { cache: 'no-cache' }); // Pages sends max-age=600; revalidate so rebuilds show at once
