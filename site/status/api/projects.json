@@ -1022,9 +1022,9 @@
     ],
     "3": [
      {
-      "agent": "claude",
+      "agent": "opencode:opencode-go/deepseek-v4.1-flash",
       "calls": 1,
-      "last": 1793620816.7949393,
+      "last": 1793621042.6047006,
       "role": "phase"
      }
     ]
