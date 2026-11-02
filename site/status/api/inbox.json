@@ -1,13 +1,6 @@
 {
  "items": [
   {
-   "dir": "psp",
-   "folder": false,
-   "name": "xxxxxxxxx xxxx: xxxxx xxxx",
-   "preset": "default",
-   "ready": true
-  },
-  {
    "dir": "psx",
    "folder": true,
    "name": "xxxxxxxx xxxxxxxx",
