@@ -34,7 +34,8 @@ button:hover { filter:brightness(1.15); } button:disabled { opacity:.35; cursor:
 .mark h1 { margin:0; font-size:22px; letter-spacing:.04em; }
 .gear { width:28px; height:28px; color:var(--hazard); }
 .spin .gear { animation: spin 6s linear infinite; }
-.view #inbox .t, .view .holding .t { color:transparent; background:#000; border-radius:2px; user-select:none; }  /* view page hides unreleased game names */
+.view #inbox .t span, .view .holding .t span { color:transparent; background:#000; border-radius:2px; user-select:none; padding:0 2px; }  /* view page hides unreleased game names */
+.view #inbox .t, .view .holding .t { line-height:1.6; }  /* gap between wrapped redacted lines */
 .lamps { display:flex; gap:8px; align-items:center; margin-left:auto; }
 .lamp { width:14px; height:14px; border-radius:50%; background:var(--rivet); box-shadow: inset 0 -2px 0 rgba(0,0,0,.25); }
 .lamp.on { background:var(--ship); box-shadow: 0 0 10px var(--ship); animation: blink 2.4s ease-in-out infinite; }
@@ -75,7 +76,7 @@ button:hover { filter:brightness(1.15); } button:disabled { opacity:.35; cursor:
 .crate { background:var(--plate); border-radius:5px; padding:8px 10px; border-left:4px solid var(--rivet); position:relative;
   box-shadow: 0 2px 0 rgba(0,0,0,.18); cursor:grab; }
 .crate[draggable=false], .bay[draggable=false] { cursor:default; }
-.view .holding .sub, .view #waiting, .view #parked, .view #hopper, .view .hopper-opts, .view .agents-btn, .view button[data-act], .view #confirm { display:none !important; }
+.view .holding .sub, .view #waiting, .view #parked, .view #hopper, .view .hopper-opts, .view .agents-btn, .view .rename-btn, .view button[data-act], .view #confirm { display:none !important; }
 .view #queue { margin-top:22px !important; flex:1; overflow:auto; }  /* stands in for the hidden bottom lane */
 .crate.dragging { opacity:.4; }
 .crate.drop-before { box-shadow: 0 -3px 0 var(--hazard); } .crate.drop-after { box-shadow: 0 3px 0 var(--hazard); }
@@ -164,7 +165,7 @@ button:hover { filter:brightness(1.15); } button:disabled { opacity:.35; cursor:
 
 .btn-stop { background:var(--stop); color:#fff; } .btn-go { background:var(--ship); color:#0d2614; } .btn-pause { background:var(--flow); color:#04252a; }
 
-.agents-btn { margin-top:6px; font-size:12px; padding:2px 8px; }
+.agents-btn, .rename-btn { margin-top:6px; font-size:12px; padding:2px 8px; }
 #agents-dlg { background:var(--plate); color:var(--ink); border:2px solid var(--hazard); border-radius:8px; padding:16px;
   max-width:min(440px, calc(100vw - 32px)); }
 #agents-dlg::backdrop { background:rgba(0,0,0,.5); }
@@ -473,6 +474,7 @@ const SNAPSHOT = true;  // `harness publish` flips this: a static copy on GitHub
 const VIEW = SNAPSHOT || location.pathname === "/view";  // read-only page: no drag, no actions, no hopper
 if (VIEW) document.body.classList.add("view");
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const hide = s => esc(s).replace(/[^ :-]+/g, "<span>$&</span>");  // the view page blacks out the spans, leaving space, dash and colon readable
 const H = {"X-Harness": "1"};
 const PHASES = 10;  // status.md phases 0..9
 let data = {projects: [], slots: {}}, seen = {}, dragging = null, busy = false;
@@ -539,8 +541,8 @@ function crate(p, extra = "") {
     <div class="name" title="${esc(p.name)}">${chip(p.system)}${esc(p.title || p.name)}</div>
     <div class="meta">${p.released ? `Released ${new Date(p.released * 1000).toLocaleDateString([], {year:"numeric", month:"short", day:"numeric"})}` : "Released"}</div></div>`;
   return `<div class="crate ${esc(p.state)}${arrive(p)}" draggable="${!VIEW}" data-name="${esc(p.name)}">
-    <div class="name"${VIEW ? "" : ` title="${esc(p.name)}"`}>${chip(p.system)}<span class="t">${esc(p.title || p.name)}</span></div><div class="meta">Phase ${p.phase ?? "?"}${extra}</div>
-    ${ticks(p)}${models(p)}${p.state === "built" ? "" : `<div class="acts">${acts(p)}</div>`}</div>`;
+    <div class="name"${VIEW ? "" : ` title="${esc(p.name)}"`}>${chip(p.system)}<span class="t">${hide(p.title || p.name)}</span></div><div class="meta">Phase ${p.phase ?? "?"}${extra}</div>
+    ${ticks(p)}${models(p)}${p.state === "built" ? "" : `<div class="acts">${acts(p)}<button class="rename-btn" data-project="${esc(p.name)}" data-title="${esc(p.title || p.name)}">Rename</button></div>`}</div>`;
 }
 
 // little workers: glossy white bots, round head with a black visor and white oval eyes, ear pods,
@@ -730,11 +732,14 @@ function renderInbox(i = inboxData) {
   const sys = $("sys"); if (sys.options.length < 2) sys.insertAdjacentHTML("beforeend", i.systems.map(s => `<option>${esc(s)}</option>`).join(""));
   const shown = i.items.map((r, n) => ({...r, n})).filter(r => !sys.value || DIR(r.dir) === sys.value);
   $("n-inbox").textContent = i.items.length ? (shown.length < i.items.length ? `${shown.length}/${i.items.length}` : i.items.length) : "";
+  // display only: data-rom keeps the real name
+  const romName = r => r.title || (r.folder ? r.name : r.name.trim().replace(/\.[^. ]{1,4}$/, "")).replace(/\s*\(Japan\)/gi, "").trim();
   $("inbox").innerHTML = shown.map(r => `<div class="crate rom" draggable="${r.ready && !VIEW}" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}"
     title="${r.ready ? "Drag onto the machine floor to start now, or onto another ROM to change its place in line" : "Still uploading or settling (60s)"}">
-    <b class="pos" title="Place in line">${r.n + 1}</b><div class="name">${chip(r.dir)}<span class="t">${esc(r.name)}${r.folder ? "/" : ""}</span></div>
+    <b class="pos" title="Place in line">${r.n + 1}</b><div class="name">${chip(r.dir)}<span class="t">${hide(romName(r))}</span></div>
     ${r.ready && r.preset === "default" ? "" : `<div class="meta">${[!r.ready && "settling", r.preset !== "default" && esc(r.preset)].filter(Boolean).join(" · ")}</div>`}
-    <button class="agents-btn" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}">Agents</button></div>`).join("")
+    <button class="agents-btn" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}">Agents</button>
+    <button class="rename-btn" data-dir="${esc(r.dir)}" data-name="${esc(r.name)}" data-title="${esc(romName(r))}">Rename</button></div>`).join("")
     || `<div class="hint">${i.items.length ? "No ROMs for this system." : "Inbox empty."}</div>`;
 }
 $("sys").onchange = () => renderInbox();
@@ -784,6 +789,17 @@ $("agents-form").onsubmit = async e => {
 };
 $("default-agents").onclick = () => openAgents();
 $("inbox").onclick = e => { const b = e.target.closest(".agents-btn"); if (b) openAgents(b.dataset.dir, b.dataset.rom); };
+
+// rename: display title only (Hopper ROM sidecar or the project's rom/title.txt); blank resets it
+document.addEventListener("click", async e => {
+  const b = e.target.closest(".rename-btn"); if (!b) return;
+  const t = prompt("Display name (blank resets to the default):", b.dataset.title); if (t === null) return;
+  const q = b.dataset.project ? {project: b.dataset.project} : {dir: b.dataset.dir, name: b.dataset.name};
+  try { toast((await api(`/api/title?${new URLSearchParams(q)}`, {method: "POST", headers: {...H, "Content-Type": "application/json"},
+    body: JSON.stringify({title: t})})).message); }
+  catch (err) { toast("Rename: " + err.message); }
+  refresh();
+});
 
 async function startRom(dir, name) {
   toast(`Starting ${name}: creating the repo…`);

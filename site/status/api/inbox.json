@@ -3,28 +3,28 @@
   {
    "dir": "psp",
    "folder": false,
-   "name": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "name": "xxxxxxxxx xxxx: xxxxx xxxx",
    "preset": "default",
    "ready": true
   },
   {
    "dir": "psx",
    "folder": true,
-   "name": "xxxxxxxxxxxxxxxxxxxxxxxxx",
+   "name": "xxxxxxxx xxxxxxxx",
    "preset": "default",
    "ready": true
   },
   {
    "dir": "snes",
    "folder": false,
-   "name": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "name": "xxxxx xxxxxxx xxxxxxxxx xxx",
    "preset": "default",
    "ready": true
   },
   {
    "dir": "psx",
    "folder": true,
-   "name": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "name": "xxxxxxxx xxxx: xxxxxxxx xx xxxxxxx",
    "preset": "default",
    "ready": true
   }
