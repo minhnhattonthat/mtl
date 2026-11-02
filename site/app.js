@@ -130,7 +130,7 @@ try {
 try {
   const res = await fetch('supporters.json');
   if (!res.ok) throw new Error(res.status);
-  const list = await res.json();
+  const list = (await res.json()).reverse(); // json is newest first; show oldest first
   if (list.length) {
     $('supporters').querySelector('ul').replaceChildren(...list.map((s) => el('li', {},
       s.avatar && el('img', { src: s.avatar, alt: '', loading: 'lazy', width: 28, height: 28 }),
