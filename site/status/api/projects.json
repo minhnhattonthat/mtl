@@ -69,8 +69,8 @@
     "8": [
      {
       "agent": "claude",
-      "calls": 2,
-      "last": 1793639645.4248426,
+      "calls": 3,
+      "last": 1793652832.4718418,
       "role": "phase"
      }
     ]
@@ -80,7 +80,7 @@
    "phase": 8,
    "released": null,
    "resets_at": null,
-   "since": 1793602315.5992105,
+   "since": 1793652832.4423244,
    "state": "running",
    "system": "psp",
    "title": "Bakumatsu Rock: Ultra Soul",
