@@ -1124,7 +1124,7 @@
     ]
    },
    "name": "seireiki-rayblade-en",
-   "next": "1. Phase 7: build is green; width/overflow lint + control-code match over the merged text, romdiff write\n     ranges; menu rows over width (batch-check warnings) need engine room (D4); the 9 `special` bank strings by\n     hand; slot 239 dev scenario lists (literal translation or leave).\n  2. Phase 8: `warp.py --all --title` on the English build + visual-QA verdicts.",
+   "next": "1. Phase 7 (rest): empty tools/lint_known.txt. (a) weapon list: warp to a battle with Attack available (no\n     scene yet: add one to tools/debug/scenes.tsv), dump cells (tools/debug/cells.py) + shot to get the name\n     column's room, then reword names still over it (docs/menu-fit.tsv, flag ABBR). (b) trust list window\n     (battle_trust, frame ~60 px at x 144): find the frame width (engine, D4) or shorter labels + cost at a\n     pen column. (c) specials: status panel `{ctl:9080}Spirit` fits 24 px; redraw cells 0x111-0x113 (small\n     \u30d7\u30e9\u30ca label) as a small \"PRANA\" and re-pen around the 4-px space; `<200>` = blank 12-px kanji cell used as a\n     spacer (F1 00); keep the {fb} runs byte for byte (lint forbids `[XX]` in English: special form needs an\n     exemption). (d) slot 239 dev scenario lists (literal translation or leave).\n     Then rebuild, smoke, re-warp the menu scenes and compare (work/qa/p7vwf2 = last good set).\n  2. Phase 8: `warp.py --all --title` on the English build + visual-QA verdicts.",
    "phase": 7,
    "released": null,
    "resets_at": null,
@@ -1132,7 +1132,7 @@
    "state": "running",
    "system": "psx",
    "title": "Seireiki Rayblade",
-   "updated": 1793660610.7166536,
+   "updated": 1793661878.0233426,
    "waiting": "nothing blocking. Non-blocking: title logo \u8056\u970a\u6a5f\u30e9\u30a4\u30d6\u30ec\u30fc\u30c9 has no official English logo,\n  kept Japanese per D5 unless the owner wants an English logo.",
    "worked": 39800.0
   },
