@@ -2,7 +2,7 @@
  "fixes": [],
  "projects": [
   {
-   "done": "- Template files, `tools/skill.py`, `tools/iso9660.py`, `tools/check.py` + `tests/test_rom.py`, pre-commit hook in `tools/hooks/` (`core.hooksPath`), verified: a failing test blocks the commit.\n  - `rom.sha1` pinned (SHA-1 4fa0409f0a547cc4250a34c8ef5ac5b62bdd1cb2, 1,699,610,624 bytes).\n  - PPSSPPHeadless QA fork (machine-wide) boots the original ISO: `tools/routes/boot.txt` reaches the main menu (input works). PPSSPP v1.20.4 in `tools/ppsspp/` for the EBOOT dump / human play. Guard hook (plugin) blocks `sed -i` and heredocs.\n  - ISO layout: `PSP_GAME/USRDIR/INST.CPK` (507 MB), `NOINST.CPK` (558 MB), `INSDIR/INST.DNS` (515 MB, install data), `content/THEME/*.PTF` (6 PSP themes), `SYSDIR/EBOOT.BIN` (encrypted), `SYSDIR/UPDATE/` (firmware update, leave alone).\n  - Boot shows menus drawn as graphics (MENU / OPTION / LIVE / STORY / GALLERY / CHAPTER, help line in Japanese at the bottom).",
+   "done": "- Step 0: repo, hooks, check, `rom.sha1`, PPSSPPHeadless boot route (`tools/routes/boot.txt`).\n  - Phase 1 (`docs/re/README.md` indexes it): no earlier patch exists (only a 2014 screenshot-guide blog). ISO/CPK layout,\n    CRILAYLA decompressor (`tools/crilayla.py`), unpacker (`tools/unpack.py`), GIM sweep (`tools/gimsweep.py`), plain EBOOT dumped\n    (`work/eboot/EBOOT.ELF`; headless ignores ppsspp.ini, the windowed `tools/ppsspp/` build did it).\n  - Text: Shift-JIS; script bytecode framing + 100-name table + jump word-offsets (`text.md`); ~13k dialogue lines (300k chars),\n    121 choices, 74 staff-roll pages, 9 UI tables, ~500 lyric fragments, 3 EBOOT save titles + SFO.\n  - Graphics survey: 744 Japanese GIMs (`docs/re/graphics-survey.tsv`), movies, XMB. Tests: `tests/test_formats.py`.\n  - Tour: `work/states/mainmenu.ppst` (STORY menu after boot.txt), `work/qa/tour1-3`.",
    "models": {
     "0": [
      {
@@ -15,23 +15,23 @@
     "1": [
      {
       "agent": "claude",
-      "calls": 1,
-      "last": 1793602315.6293967,
+      "calls": 2,
+      "last": 1793603752.0369737,
       "role": "phase"
      }
     ]
    },
    "name": "bakumatsu-rock-ultra-soul-en",
    "next": "",
-   "phase": 0,
+   "phase": 1,
    "released": null,
    "resets_at": null,
    "since": 1793602315.5992105,
    "state": "running",
    "system": "psp",
    "title": "Bakumatsu Rock: Ultra Soul",
-   "updated": 1793602542.2683825,
-   "waiting": "nothing.",
+   "updated": 1793603727.0711882,
+   "waiting": "",
    "worked": 0.0
   },
   {
