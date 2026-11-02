@@ -194,6 +194,7 @@
    "worked": 0.0
   },
   {
+   "done": "",
    "models": {
     "1": [
      {
@@ -272,15 +273,17 @@
      }
     ]
    },
-   "name": "held-12",
+   "name": "emblem-of-gundam-en",
+   "next": "",
    "phase": null,
-   "released": null,
-   "resets_at": 1793552797,
+   "released": 1793575586.8602436,
+   "resets_at": null,
    "since": null,
-   "state": "queued",
+   "state": "built",
    "system": "nds",
-   "title": "xxxxxxxxxxxxxxxx",
-   "updated": 1793573345.503691,
+   "title": "Emblem of Gundam",
+   "updated": 1793576579.8616817,
+   "waiting": "",
    "worked": 0.0
   },
   {
@@ -620,35 +623,35 @@
     ],
     "9": [
      {
-      "agent": "opencode:opencode-go/gpt-6-luna",
+      "agent": "opencode:opencode/deepseek-v4.1-flash-free",
       "calls": 3,
-      "last": 1793573586.0647116,
+      "last": 1793578186.5195441,
+      "role": "last-resort"
+     },
+     {
+      "agent": "opencode:opencode-go/gpt-6-luna",
+      "calls": 8,
+      "last": 1793578140.4516718,
       "role": "fallback"
      },
      {
       "agent": "claude",
-      "calls": 5,
-      "last": 1793573543.2275643,
+      "calls": 12,
+      "last": 1793578076.3846428,
       "role": "phase"
-     },
-     {
-      "agent": "opencode:opencode/deepseek-v4.1-flash-free",
-      "calls": 1,
-      "last": 1793569954.0954497,
-      "role": "last-resort"
      }
     ]
    },
    "name": "kuro-no-ken-blade-of-the-darkness-en",
-   "next": "",
+   "next": "nothing required; publishing is the user's call. Optional: a `battle_talk` variant for a fight with Kaies\n  (op 4) or the op-0 party lines.\n  Gates: `build.py` = `insert: 6811 strings, 5905 message ops relocated, 0 problems`; EXE romdiff gate\n  (`data/exe_allowed.txt` = hooks/layout only; strings + pointers via the write journal, 139 writes; EXE sha1\n  pinned in build.py); `tools/gate.py` on every archive (see its docstring); `batches.py lint` 0 errors;\n  `check.py` = 35 tests (incl. `tests/test_english_build.py`, a fresh English build in a temp tree) + lint.",
    "phase": 9,
-   "released": 1793574138.215544,
+   "released": 1793577822.2238858,
    "resets_at": null,
    "since": 1793529305.3993227,
    "state": "running",
    "system": "psx",
    "title": "Kuro no Ken: Blade of the Darkness",
-   "updated": 1793573446.2796316,
+   "updated": 1793578020.5518277,
    "waiting": "- (non-blocking) Running the downloaded jPSXdec jar (`work/dl/jp/`) was refused by the auto-mode permission\n    check; needed later to decode/re-encode LOGO.STR if the prologue is FMV. A permission rule for\n    `java -jar tools/jpsxdec/jpsxdec.jar` would unblock it.\n  - (non-blocking) Title logo \u9ed2\u306e\u5263: default keep (D5); the disc's volume id is BLADE_OF_THE_DARKNESS\n    (official English subtitle), so an English subtitle line under the logo is the fallback plan.",
    "worked": 0.0
   },

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Translation Works</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-1 -5.6 26 26'%3E%3Cdefs%3E%3CradialGradient id='shell' cx='.38' cy='.3' r='.8'%3E%3Cstop offset='0' stop-color='#fff'/%3E%3Cstop offset='.65' stop-color='#eef1f5'/%3E%3Cstop offset='1' stop-color='#c3cad4'/%3E%3C/radialGradient%3E%3CradialGradient id='visor' cx='.4' cy='.25' r='.9'%3E%3Cstop offset='0' stop-color='#2a2d33'/%3E%3Cstop offset='1' stop-color='#050607'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cpath d='M8 3.8 7.2-2.6M16 3.8l.8-6.4' stroke='#aeb6c1' stroke-width='.8' stroke-linecap='round'/%3E%3Ccircle cx='7.2' cy='-3.4' r='1.76' fill='#ff6a00'/%3E%3Ccircle cx='16.8' cy='-3.4' r='1.76' fill='#ff6a00'/%3E%3Crect x='1' y='8.4' width='2.6' height='5.4' rx='1.3' fill='#ff6a00'/%3E%3Crect x='20.4' y='8.4' width='2.6' height='5.4' rx='1.3' fill='#ff6a00'/%3E%3Crect x='2.4' y='2.6' width='19.2' height='17.2' rx='6' fill='url%28#shell%29'/%3E%3Crect x='3.6' y='7' width='16.8' height='8.6' rx='4.3' fill='url%28#visor%29'/%3E%3Cellipse cx='9' cy='11.3' rx='1.55' ry='2.5' fill='#fff'/%3E%3Cellipse cx='15' cy='11.3' rx='1.55' ry='2.5' fill='#fff'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-1 -5.6 26 26'%3E%3Cdefs%3E%3CradialGradient id='shell' cx='.38' cy='.3' r='.8'%3E%3Cstop offset='0' stop-color='%23fff'/%3E%3Cstop offset='.65' stop-color='%23eef1f5'/%3E%3Cstop offset='1' stop-color='%23c3cad4'/%3E%3C/radialGradient%3E%3CradialGradient id='visor' cx='.4' cy='.25' r='.9'%3E%3Cstop offset='0' stop-color='%232a2d33'/%3E%3Cstop offset='1' stop-color='%23050607'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cpath d='M8 3.8 7.2-2.6M16 3.8l.8-6.4' stroke='%23aeb6c1' stroke-width='.8' stroke-linecap='round'/%3E%3Ccircle cx='7.2' cy='-3.4' r='1.76' fill='%23ff6a00'/%3E%3Ccircle cx='16.8' cy='-3.4' r='1.76' fill='%23ff6a00'/%3E%3Crect x='1' y='8.4' width='2.6' height='5.4' rx='1.3' fill='%23ff6a00'/%3E%3Crect x='20.4' y='8.4' width='2.6' height='5.4' rx='1.3' fill='%23ff6a00'/%3E%3Crect x='2.4' y='2.6' width='19.2' height='17.2' rx='6' fill='url%28%23shell%29'/%3E%3Crect x='3.6' y='7' width='16.8' height='8.6' rx='4.3' fill='url%28%23visor%29'/%3E%3Cellipse cx='9' cy='11.3' rx='1.55' ry='2.5' fill='%23fff'/%3E%3Cellipse cx='15' cy='11.3' rx='1.55' ry='2.5' fill='%23fff'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -28,6 +28,9 @@ button:hover { filter:brightness(1.15); } button:disabled { opacity:.35; cursor:
 .top { display:flex; align-items:center; gap:24px; flex-wrap:wrap; padding:14px 20px; border-bottom:3px solid var(--hazard);
   background:var(--floor-2); }
 .mark { display:flex; align-items:center; gap:10px; }
+.back { color:var(--dim); text-decoration:none; font-size:32px; line-height:1; padding:0 4px; margin-right:-12px; transition:color .15s, transform .15s; }
+.back:hover, .back:focus-visible { color:var(--shu); transform:translateX(-3px); }
+.sr { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
 .mark h1 { margin:0; font-size:22px; letter-spacing:.04em; }
 .gear { width:28px; height:28px; color:var(--hazard); }
 .spin .gear { animation: spin 6s linear infinite; }
@@ -35,7 +38,7 @@ button:hover { filter:brightness(1.15); } button:disabled { opacity:.35; cursor:
 .lamps { display:flex; gap:8px; align-items:center; margin-left:auto; }
 .lamp { width:14px; height:14px; border-radius:50%; background:var(--rivet); box-shadow: inset 0 -2px 0 rgba(0,0,0,.25); }
 .lamp.on { background:var(--ship); box-shadow: 0 0 10px var(--ship); animation: blink 2.4s ease-in-out infinite; }
-.lamp-label { color:var(--dim); font-size:13px; margin-left:4px; }
+.lamp-label { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }  /* lamps show it; screen readers still need text */
 
 /* production line */
 .line { display:grid; grid-template-columns: 230px minmax(380px, 1fr) 230px 220px; gap:0; padding:18px 12px 24px;
@@ -363,6 +366,28 @@ body { padding-bottom:84px; background-color:var(--floor);
   .lane { margin-top:6px; }
 }
 @media (max-width: 640px) { .line { grid-template-columns: 1fr; } .top { padding:12px 16px; } }
+/* ko-fi: "sashiire" (a treat for the workers) plate with a hanko seal; hovering stamps it and makes the gear race */
+.fuel { display:flex; align-items:center; gap:10px; padding:4px 12px 4px 4px; text-decoration:none; color:var(--ink); background:var(--plate);
+  border-radius:22px; border:2px solid var(--shu); box-shadow:0 3px 0 #a84600; transition:filter .15s, transform .1s, box-shadow .1s; }
+.fuel { position:relative; }
+.fuel::after { content:attr(data-tip); position:absolute; top:calc(100% + 12px); left:50%; z-index:20; width:max-content; white-space:pre; text-align:center;
+  padding:6px 12px; background:var(--plate); border:1px solid var(--rivet); color:var(--ink); border-top:3px solid var(--shu); border-radius:4px; box-shadow:0 4px 12px rgba(0,0,0,.4);
+  font:500 12px "Zen Kaku Gothic New", system-ui, sans-serif; opacity:0; transform:translate(-50%, -4px); transition:opacity .15s, transform .15s; pointer-events:none; }
+.fuel::before { content:""; position:absolute; top:calc(100% + 6px); left:calc(50% - 6px); border:6px solid transparent; border-top:0; border-bottom-color:var(--shu);
+  opacity:0; transition:opacity .15s; }
+.fuel:hover::after, .fuel:focus-visible::after { opacity:1; transform:translate(-50%, 0); }
+.fuel:hover::before, .fuel:focus-visible::before { opacity:1; }
+.fuel:active { transform:translateY(3px); box-shadow:0 0 0 #a84600; }
+.fuel .seal { width:30px; height:30px; display:grid; place-items:center; border:2px solid var(--shu); border-radius:50%; color:var(--shu);
+  font:700 15px "Zen Maru Gothic", system-ui, sans-serif; transform:rotate(-8deg); transition:transform .2s, background .2s, color .2s; }
+.fuel .seal svg { width:18px; height:18px; }
+.fuel:hover .seal path + path, .fuel:focus-visible .seal path + path { fill:var(--shu); }
+.fuel span { display:flex; flex-direction:column; line-height:1.15; font:700 13px "Zen Maru Gothic", system-ui, sans-serif; }
+.fuel small { font-size:11px; color:var(--shu); letter-spacing:.1em; }
+.fuel:hover, .fuel:focus-visible { background:#3d3d3d; }  /* not filter: it would trap the tooltip under the top stripe */
+.fuel:hover .seal, .fuel:focus-visible .seal { background:var(--shu); color:var(--floor-2); transform:rotate(0) scale(.88); }
+.top:has(.fuel:hover) .gear { animation:spin .6s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .fuel .seal { transition:none; } .top:has(.fuel:hover) .gear { animation:none; } }
 </style>
 </head>
 <body>
@@ -374,10 +399,13 @@ body { padding-bottom:84px; background-color:var(--floor);
 </svg>
 
 <div class="top" id="top">
+  <a class="back" href="https://minhnhattonthat.github.io/mtl/"><span aria-hidden="true">‹</span><span class="sr">Back to library</span></a>
   <div class="mark"><svg class="gear"><use href="#gear"/></svg><h1>Translation Works<small lang="ja">翻訳工房</small></h1></div>
   <svg class="mascot"></svg>
   <div class="bubble" aria-hidden="true"><span id="say"></span></div>
-  <div class="lamps" id="lamps" aria-live="polite"></div></div>
+  <div class="lamps" id="lamps" aria-live="polite"></div>
+  <a class="fuel" href="https://ko-fi.com/minhnhattonthat" target="_blank" rel="noopener" data-tip="Bots run on coffee ☕&#10;Buy them one on Ko-fi">
+    <i class="seal" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h15v7a6 6 0 0 1-6 6H9a6 6 0 0 1-6-6zm15 2v6a3 3 0 0 0 0-6z" fill-rule="evenodd"/><path fill="var(--plate)" d="M10.5 9.6c-1-1.2-3-.5-2.7 1.1.3 1.3 2.7 2.9 2.7 2.9s2.4-1.6 2.7-2.9c.3-1.6-1.7-2.3-2.7-1.1z"/></svg></i><span>Fuel the bots · Ko-fi<small lang="ja">差し入れ</small></span></a></div>
 
 <div class="line" id="line">
   <div class="belt" aria-hidden="true"><i class="pkg"></i><i class="pkg"></i><i class="pkg"></i><i class="pkg"></i><i class="pkg"></i><i class="pkg"></i><i class="pkg"></i><i class="pkg"></i></div>
@@ -668,7 +696,8 @@ function render() {
         park = by(["paused","stopped","idle"]), ship = by(["built"]);
   const max = Object.values(data.slots).reduce((a, s) => a + s.max, 0) || 3;
   const used = Object.values(data.slots).reduce((a, s) => a + s.used, 0);
-  $("lamps").innerHTML = Array.from({length: max}, (_, i) => `<span class="lamp ${i < used ? "on" : ""}"></span>`).join("")
+  $("lamps").title = `${used} of ${max} machines busy`;
+  $("lamps").innerHTML =Array.from({length: max}, (_, i) => `<span class="lamp ${i < used ? "on" : ""}"></span>`).join("")
     + `<span class="lamp-label">${used} of ${max} machines busy</span>`;
   $("top").classList.toggle("spin", used > 0);
   document.body.classList.toggle("busy", used > 0);
