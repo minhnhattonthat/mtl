@@ -73,20 +73,28 @@
       "last": 1793652832.4718418,
       "role": "phase"
      }
+    ],
+    "9": [
+     {
+      "agent": "claude",
+      "calls": 1,
+      "last": 1793652832.4718418,
+      "role": "phase"
+     }
     ]
    },
    "name": "bakumatsu-rock-ultra-soul-en",
    "next": "",
-   "phase": 8,
+   "phase": 9,
    "released": null,
    "resets_at": null,
    "since": 1793652832.4423244,
    "state": "running",
    "system": "psp",
    "title": "Bakumatsu Rock: Ultra Soul",
-   "updated": 1793655977.9756114,
+   "updated": 1793657365.2165258,
    "waiting": "",
-   "worked": 0.0
+   "worked": 50400.0
   },
   {
    "done": "- Step 0 repo setup (rom pin, MesenCE in `tools/mesen/`, guard hook, pre-commit -> `tools/check.py`).\n  - Phase 1: no prior patch exists. All text is pre-built BG3 tilemaps inside 179 compressed resources\n    (`docs/re/text.md`, `compression.md`); decoder `tools/btlz.py` + tests; text blocks 47/90/91/92/A8/B0 (font 46),\n    story 9D-A5 (fonts 93 + 94..9C), credits AF (font AE), ~10.4k JP chars. Graphics-text survey in\n    `docs/re/graphics.md` (title logo, watermark, name plates/side panel res 1C, status names res AA, ...).\n    Official character spellings from in-game English tags are in `glossary.md`.\n  - Tools: `tools/render_msgs.py` (render a text block with its font), `tools/res_callers.py`, Lua probes\n    `tools/lua/{cpuwatch,hirom_reads,reslog}.lua`.\n  - Phase 2: `tools/debug/warp.lua` + `scenes.txt` (57 scenes: intro/title/mode select/option/VS+COM battle, every\n    Advance place, inn status/option, side-panel day/time/stage variants, story scenes 1-3 for all 9 characters,\n    venue fight, street battle, game over, ending, credits). `python -X utf8 tools/debug/regen.py` -> 57/57 reached\n    from cold boot (shots `work/qa/warp/<scene>/arrived.png`, states `work/states/<scene>.mss`). RAM map and place\n    ids in `docs/re/debug.md`. Story blocks 9D-A5 are per character (not chapters); \"visuals\" = story scenes.\n    Graphics tour 2 added to `docs/re/graphics.md` (side panel plates, status screen res AA, staff roll).\n    Tools: `tools/ramdiff.py`, `tools/xref_long.py`.\n  - Phase 3: `btlz.compress` (greedy RLE encoder, roundtrips all 179 resources, +0.07% vs original) and\n    `tools/build.py` (unchanged resources keep original bytes; edited ones go back in place or to banks F0-FF with\n    the table entry repointed; write log `build/bt_en_writes.txt` for `romdiff.py --writes`). Tests\n    `tests/test_build.py`: no-edit build byte-identical, codec roundtrip, recompress-all decodes same, oversize edit\n    relocates. In-game proof: `build.py --recompress-all --out build/bt_recompress.sfc` (79 resources moved to\n    F0-FA, 4 MB) smoke ok + 57/57 warp scenes (`regen.py --rom build/bt_recompress.sfc --tag recompress`).\n    `regen.py --tag T` keeps the original states/shots apart.\n  - Phase 4: cell tables `tbl/f46,f93,f94..f9c,fae.tbl` (kana by the shared layout, kanji by\n    `tools/glyphmatch.py` + eye check + a read of every decoded kanji line; `docs/re/text.md` \u00a7Cell tables).\n    `tools/tilemap.py` (codec, `entries`/`rebuild`), `tools/extract.py` -> `script/<BB>.tsv` (16 files, 1202 rows:\n    story 652, item 230, credit 123, menu 107, name 27, data 63; format `script/README.md`).\n    `tests/test_extract.py`: rebuild == original for all 16 blocks (alias cells canonicalised), no unknown cell,\n    script jp == ROM.\n  - Phase 5: English 8x16 font (Spleen, BSD-2, `fonts/`, D8) injected by `tools/enfont.py` into cells the English\n    no longer needs (`docs/re/text.md` \u00a7English glyph cells); `tilemap.encoder(table, font)` mixes ASCII columns with\n    table cells. `tools/insert.py` (script en -> resources; story pages re-wrapped at 30 letters, 5 lines/page,\n    reflowed across the scene's 64 lines) feeds `build.py` (`--marker`, `--qa ID=TEXT`). `tools/lint.py` (budgets,\n    fixed YES/NO/cursor columns, controls) runs in check.py via `tests/test_insert.py`. Marker build\n    (`build.py --marker --out build/bt_marker.sfc`, `[id]` + column ruler): smoke ok, 57/57 warp scenes\n    (`regen.py --rom build/bt_marker.sfc --tag marker`), every box shows its id, YES/NO highlight still works, glyph\n    torture line + 8-line page in `build/bt_qa.sfc` (story_bang_1). Width gate: `docs/re/windows.md` (message 20,\n    popup 18, item 16, name 14, story 30 x 5, credits 32). warp.lua fix: a queued mash press entering the place\n    under the cursor before the forced place (Pachet/Harman story warps failed on the marker ROM).",
@@ -1076,9 +1084,9 @@
    "state": "running",
    "system": "psx",
    "title": "Seireiki Rayblade",
-   "updated": 1793655599.9403498,
+   "updated": 1793657291.1775608,
    "waiting": "nothing blocking. Non-blocking: title logo \u8056\u970a\u6a5f\u30e9\u30a4\u30d6\u30ec\u30fc\u30c9 has no official English logo,\n  kept Japanese per D5 unless the owner wants an English logo.",
-   "worked": 0.0
+   "worked": 39800.0
   },
   {
    "done": "- Phase 7 external review Important #1 fixed: actual `en` validated without `src`; final-build coverage includes\n    every non-empty original name/record/string, with an empty committed reasoned keep-list and explicit test modes.\n    Regression checks cover missing sources, empty translations, direct-English overflow and incomplete name maps.\n  - Step 0: template, MesenCE 2.2.1 + GBA BIOS in `tools/mesen/`, guard hook proven, pre-commit runs `tools/check.py`,\n    `rom.sha1` pinned, original ROM smoke-boots.\n  - Phase 1 (docs/re/text.md, docs/re/graphics.md): encoding + `tbl/jp.tbl`, fonts (LZ 0x160698 big, 0x161FD0 small),\n    story scripts 0x32A670, all other text tables mapped, ROM layout, free space 0x3529D0-0x3FFFFF verified, graphics\n    survey.\n  - Phase 2 (docs/re/debug.md): `tools/debug/warp.lua` + `scenes.txt` (78 scenes), `tools/debug/warp_all.py`\n    (`--rom`, `--out`, `--only`; a build's states go to a subfolder). 78/78 ok on the original.\n  - Phase 3 (docs/re/build.md): `build.py` repacks every text table, record block and LZ block byte-identical.\n  - Phase 4 (docs/re/build.md \"Script files\"): `tools/extract.py` -> `script/*.json`, 15 files, 854 units.\n  - Phase 5 (docs/re/vwf.md): English engine in `asm/vwf.s` (keystone via `tools/asm.py`, Thumb-2 refused), at\n    0x3F0000: VWF for story / message / tutorial boxes (224 px lines), proportional pen for the 8x8 menu font, DeviDas\n    name bitmap, names moved to 16-byte records (15 glyphs). `tbl/en.tbl` shared by all codecs; fonts\n    `fonts/vwf.txt`, `fonts/small.txt` (drawn, MIT). Marker build `tools/marker.py` (`--set ID=TEXT|TORTURE|TORTURE2`,\n    `--out`): 78/78 scenes, independent visual-QA verdict (`work/qa/verdicts/p5_marker.tsv`; 2 issues resolved),\n    torture lines clean in both boxes. Race menu labels (00-padded, missed by strayscan) found and extracted\n    (`script/race_menu.json`, 16 + 14 bytes). Test: every block has a budget.\n  - Phase 6: `tools/batches.py` (split / check / merge / fit: auto-wraps each page to 224 px + 210 px last line,\n    fails 3-line pages, msg sprite cap 32/page, small-font px, cell / byte slots, glossary whole-run match, codes,\n    link-font charset), `tools/pairs.py` (reviewer pairs, `--chapters` for the story pass), `tests/test_batches.py`\n    (every merged `src` re-renders to `en` and passes). Glossary: official DemiKids names (D8; Imperium, Demiloc,\n    Demonary, Sol Cat, Rox...). Docs: `docs/synopsis.md`, `docs/style-reference.md` (pilot = prologue, checked\n    in-game `work/qa/pilot`), translator / reviewer briefs. Batches b001-b011 in `work/tl/` (gitignored). Centred\n    ending lines and multiboot link lines are raw `=` units (hand-laid). Story speakers come from face codes\n    (`batches.FACES`: A3 Jin, A4 Akira, 00 Rand, 01 Gale, else demon id = names index).\n  - Phase 7 (docs/re/build.md \"Checks\"): `build.verify` gates every `build.py` and `tests/test_build_en.py`:\n    romdiff write log, writes only inside `build.allowed()`, every string read back through its pointer with its\n    control codes, no stale pointer into a moved block's old slot, no branch into a hook. `jp_left.py` doesn't apply\n    (English reuses the kana byte codes); read-back is the text-side leftover check. English tour\n    `warp_all.py --rom build/pdc_en.gba --out work/qa/p7`: 78/78 ok (sheets `work/qa/p7/_finals`, no verdicts yet).\n    Build sha1 814f33e6..., smoke ok.",
