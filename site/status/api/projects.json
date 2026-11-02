@@ -51,18 +51,26 @@
       "last": 1793610740.882099,
       "role": "phase"
      }
+    ],
+    "6": [
+     {
+      "agent": "claude",
+      "calls": 1,
+      "last": 1793610740.882099,
+      "role": "phase"
+     }
     ]
    },
    "name": "bakumatsu-rock-ultra-soul-en",
    "next": "",
-   "phase": 5,
+   "phase": 6,
    "released": null,
    "resets_at": null,
    "since": 1793602315.5992105,
    "state": "running",
    "system": "psp",
    "title": "Bakumatsu Rock: Ultra Soul",
-   "updated": 1793615402.344442,
+   "updated": 1793618960.6715207,
    "waiting": "",
    "worked": 0.0
   },
@@ -905,8 +913,8 @@
    "phase": 9,
    "released": 1793326725.837593,
    "resets_at": null,
-   "since": null,
-   "state": "built",
+   "since": 1793275817.900081,
+   "state": "running",
    "system": "psx",
    "title": "Nage Libre: Rasen no Soukoku",
    "updated": 1793326742.8705518,
@@ -1237,7 +1245,7 @@
  "slots": {
   "retro": {
    "max": 3,
-   "used": 2
+   "used": 3
   }
  }
 }
