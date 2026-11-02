@@ -59,18 +59,26 @@
       "last": 1793622779.7977781,
       "role": "phase"
      }
+    ],
+    "8": [
+     {
+      "agent": "claude",
+      "calls": 1,
+      "last": 1793622779.7977781,
+      "role": "phase"
+     }
     ]
    },
    "name": "bakumatsu-rock-ultra-soul-en",
    "next": "",
-   "phase": 7,
+   "phase": 8,
    "released": null,
    "resets_at": null,
    "since": 1793602315.5992105,
    "state": "running",
    "system": "psp",
    "title": "Bakumatsu Rock: Ultra Soul",
-   "updated": 1793622676.2892904,
+   "updated": 1793624414.2160065,
    "waiting": "",
    "worked": 0.0
   },
