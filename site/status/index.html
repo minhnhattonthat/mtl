@@ -36,7 +36,7 @@ button:hover { filter:brightness(1.15); } button:disabled { opacity:.35; cursor:
 .spin .gear { animation: spin 6s linear infinite; }
 .view #inbox .t span, .view .holding .t span { color:transparent; background:#000; border-radius:2px; user-select:none; padding:0 2px; }  /* view page hides unreleased game names */
 .view #inbox .t, .view .holding .t { line-height:1.6; }  /* gap between wrapped redacted lines */
-.lamps { display:flex; gap:8px; align-items:center; margin-left:auto; }
+.lamps { display:flex; gap:6px; align-items:center; align-self:center; }
 .lamp { width:14px; height:14px; border-radius:50%; background:var(--rivet); box-shadow: inset 0 -2px 0 rgba(0,0,0,.25); }
 .lamp.on { background:var(--ship); box-shadow: 0 0 10px var(--ship); animation: blink 2.4s ease-in-out infinite; }
 .lamp-label { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }  /* lamps show it; screen readers still need text */
@@ -370,7 +370,7 @@ body { padding-bottom:84px; background-color:var(--floor);
 /* ko-fi: "sashiire" (a treat for the workers) plate with a hanko seal; hovering stamps it and makes the gear race */
 .fuel { display:flex; align-items:center; gap:10px; padding:4px 12px 4px 4px; text-decoration:none; color:var(--ink); background:var(--plate);
   border-radius:22px; border:2px solid var(--shu); box-shadow:0 3px 0 #a84600; transition:filter .15s, transform .1s, box-shadow .1s; }
-.fuel { position:relative; }
+.fuel { position:relative; margin-left:auto; }
 .fuel::after { content:attr(data-tip); position:absolute; top:calc(100% + 12px); left:50%; z-index:20; width:max-content; white-space:pre; text-align:center;
   padding:6px 12px; background:var(--plate); border:1px solid var(--rivet); color:var(--ink); border-top:3px solid var(--shu); border-radius:4px; box-shadow:0 4px 12px rgba(0,0,0,.4);
   font:500 12px "Zen Kaku Gothic New", system-ui, sans-serif; opacity:0; transform:translate(-50%, -4px); transition:opacity .15s, transform .15s; pointer-events:none; }
@@ -404,7 +404,6 @@ body { padding-bottom:84px; background-color:var(--floor);
   <div class="mark"><svg class="gear"><use href="#gear"/></svg><h1>Translation Works<small lang="ja">翻訳工房</small></h1></div>
   <svg class="mascot"></svg>
   <div class="bubble" aria-hidden="true"><span id="say"></span></div>
-  <div class="lamps" id="lamps" aria-live="polite"></div>
   <a class="fuel" href="https://ko-fi.com/minhnhattonthat" target="_blank" rel="noopener" data-tip="Bots run on coffee ☕&#10;Buy them one on Ko-fi">
     <i class="seal" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h15v7a6 6 0 0 1-6 6H9a6 6 0 0 1-6-6zm15 2v6a3 3 0 0 0 0-6z" fill-rule="evenodd"/><path fill="var(--plate)" d="M10.5 9.6c-1-1.2-3-.5-2.7 1.1.3 1.3 2.7 2.9 2.7 2.9s2.4-1.6 2.7-2.9c.3-1.6-1.7-2.3-2.7-1.1z"/></svg></i><span>Fuel the bots · Ko-fi<small lang="ja">差し入れ</small></span></a></div>
 
@@ -430,7 +429,7 @@ body { padding-bottom:84px; background-color:var(--floor);
   </section>
 
   <section class="station floor">
-    <header><h2>Machine floor<small lang="ja">工場</small></h2><span class="num" id="n-floor"></span></header>
+    <header><h2>Machine floor<small lang="ja">工場</small></h2><div class="lamps" id="lamps" aria-live="polite"></div></header>
     <svg class="chev" aria-hidden="true"><use href="#chev"/></svg>
     <div class="lane droppable floor-lanes" data-drop="resume" id="floor"></div>
   </section>
@@ -720,7 +719,6 @@ function render() {
     || `<div class="hint">Nothing on hold.</div>`;  // the view page shows one Holding lane
   $("dock").innerHTML = ship.map(p => crate(p)).join("");
   $("n-ship").textContent = ship.length || "";
-  $("n-floor").textContent = `${run.length}/${max}`;
   $("n-hold").textContent = q.length + wait.length + park.length || "";
   seen = Object.fromEntries(data.projects.map(p => [p.name, p.state]));
 }
