@@ -1060,7 +1060,7 @@
     ]
    },
    "name": "seireiki-rayblade-en",
-   "next": "1. Finish the flow check: `warp.py --all --match story_ --deep 30` on the marker build vs the original\n     (any scene that reaches 30 boxes on the original but not on the marker = a branch form still missing;\n     `work/qa/marker_deep`). The 8 remaining walk errors and 1,174 undecoded bytes: `tools/branch_check.py`.\n  2. **Script buffer**: the scene loader allocates 0x8000 (0x80058298 -> allocator 0x80036860, best-fit free\n     list at 0x800D4E58 {addr,size} x n, count at +0x200). English at ~2.5x Japanese chars makes the largest\n     records ~0xCB00 (slots 241, 345, 16, 239, 361, 44). Dump the free list in a scene state and raise the\n     allocation (or move text out) before phase 6.\n  3. Menu text (EXE message bank, 1,838 entries; groups 0-11 \u2248 16 KB of real text, groups 12-21 are mostly\n     data that decodes): they live in the EXE data section behind self-relative u32 group tables, so English\n     (~40 KB) needs the strings relocated (heap/free space; the EXE cannot just grow into BSS) and the tables\n     repointed; then measure the menu field widths (docs/widths.md) and the choice box (probe style C0, stop\n     on op 7A).\n  4. D_BMESS battle messages: looks tractable \u2014 each message is `FC 01 4x <text> FE FF` (speaker/face +\n     text + page + end), reached from `FC 00 3F <u16 list relative to the list start> FF FF` lists inside\n     per-category bytecode (header = u16 category offsets). `python -X utf8 tools/bmess.py 2` maps lists,\n     messages and uncovered gaps for one record. Decode the category bytecode (`FC 7B ..` conditions), extract, insert with repointing.\n  5. Phase 6: batch translation. Before the first batch, review the rest of `tbl/jp.tbl` readings (below) and\n     give translators docs/widths.md + the glossary.",
+   "next": "1. Menu text (EXE message bank, 1,838 entries; groups 0-11 \u2248 16 KB of real text, groups 12-21 are mostly\n     data that decodes): they live in the EXE data section behind self-relative u32 group tables, so English\n     (~40 KB) needs the strings relocated (heap/free space; the EXE cannot just grow into BSS) and the tables\n     repointed; then measure the menu field widths (docs/widths.md) and the choice box (probe style C0, stop\n     on op 7A).\n  4. D_BMESS battle messages: looks tractable \u2014 each message is `FC 01 4x <text> FE FF` (speaker/face +\n     text + page + end), reached from `FC 00 3F <u16 list relative to the list start> FF FF` lists inside\n     per-category bytecode (header = u16 category offsets). `python -X utf8 tools/bmess.py 2` maps lists,\n     messages and uncovered gaps for one record. Decode the category bytecode (`FC 7B ..` conditions), extract, insert with repointing.\n  5. Phase 6: batch translation. Before the first batch, review the rest of `tbl/jp.tbl` readings (below) and\n     give translators docs/widths.md + the glossary.",
    "phase": 5,
    "released": null,
    "resets_at": null,
@@ -1068,7 +1068,7 @@
    "state": "running",
    "system": "psx",
    "title": "Seireiki Rayblade (Japan)",
-   "updated": 1793631757.8150876,
+   "updated": 1793632119.3081553,
    "waiting": "nothing blocking. Non-blocking: title logo \u8056\u970a\u6a5f\u30e9\u30a4\u30d6\u30ec\u30fc\u30c9 has no official English logo,\n  kept Japanese per D5 unless the owner wants an English logo.",
    "worked": 0.0
   },
