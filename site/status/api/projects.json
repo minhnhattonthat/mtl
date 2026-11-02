@@ -999,8 +999,8 @@
     "1": [
      {
       "agent": "claude",
-      "calls": 1,
-      "last": 1793613040.7197528,
+      "calls": 2,
+      "last": 1793616638.3748486,
       "role": "phase"
      }
     ]
@@ -1014,7 +1014,7 @@
    "state": "running",
    "system": "psx",
    "title": "Seireiki Rayblade (Japan)",
-   "updated": 1793615439.22511,
+   "updated": 1793616619.0619428,
    "waiting": "nothing blocking. Non-blocking: title logo \u8056\u970a\u6a5f\u30e9\u30a4\u30d6\u30ec\u30fc\u30c9 has no official English logo,\n  kept Japanese per D5 unless the owner wants an English logo.",
    "worked": 0.0
   },
