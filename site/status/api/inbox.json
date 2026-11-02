@@ -20,6 +20,20 @@
    "name": "xxxxxxxx xxxx: xxxxxxxx xx xxxxxxx",
    "preset": "default",
    "ready": true
+  },
+  {
+   "dir": "psx",
+   "folder": true,
+   "name": "xxxxx-xxxxxx x",
+   "preset": "default",
+   "ready": true
+  },
+  {
+   "dir": "psx",
+   "folder": true,
+   "name": "xxxxxxxxxxx",
+   "preset": "default",
+   "ready": true
   }
  ],
  "systems": [

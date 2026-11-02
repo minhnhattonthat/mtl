@@ -2,8 +2,16 @@
  "fixes": [],
  "projects": [
   {
-   "done": "<...>",
+   "done": "- Template files, `tools/skill.py`, `tools/iso9660.py`, `tools/check.py` + `tests/test_rom.py`, pre-commit hook in `tools/hooks/` (`core.hooksPath`), verified: a failing test blocks the commit.\n  - `rom.sha1` pinned (SHA-1 4fa0409f0a547cc4250a34c8ef5ac5b62bdd1cb2, 1,699,610,624 bytes).\n  - PPSSPPHeadless QA fork (machine-wide) boots the original ISO: `tools/routes/boot.txt` reaches the main menu (input works). PPSSPP v1.20.4 in `tools/ppsspp/` for the EBOOT dump / human play. Guard hook (plugin) blocks `sed -i` and heredocs.\n  - ISO layout: `PSP_GAME/USRDIR/INST.CPK` (507 MB), `NOINST.CPK` (558 MB), `INSDIR/INST.DNS` (515 MB, install data), `content/THEME/*.PTF` (6 PSP themes), `SYSDIR/EBOOT.BIN` (encrypted), `SYSDIR/UPDATE/` (firmware update, leave alone).\n  - Boot shows menus drawn as graphics (MENU / OPTION / LIVE / STORY / GALLERY / CHAPTER, help line in Japanese at the bottom).",
    "models": {
+    "0": [
+     {
+      "agent": "claude",
+      "calls": 1,
+      "last": 1793602564.1240952,
+      "role": "phase"
+     }
+    ],
     "1": [
      {
       "agent": "claude",
@@ -14,16 +22,16 @@
     ]
    },
    "name": "bakumatsu-rock-ultra-soul-en",
-   "next": "<...>",
-   "phase": 1,
+   "next": "",
+   "phase": 0,
    "released": null,
    "resets_at": null,
    "since": 1793602315.5992105,
    "state": "running",
    "system": "psp",
    "title": "Bakumatsu Rock: Ultra Soul",
-   "updated": 1793602306.6359472,
-   "waiting": "<question, see docs/decisions.md>",
+   "updated": 1793602542.2683825,
+   "waiting": "nothing.",
    "worked": 0.0
   },
   {
