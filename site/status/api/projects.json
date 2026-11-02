@@ -7,7 +7,7 @@
     "0": [
      {
       "agent": "claude",
-      "calls": 1,
+      "calls": 2,
       "last": 1793602564.1240952,
       "role": "phase"
      }
@@ -15,7 +15,7 @@
     "1": [
      {
       "agent": "claude",
-      "calls": 2,
+      "calls": 1,
       "last": 1793603752.0369737,
       "role": "phase"
      }
@@ -52,6 +52,14 @@
       "role": "phase"
      }
     ],
+    "6": [
+     {
+      "agent": "claude",
+      "calls": 1,
+      "last": 1793610740.882099,
+      "role": "phase"
+     }
+    ],
     "7": [
      {
       "agent": "codex",
@@ -78,7 +86,7 @@
      {
       "agent": "claude",
       "calls": 1,
-      "last": 1793652832.4718418,
+      "last": 1793657800.684671,
       "role": "phase"
      }
     ]
@@ -86,15 +94,15 @@
    "name": "bakumatsu-rock-ultra-soul-en",
    "next": "",
    "phase": 9,
-   "released": null,
+   "released": 1793659105.8098607,
    "resets_at": null,
-   "since": 1793652832.4423244,
-   "state": "running",
+   "since": null,
+   "state": "built",
    "system": "psp",
    "title": "Bakumatsu Rock: Ultra Soul",
-   "updated": 1793657365.2165258,
+   "updated": 1793660309.332218,
    "waiting": "",
-   "worked": 50400.0
+   "worked": 56953.59298205376
   },
   {
    "done": "- Step 0 repo setup (rom pin, MesenCE in `tools/mesen/`, guard hook, pre-commit -> `tools/check.py`).\n  - Phase 1: no prior patch exists. All text is pre-built BG3 tilemaps inside 179 compressed resources\n    (`docs/re/text.md`, `compression.md`); decoder `tools/btlz.py` + tests; text blocks 47/90/91/92/A8/B0 (font 46),\n    story 9D-A5 (fonts 93 + 94..9C), credits AF (font AE), ~10.4k JP chars. Graphics-text survey in\n    `docs/re/graphics.md` (title logo, watermark, name plates/side panel res 1C, status names res AA, ...).\n    Official character spellings from in-game English tags are in `glossary.md`.\n  - Tools: `tools/render_msgs.py` (render a text block with its font), `tools/res_callers.py`, Lua probes\n    `tools/lua/{cpuwatch,hirom_reads,reslog}.lua`.\n  - Phase 2: `tools/debug/warp.lua` + `scenes.txt` (57 scenes: intro/title/mode select/option/VS+COM battle, every\n    Advance place, inn status/option, side-panel day/time/stage variants, story scenes 1-3 for all 9 characters,\n    venue fight, street battle, game over, ending, credits). `python -X utf8 tools/debug/regen.py` -> 57/57 reached\n    from cold boot (shots `work/qa/warp/<scene>/arrived.png`, states `work/states/<scene>.mss`). RAM map and place\n    ids in `docs/re/debug.md`. Story blocks 9D-A5 are per character (not chapters); \"visuals\" = story scenes.\n    Graphics tour 2 added to `docs/re/graphics.md` (side panel plates, status screen res AA, staff roll).\n    Tools: `tools/ramdiff.py`, `tools/xref_long.py`.\n  - Phase 3: `btlz.compress` (greedy RLE encoder, roundtrips all 179 resources, +0.07% vs original) and\n    `tools/build.py` (unchanged resources keep original bytes; edited ones go back in place or to banks F0-FF with\n    the table entry repointed; write log `build/bt_en_writes.txt` for `romdiff.py --writes`). Tests\n    `tests/test_build.py`: no-edit build byte-identical, codec roundtrip, recompress-all decodes same, oversize edit\n    relocates. In-game proof: `build.py --recompress-all --out build/bt_recompress.sfc` (79 resources moved to\n    F0-FA, 4 MB) smoke ok + 57/57 warp scenes (`regen.py --rom build/bt_recompress.sfc --tag recompress`).\n    `regen.py --tag T` keeps the original states/shots apart.\n  - Phase 4: cell tables `tbl/f46,f93,f94..f9c,fae.tbl` (kana by the shared layout, kanji by\n    `tools/glyphmatch.py` + eye check + a read of every decoded kanji line; `docs/re/text.md` \u00a7Cell tables).\n    `tools/tilemap.py` (codec, `entries`/`rebuild`), `tools/extract.py` -> `script/<BB>.tsv` (16 files, 1202 rows:\n    story 652, item 230, credit 123, menu 107, name 27, data 63; format `script/README.md`).\n    `tests/test_extract.py`: rebuild == original for all 16 blocks (alias cells canonicalised), no unknown cell,\n    script jp == ROM.\n  - Phase 5: English 8x16 font (Spleen, BSD-2, `fonts/`, D8) injected by `tools/enfont.py` into cells the English\n    no longer needs (`docs/re/text.md` \u00a7English glyph cells); `tilemap.encoder(table, font)` mixes ASCII columns with\n    table cells. `tools/insert.py` (script en -> resources; story pages re-wrapped at 30 letters, 5 lines/page,\n    reflowed across the scene's 64 lines) feeds `build.py` (`--marker`, `--qa ID=TEXT`). `tools/lint.py` (budgets,\n    fixed YES/NO/cursor columns, controls) runs in check.py via `tests/test_insert.py`. Marker build\n    (`build.py --marker --out build/bt_marker.sfc`, `[id]` + column ruler): smoke ok, 57/57 warp scenes\n    (`regen.py --rom build/bt_marker.sfc --tag marker`), every box shows its id, YES/NO highlight still works, glyph\n    torture line + 8-line page in `build/bt_qa.sfc` (story_bang_1). Width gate: `docs/re/windows.md` (message 20,\n    popup 18, item 16, name 14, story 30 x 5, credits 32). warp.lua fix: a queued mash press entering the place\n    under the cursor before the forced place (Pachet/Harman story warps failed on the marker ROM).",
@@ -291,10 +299,18 @@
   {
    "done": "",
    "models": {
+    "0": [
+     {
+      "agent": "claude",
+      "calls": 1,
+      "last": 1793484404.1053476,
+      "role": "phase"
+     }
+    ],
     "1": [
      {
       "agent": "claude",
-      "calls": 2,
+      "calls": 1,
       "last": 1793485236.5320914,
       "role": "phase"
      }
@@ -643,7 +659,7 @@
     "0": [
      {
       "agent": "claude",
-      "calls": 1,
+      "calls": 2,
       "last": 1793529545.9278226,
       "role": "phase"
      }
@@ -651,7 +667,7 @@
     "1": [
      {
       "agent": "claude",
-      "calls": 2,
+      "calls": 1,
       "last": 1793530764.0003994,
       "role": "phase"
      }
@@ -709,6 +725,14 @@
       "last": 1793568017.2263062,
       "role": "review"
      },
+     {
+      "agent": "claude",
+      "calls": 1,
+      "last": 1793554517.560636,
+      "role": "phase"
+     }
+    ],
+    "8": [
      {
       "agent": "claude",
       "calls": 1,
@@ -880,6 +904,14 @@
       "last": 1793521659.5245783,
       "role": "fallback"
      }
+    ],
+    "9": [
+     {
+      "agent": "codex",
+      "calls": 1,
+      "last": 1793563267.1954749,
+      "role": "phase"
+     }
     ]
    },
    "name": "momotarou-matsuri-ishikawa-rokuemon-no-maki-en",
@@ -1026,10 +1058,18 @@
   {
    "done": "- Step 0: PCSX-Redux in `tools/pcsx/`, SCPH-5500 BIOS, mkpsxiso/dumpsxiso 2.30 in `tools/mkpsxiso/`, armips 0.11\n    in `tools/armips/` (all gitignored; re-fetch: `fetch_emu.py pcsx|psx-bios`, `gh release download` from\n    Lameguy64/mkpsxiso v2.30 and Kingcom/armips v0.11.0). ROM pinned, pre-commit check gates commits, guard hook\n    active, boot route `tools/routes/boot.txt`. Rulings D1-D7 in docs/decisions.md.\n  - Phase 1 recon (docs/re/): archive/LZ/QX (roundtrip), font, `tbl/jp.tbl`, VM opcode table, text sources,\n    RAM limit, graphics-text survey (docs/re/graphics.md).\n  - **Phase 2 debug tool** (`tools/debug/`, facts in docs/re/flow.md): `warp.lua` patches the New Game `0B 01 00`\n    in the resident EXE script to any D_SCE scene (or falls through to the intermission, SCENE=-1), sets story\n    flags / episode / pokes, and can stop on a VM op (`STOP_OP`) and play a route after it (`POST`).\n    `warp.py NAME|--all [--title]` runs entries of `scenes.tsv` (generated by `gen_scenes.py`): 26 chapter starts,\n    69 chapter cards, intermission + Save / System / Next, character + unit settings, Continue, first battle,\n    sortie screen, dev guard message, endings 347-352, credits (scene 0). All 115 reach their screen from a cold\n    boot (re-verified 2026-11-03 on the marker build). States in work/states/<name>.sstate.\n  - **Phase 3 identity build**: `tools/build.py` (dumpsxiso once -> arc.pack -> mkpsxiso via a layout pointing\n    changed files at build/files -> split into Track 1/2 + cue), ~5 s. `tests/test_build.py` asserts both track\n    SHA-1s == rom.sha1 (green). Files may grow on disc (found by ISO name).\n  - **Phase 4 extract** (2026-11-02): `tools/vm.py` decodes the scenario bytecode; `tools/extract.py dump` writes\n    `script/sce/NNN.json` (49,363), `script/exe_bank.json` (1,990), `script/exe_vm.json` (6), `script/resident.json`\n    (11), `script/exe_inline.json`; `check` re-encodes every `jp` and re-discovers every block. `tbl/jp.tbl` covers\n    all 2,637 glyph cells.\n  - **Phase 5 insert + marker build** (2026-11-03):\n    - `tools/patch.py` re-emits a VM record from an instruction partition and rewrites every offset operand\n      (01/02/03/04/07/14/7A); identity rebuild is byte-exact for all 448 records and `verify()` re-decodes the\n      result. Operand formulas corrected from the handlers (01/03 are s16; 07 is `07 <count> <s16>`), see\n      docs/re/text.md.\n    - **The three archives' slot tables are duplicated in the EXE** (D_SCE 0x9D5FC, D_BMESS 0x9DCFC, D_SYSTEM\n      0x9787C) and the loader reads *that* copy: repacking D_SCE without patching it loaded every record from the\n      old offset (scene 1 came up black). `insert.py` now rewrites the copy and fails when the match is ambiguous.\n    - `tools/insert.py` writes `en` (or marker) text into D_SCE, repacks through `arc.pack`, patches the font and\n      logs every write to `build/writes.txt` (romdiff format). `tools/build.py --marker [--slots] [--width]\n      [--override TSV]`.\n    - English font: the game already has 8x16 half-width A-Z a-z 0-9 and ? ! : / = + % ~; `tools/font_en.py` adds\n      24 punctuation cells (0x114-0x12B) into blank cells, `tbl/en.tbl` is the encoder. Verified in-game.\n    - Marker build (`build/`, `--marker`) tours: **115/115 scenes reached**, contact sheets\n      `work/qa/marker_all/sheet.png`, per-scene shots in `work/qa/marker_all/`.\n    - **Width gate**: 30 chars/line, 3 lines/page for the dialogue box (portrait and plain), measured with a\n      90-digit probe (`work/qa/probe1/`). Table and rules in `docs/widths.md`.\n  - **Missed text fixed** (2026-11-03): resync pass (`vm.resync_texts`, shared by extract and insert via\n    `patch.sweep`) +146 lines; `FC xx 3C a b` carries 2 more bytes (inline face change; its FF was read as the\n    end, ~370 lines cut short) -> `{face:..}` in tbl (`FC??3C` wildcard key, tbl.py). jp_left on the marker\n    D_SCE: 778 runs/6,605 B -> 349/1,592 B, all \u22647-byte bytecode noise. 51,364 strings.\n  - **VM grammar fixes** (docs/re/text.md \"Opcode operand fixes\"): op 15/D1/D2/D3 and sub-ops 16/19, 5C/20,\n    C8/*, DC/3-5 are branches the rewriter ignored; 0E carries hook pointers; vm.SUBK had branch biases as\n    lengths (5C/20 swallowed a text op and hung story_S31) and lacked 8 one-byte entries. `tools/subops.py`\n    audits the handlers. Undecoded D_SCE bytes 5,944 -> 3,964.\n  - **Trailing offset tables + switch + variable lengths** (same day): helper 0x8005832C branches through\n    self-relative s16 tables after the op (`vm.TRAIL`: 17/18/19, C0/29/30/35 + handler-derived keys), B9\n    switch tables (FFFF-terminated), 82/C0-45/5C-24/C8-21/DC-5 lengths. D_SCE undecoded bytes 5,944 -> 1,174,\n    walk errors 266 -> 8; 51,366 strings. `warp.py --deep N` = flow check to the Nth text box.\n  - **Flow check** `warp.py --all --match story_ --deep 30`: 24/26 reach the 30th box on the marker build;\n    S22 and S30 stop short on the original disc too (their scenes end first). Normal tour 115/115.\n  - **Script buffer raised 0x8000 -> 0xFFF0** (one EXE immediate, logged in build/writes.txt); heap has\n    480+ KB free even mid-battle; a 0x9690-byte slot 1 verified in-game (docs/re/disc.md).\n  - **EXE message bank** (menus, names): relocated past the EXE end behind a new root, heap moved above it\n    (docs/re/disc.md); 13 menu scenes verified with marker text. Groups 12-21 + 2 table entries = status data.\n  - **D_BMESS**: `tools/bmess.py` walker, extract + insert with re-aimed offsets, record stride 0x3FF8, output\n    buffer 0x800; verified in a battle (docs/re/text.md).\n  - **Resident sub 58** (Yamato's affection hints): copied after the bank with call stubs (docs/re/text.md);\n    `warp.py res58_status` shows the relocated sub running; structural test in tests/test_patch.py.\n  - Marker regression tour 2026-11-03 (`warp.py --all --title`): **118/118** reached, sheets\n    `work/qa/marker_all/sheet*.png`. Choice rows now stop on `0x78/C0` (warp.lua STOP_ARG; the 7A runs within\n    a frame) and a STOP halts the mash so the shot holds the box.\n  - Width gate complete (docs/widths.md): dialogue 30x3, choice 30, battle band 36x3 (no wrap, `{nl}` by\n    hand), menus = Japanese pixel width, hints 30 (assumed).",
    "models": {
+    "0": [
+     {
+      "agent": "claude",
+      "calls": 1,
+      "last": 1793613040.7197528,
+      "role": "phase"
+     }
+    ],
     "1": [
      {
       "agent": "claude",
-      "calls": 2,
+      "calls": 1,
       "last": 1793616638.3748486,
       "role": "phase"
      }
@@ -1073,18 +1113,26 @@
       "last": 1793653939.8034954,
       "role": "phase"
      }
+    ],
+    "7": [
+     {
+      "agent": "claude",
+      "calls": 1,
+      "last": 1793659184.4759293,
+      "role": "phase"
+     }
     ]
    },
    "name": "seireiki-rayblade-en",
-   "next": "1. Finish phase 6 waves: translate all 341 batches, review+fix each (fresh agent), merge, commit; between waves\n     merge NEW TERMs into glossary.md and run `batches.py terms`. Minors -> docs/polish.md.\n  2. Phase 7: menu rows over width (check warnings) need engine room (D4); the 10 `special` bank strings.",
-   "phase": 6,
+   "next": "1. Phase 7: build is green; width/overflow lint + control-code match over the merged text, romdiff write\n     ranges; menu rows over width (batch-check warnings) need engine room (D4); the 9 `special` bank strings by\n     hand; slot 239 dev scenario lists (literal translation or leave).\n  2. Phase 8: `warp.py --all --title` on the English build + visual-QA verdicts.",
+   "phase": 7,
    "released": null,
    "resets_at": null,
    "since": 1793652846.912113,
    "state": "running",
    "system": "psx",
    "title": "Seireiki Rayblade",
-   "updated": 1793657291.1775608,
+   "updated": 1793659146.0201073,
    "waiting": "nothing blocking. Non-blocking: title logo \u8056\u970a\u6a5f\u30e9\u30a4\u30d6\u30ec\u30fc\u30c9 has no official English logo,\n  kept Japanese per D5 unless the owner wants an English logo.",
    "worked": 39800.0
   },
@@ -1307,7 +1355,7 @@
  "slots": {
   "retro": {
    "max": 3,
-   "used": 2
+   "used": 1
   }
  }
 }
