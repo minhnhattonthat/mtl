@@ -905,8 +905,8 @@
    "phase": 9,
    "released": 1793326725.837593,
    "resets_at": null,
-   "since": null,
-   "state": "built",
+   "since": 1793275817.900081,
+   "state": "running",
    "system": "psx",
    "title": "Nage Libre: Rasen no Soukoku",
    "updated": 1793326742.8705518,
@@ -994,6 +994,31 @@
    "worked": 0.0
   },
   {
+   "done": "<...>",
+   "models": {
+    "1": [
+     {
+      "agent": "claude",
+      "calls": 1,
+      "last": 1793613040.7197528,
+      "role": "phase"
+     }
+    ]
+   },
+   "name": "seireiki-rayblade-en",
+   "next": "<...>",
+   "phase": 1,
+   "released": null,
+   "resets_at": null,
+   "since": 1793613040.674665,
+   "state": "running",
+   "system": "psx",
+   "title": "Seireiki Rayblade (Japan)",
+   "updated": 1793613036.3260486,
+   "waiting": "<question, see docs/decisions.md>",
+   "worked": 0.0
+  },
+  {
    "done": "- Phase 7 external review Important #1 fixed: actual `en` validated without `src`; final-build coverage includes\n    every non-empty original name/record/string, with an empty committed reasoned keep-list and explicit test modes.\n    Regression checks cover missing sources, empty translations, direct-English overflow and incomplete name maps.\n  - Step 0: template, MesenCE 2.2.1 + GBA BIOS in `tools/mesen/`, guard hook proven, pre-commit runs `tools/check.py`,\n    `rom.sha1` pinned, original ROM smoke-boots.\n  - Phase 1 (docs/re/text.md, docs/re/graphics.md): encoding + `tbl/jp.tbl`, fonts (LZ 0x160698 big, 0x161FD0 small),\n    story scripts 0x32A670, all other text tables mapped, ROM layout, free space 0x3529D0-0x3FFFFF verified, graphics\n    survey.\n  - Phase 2 (docs/re/debug.md): `tools/debug/warp.lua` + `scenes.txt` (78 scenes), `tools/debug/warp_all.py`\n    (`--rom`, `--out`, `--only`; a build's states go to a subfolder). 78/78 ok on the original.\n  - Phase 3 (docs/re/build.md): `build.py` repacks every text table, record block and LZ block byte-identical.\n  - Phase 4 (docs/re/build.md \"Script files\"): `tools/extract.py` -> `script/*.json`, 15 files, 854 units.\n  - Phase 5 (docs/re/vwf.md): English engine in `asm/vwf.s` (keystone via `tools/asm.py`, Thumb-2 refused), at\n    0x3F0000: VWF for story / message / tutorial boxes (224 px lines), proportional pen for the 8x8 menu font, DeviDas\n    name bitmap, names moved to 16-byte records (15 glyphs). `tbl/en.tbl` shared by all codecs; fonts\n    `fonts/vwf.txt`, `fonts/small.txt` (drawn, MIT). Marker build `tools/marker.py` (`--set ID=TEXT|TORTURE|TORTURE2`,\n    `--out`): 78/78 scenes, independent visual-QA verdict (`work/qa/verdicts/p5_marker.tsv`; 2 issues resolved),\n    torture lines clean in both boxes. Race menu labels (00-padded, missed by strayscan) found and extracted\n    (`script/race_menu.json`, 16 + 14 bytes). Test: every block has a budget.\n  - Phase 6: `tools/batches.py` (split / check / merge / fit: auto-wraps each page to 224 px + 210 px last line,\n    fails 3-line pages, msg sprite cap 32/page, small-font px, cell / byte slots, glossary whole-run match, codes,\n    link-font charset), `tools/pairs.py` (reviewer pairs, `--chapters` for the story pass), `tests/test_batches.py`\n    (every merged `src` re-renders to `en` and passes). Glossary: official DemiKids names (D8; Imperium, Demiloc,\n    Demonary, Sol Cat, Rox...). Docs: `docs/synopsis.md`, `docs/style-reference.md` (pilot = prologue, checked\n    in-game `work/qa/pilot`), translator / reviewer briefs. Batches b001-b011 in `work/tl/` (gitignored). Centred\n    ending lines and multiboot link lines are raw `=` units (hand-laid). Story speakers come from face codes\n    (`batches.FACES`: A3 Jin, A4 Akira, 00 Rand, 01 Gale, else demon id = names index).\n  - Phase 7 (docs/re/build.md \"Checks\"): `build.verify` gates every `build.py` and `tests/test_build_en.py`:\n    romdiff write log, writes only inside `build.allowed()`, every string read back through its pointer with its\n    control codes, no stale pointer into a moved block's old slot, no branch into a hook. `jp_left.py` doesn't apply\n    (English reuses the kana byte codes); read-back is the text-side leftover check. English tour\n    `warp_all.py --rom build/pdc_en.gba --out work/qa/p7`: 78/78 ok (sheets `work/qa/p7/_finals`, no verdicts yet).\n    Build sha1 814f33e6..., smoke ok.",
    "models": {},
    "name": "shin-megami-tensei-devil-children-puzzle-de-call-en",
@@ -1059,7 +1084,7 @@
   },
   {
    "models": {},
-   "name": "held-49",
+   "name": "held-50",
    "phase": 8,
    "released": null,
    "resets_at": null,
@@ -1136,7 +1161,7 @@
   },
   {
    "models": {},
-   "name": "held-54",
+   "name": "held-55",
    "phase": 2,
    "released": null,
    "resets_at": null,
@@ -1149,7 +1174,7 @@
   },
   {
    "models": {},
-   "name": "held-55",
+   "name": "held-56",
    "phase": 6,
    "released": null,
    "resets_at": null,
@@ -1212,7 +1237,7 @@
  "slots": {
   "retro": {
    "max": 3,
-   "used": 1
+   "used": 3
   }
  }
 }
