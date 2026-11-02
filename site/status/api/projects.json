@@ -2,7 +2,7 @@
  "fixes": [],
  "projects": [
   {
-   "done": "- Step 0: repo, hooks, check, `rom.sha1`, PPSSPPHeadless boot route (`tools/routes/boot.txt`; `menu.txt` = to top MENU).\n  - Phase 1 (`docs/re/README.md` indexes it): no earlier patch exists. ISO/CPK layout, CRILAYLA, unpacker, GIM sweep, plain\n    EBOOT (`work/eboot/EBOOT.ELF`). Text: Shift-JIS script bytecode (`text.md`), UI tables, EBOOT save titles. Graphics survey:\n    744 Japanese GIMs (`docs/re/graphics-survey.tsv`).\n  - Phase 2: `tools/debug/warp.py` + `scenes.tsv` (120 scenes: all 80 scene scripts by file name incl. endings, OPs, both\n    staff rolls; boot notices + title; every top/story/chapter/gallery/option/live screen; rhythm game play, pause, result;\n    ADV auto/menu/save/load/backlog/skip). Cold boot each (cached MENU state per ISO), everything unlocked by RAM pokes,\n    script warp = breakpoint on the script-name setter. Each run asserts the loaded script / entered sequence; proof shots\n    `work/qa/warp/<scene>/`. `--all` -> states in `work/states/warp/`. How it works: `docs/re/debug.md`.\n  - Phase 3: `tools/build.py` (check_rom -> `cpk.rebuild` both CPKs with `edits()` -> `iso9660.patch`), ~7 s. No edits =\n    byte-identical ISO (`tests/test_identity.py`, plus an edited-CPK read-back test). Fixed 3 bugs in the skill's\n    `cpk.rebuild` (untouched compressed files got ExtractSize = FileSize; last file unpadded; name-only keys hit INST's two\n    `com_000.gim`). In-game proof that raw-stored replacements load: all 224 compressed NOINST files + all 80 scene scripts\n    stored decompressed -> 9 warps (title, menu, options, profile, live, ADV, backlog, ending) ok, shots match the original\n    apart from animation. Smoke passes on the build.\n  - Phase 4: `tools/textfmt.py` (cp932 codec + JSON writer), `tools/mzscript.py` (MZ bytecode parse/serialize), `tools/uitable.py`\n    (the 9 UI tables + EBOOT/SFO slots), `tools/extract.py` (`dump`, `verify`). `script/`: 121 JSON files, 27,815 entries,\n    355k JP chars \u2014 13,059 dialogue, 121 choices, 78 staff, 100 shared speaker names (+2 staffroll2 overrides), 11,439 lyric\n    fragments, 3,003 UI strings, 8 EBOOT save titles + XMB title. Every file reserializes byte-identically (`serialize(parse(b)) == b`),\n    every slot re-encodes exactly, and a mask-and-scan finds 0 Japanese runs outside extracted slots. UI record layouts\n    derived and documented in `text.md` \u00a73; 46 system-text records are UTF-8 (kept per slot). `tests/test_extract.py` (8 tests).",
+   "done": "- Step 0: repo, hooks, check, `rom.sha1`, PPSSPPHeadless boot route (`tools/routes/boot.txt`; `menu.txt` = to top MENU).\n  - Phase 1 (`docs/re/README.md` indexes it): no earlier patch exists. ISO/CPK layout, CRILAYLA, unpacker, GIM sweep, plain\n    EBOOT (`work/eboot/EBOOT.ELF`). Text: Shift-JIS script bytecode (`text.md`), UI tables, EBOOT save titles. Graphics survey:\n    744 Japanese GIMs (`docs/re/graphics-survey.tsv`).\n  - Phase 2: `tools/debug/warp.py` + `scenes.tsv` (120 scenes: all 80 scene scripts by file name incl. endings, OPs, both\n    staff rolls; boot notices + title; every top/story/chapter/gallery/option/live screen; rhythm game play, pause, result;\n    ADV auto/menu/save/load/backlog/skip). Cold boot each (cached MENU state per ISO), everything unlocked by RAM pokes,\n    script warp = breakpoint on the script-name setter. Each run asserts the loaded script / entered sequence; proof shots\n    `work/qa/warp/<scene>/`. `--all` -> states in `work/states/warp/`. How it works: `docs/re/debug.md`.\n  - Phase 3: `tools/build.py` (check_rom -> `cpk.rebuild` both CPKs with `edits()` -> `iso9660.patch`), ~7 s. No edits =\n    byte-identical ISO (`tests/test_identity.py`, plus an edited-CPK read-back test). Fixed 3 bugs in the skill's\n    `cpk.rebuild` (untouched compressed files got ExtractSize = FileSize; last file unpadded; name-only keys hit INST's two\n    `com_000.gim`). In-game proof that raw-stored replacements load: all 224 compressed NOINST files + all 80 scene scripts\n    stored decompressed -> 9 warps ok. Smoke passes on the build.\n  - Phase 4: `tools/textfmt.py` (cp932 codec + JSON writer), `tools/mzscript.py` (MZ bytecode parse/serialize), `tools/uitable.py`\n    (the 9 UI tables + EBOOT/SFO slots), `tools/extract.py` (`dump`, `verify`). `script/`: 121 JSON files, 27,815 entries,\n    355k JP chars. Every file reserializes byte-identically, every slot re-encodes exactly, 0 Japanese runs outside slots.\n    `tests/test_extract.py` (8 tests).\n  - Phase 5 (this session):\n    - `tools/insert.py`: `script/` -> CPK edits. MZ scene/chart files are rebuilt with **resized string slots** and every\n      jump argument re-mapped (positions verified over all 80 scripts, re-checked after the rebuild); the shared op-0x19\n      speaker table is applied by index; UI tables are in-place with an overflow error; PARAM.SFO title too; the EBOOT save\n      titles are off by default (`--eboot`, D11). `insert.py check` = identity; `tests/test_insert.py` (8 tests).\n    - `tools/mark.py` -> `work/mark`: 27,808 markers (`[id] The quick brown fox...`). `tools/build.py --texts work/mark`\n      builds the marker ISO; it boots (`emu.py --smoke` exit 0) and warps ok. Every toured box shows its id: ADV dialogue\n      (vertical, `work/qa/warp/m_001001`), backlog (horizontal, `adv_backlog`), music list + help line (`gallery_music`,\n      `story_menu`), profile, option, chapter, skit, event.\n    - Engine finding (see `docs/re/text.md` \u00a77): the engine draws **horizontal** text (menu rows, help line, backlog) and\n      **vertical rotated** text (ADV panels) with the same KFNT font. ASCII exists in the font, so English needs the\n      horizontal path, i.e. ADV engine work in the EBOOT (D10).\n    - `tools/measure.py`: text-extent measurement from shots (crop/zoom via sheet.py for the visual read).",
    "models": {
     "0": [
      {
@@ -43,18 +43,26 @@
       "last": 1793607861.5225234,
       "role": "phase"
      }
+    ],
+    "5": [
+     {
+      "agent": "opencode:opencode-go/deepseek-v4.1-flash",
+      "calls": 1,
+      "last": 1793607861.5225234,
+      "role": "phase"
+     }
     ]
    },
    "name": "bakumatsu-rock-ultra-soul-en",
    "next": "",
-   "phase": 4,
+   "phase": 5,
    "released": null,
    "resets_at": null,
    "since": 1793602315.5992105,
    "state": "running",
    "system": "psp",
    "title": "Bakumatsu Rock: Ultra Soul",
-   "updated": 1793607768.3569376,
+   "updated": 1793610326.0272138,
    "waiting": "",
    "worked": 0.0
   },
