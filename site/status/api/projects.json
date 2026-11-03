@@ -1000,8 +1000,8 @@
    "phase": 9,
    "released": 1793326725.837593,
    "resets_at": null,
-   "since": 1793275817.900081,
-   "state": "running",
+   "since": null,
+   "state": "built",
    "system": "psx",
    "title": "Nage Libre: Rasen no Soukoku",
    "updated": 1793326742.8705518,
@@ -1402,7 +1402,7 @@
  "slots": {
   "retro": {
    "max": 3,
-   "used": 3
+   "used": 2
   }
  }
 }
