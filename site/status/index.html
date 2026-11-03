@@ -596,7 +596,7 @@ let data = {projects: [], slots: {}}, seen = {}, dragging = null, busy = false;
 const ALLOWED = {  // state -> actions it can take
   running:["pause","stop"], pausing:["stop"], stopping:[], queued:["resume","pause","stop"],
   paused:["resume"], stopped:["resume"], idle:["resume"], waiting:["resume"], steer:["resume"], built:["resume"] };
-const LABEL = {resume:"Run", pause:"Pause", stop:"Stop"};
+const LABEL = {resume:"Run", pause:"Hold", stop:"Stop"};
 const BTN = {resume:"btn-go", pause:"btn-pause", stop:"btn-stop"};
 const ICON = {resume:"M5 3l9 5-9 5z", pause:"M4 3h3v10H4zM9 3h3v10H9z", stop:"M4 4h8v8H4z"};
 const ico = d => `<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="${d}"/></svg>`;
@@ -835,7 +835,7 @@ function render() {
   $("queue").innerHTML = q.map(p => crate(p, p.resets_at ? ` · back at ${new Date(p.resets_at * 1000).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"})}` : "")).join("")
     || `<div class="hint">Usage-limited and retrying runs wait here.</div>`;
   $("waiting").innerHTML = wait.map(p => crate(p)).join("") || `<div class="hint">Nothing needs you.</div>`;
-  $("parked").innerHTML = park.map(p => crate(p)).join("") || `<div class="hint">Drop a running project to pause it after its phase. Stop now from its machine.</div>`;
+  $("parked").innerHTML = park.map(p => crate(p)).join("") || `<div class="hint">Drop a running project to hold it after its phase. Stop now from its machine.</div>`;
   if (VIEW) $("queue").innerHTML = [$("queue"), $("waiting"), $("parked")].map(l => l.innerHTML.includes('class="hint"') ? "" : l.innerHTML).join("")
     || `<div class="hint">Nothing on hold.</div>`;  // the view page shows one Holding lane
   $("steer").innerHTML = steer.map(p => crate(p)).join("") || `<div class="hint">Built releases you haven't pushed wait here.</div>`;
@@ -858,7 +858,7 @@ function renderInbox(i = inboxData) {
     title="${r.ready ? "Drag onto the machine floor to start now, or onto another ROM to change its place in line" : "Still uploading or settling (60s)"}">
     <b class="pos" title="Place in line">${r.n + 1}</b><div class="name">${chip(r.dir)}<span class="t">${hide(romName(r))}</span><button class="rename-btn" data-dir="${esc(r.dir)}" data-name="${esc(r.name)}" data-title="${esc(romName(r))}">${PEN}</button></div>
     ${r.ready && r.preset === "default" ? "" : `<div class="meta">${[!r.ready && "settling", r.preset !== "default" && esc(r.preset)].filter(Boolean).join(" · ")}</div>`}
-    <div class="acts">${r.ready ? `<button class="ico btn-go rom-play" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}" title="Start now" aria-label="Start now">${ico(ICON.resume)}</button>` : ""}<button class="ico agents-btn" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}" title="Agents" aria-label="Agents">${COG}</button></div></div>`).join("")
+    <div class="acts">${r.ready ? `<button class="ico btn-go rom-play" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}" title="Feed" aria-label="Feed">${ico(ICON.resume)}</button>` : ""}<button class="ico agents-btn" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}" title="Agents" aria-label="Agents">${COG}</button></div></div>`).join("")
     || `<div class="hint">${i.items.length ? "No ROMs for this system." : "Inbox empty."}</div>`;
 }
 $("sys").onchange = () => renderInbox();
