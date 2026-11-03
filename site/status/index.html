@@ -23,12 +23,12 @@ button { font-size:13px; font-weight:700; letter-spacing:.02em; cursor:pointer; 
   border:0; border-radius:4px; padding:4px 10px; }
 button:hover { filter:brightness(1.15); } button:disabled { opacity:.35; cursor:default; filter:none; }
 /* text buttons as wooden name plaques: one height, square-ish corners, a darker lip below, shu edge on hover */
-button:not(.stop-dot, .tk, .rename-btn) { height:28px; display:inline-flex; align-items:center; justify-content:center; gap:4px; padding:0 12px;
+button:not(.stop-dot, .tk, .rename-btn, .redact-btn) { height:28px; display:inline-flex; align-items:center; justify-content:center; gap:4px; padding:0 12px;
   font-size:12px; letter-spacing:.12em; line-height:1; white-space:nowrap; border-radius:2px;
   border:1px solid color-mix(in srgb, currentColor 22%, transparent); box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 2px 0 rgba(0,0,0,.45);
   transition:filter .15s, transform .1s, box-shadow .1s, border-color .15s; }
-button:not(.stop-dot, .tk, .rename-btn):hover:not(:disabled) { border-color:var(--shu); }
-button:not(.stop-dot, .tk, .rename-btn):active:not(:disabled) { transform:translateY(2px); box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 0 0 rgba(0,0,0,.45); }
+button:not(.stop-dot, .tk, .rename-btn, .redact-btn):hover:not(:disabled) { border-color:var(--shu); }
+button:not(.stop-dot, .tk, .rename-btn, .redact-btn):active:not(:disabled) { transform:translateY(2px); box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 0 0 rgba(0,0,0,.45); }
 :focus-visible { outline:2px solid var(--hazard); outline-offset:2px; }
 
 /* top bar */
@@ -83,7 +83,7 @@ a.back:hover, a.back:focus-visible { color:var(--shu); transform:translateX(-3px
 .crate { background:var(--plate); border-radius:5px; padding:8px 10px; border-left:4px solid var(--rivet); position:relative;
   box-shadow: 0 2px 0 rgba(0,0,0,.18); cursor:grab; }
 .crate[draggable=false], .bay[draggable=false] { cursor:default; }
-.view .holding .sub, .view .dock .sub, .view #dock, .view #waiting, .view #parked, .view #hopper, .view .hopper-opts, .view .agents-btn, .view .rename-btn, .view button[data-act], .view #confirm { display:none !important; }
+.view .holding .sub, .view .dock .sub, .view #dock, .view #waiting, .view #parked, .view #hopper, .view .hopper-opts, .view .agents-btn, .view .rename-btn, .view .redact-btn, .view button[data-act], .view #confirm { display:none !important; }
 .view #queue, .view #steer { margin-top:22px !important; flex:1; overflow:auto; }  /* stands in for the hidden bottom lane */
 .crate.dragging { opacity:.4; }
 .crate.drop-before { box-shadow: 0 -3px 0 var(--hazard); } .crate.drop-after { box-shadow: 0 3px 0 var(--hazard); }
@@ -222,8 +222,9 @@ a.back:hover, a.back:focus-visible { color:var(--shu); transform:translateX(-3px
 
 .rom > .agents-btn { margin-top:6px; }
 button.ico { width:28px; padding:0; } button.ico svg { width:14px; height:14px; }
-.rename-btn { background:none; border:0; padding:0 2px; margin-left:4px; color:var(--dim); vertical-align:-2px; line-height:0; }
-.rename-btn svg { width:13px; height:13px; } .rename-btn:hover, .rename-btn:focus-visible { color:var(--shu); filter:none; }
+.rename-btn, .redact-btn { background:none; border:0; padding:0 2px; margin-left:4px; color:var(--dim); vertical-align:-2px; line-height:0; }
+.rename-btn svg, .redact-btn svg { width:13px; height:13px; } .rename-btn:hover, .rename-btn:focus-visible, .redact-btn:hover, .redact-btn:focus-visible { color:var(--shu); filter:none; }
+.redact-btn.on { color:var(--shu); } .redact-btn.on svg path { stroke-dasharray:2 1.5; }
 #agents-dlg { background:var(--plate); color:var(--ink); border:2px solid var(--hazard); border-radius:8px; padding:16px;
   max-width:min(440px, calc(100vw - 32px)); }
 #agents-dlg::backdrop { background:rgba(0,0,0,.5); }
@@ -638,6 +639,8 @@ function models(p) {
   return `<div class="models"><b>Phase ${esc(PHASE_LABELS[i])}</b> · ${fmt(usedIn(p, i)) || "no model yet"}${pre.length ? `<br><b>Earlier</b> ${fmt(pre)}` : ""}</div>`;
 }
 
+const EYE = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="2" fill="currentColor"/></svg>`;
+const eye = p => p.redact && !p.hidden ? "" : `<button class="redact-btn${p.hidden ? " on" : ""}" data-project="${esc(p.name)}" data-on="${p.hidden ? 1 : ""}" aria-pressed="${!!p.hidden}" title="${p.hidden ? "Hidden on the view page: click to show" : "Hide name on the view page"}">${EYE}<span class="sr">Hide on view page</span></button>`;
 const PEN = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M11.5 1.5l3 3L5 14H2v-3z M9.5 3.5l3 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg><span class="sr">Rename</span>`;
 
 // platform badge, colors match the public mtl site
@@ -645,7 +648,7 @@ const chip = s => { const t = {psx:"PS1", ps1:"PS1"}[s] ?? (s || "").toUpperCase
   return t ? `<span class="chip chip--${esc(t)}">${esc(t)}</span>` : ""; };
 function crate(p, extra = "") {
   return `<div class="crate ${esc(p.state)}${p.redact ? " redact" : ""}${arrive(p)}" draggable="${!VIEW}" data-name="${esc(p.name)}">
-    <div class="name"${VIEW ? "" : ` title="${esc(p.name)}"`}>${chip(p.system)}<span class="t">${hide(p.title || p.name)}</span>${p.state === "built" ? "" : `<button class="rename-btn" data-project="${esc(p.name)}" data-title="${esc(p.title || p.name)}">${PEN}</button>`}</div><div class="meta">Phase ${p.phase ?? "?"}${extra}</div>
+    <div class="name"${VIEW ? "" : ` title="${esc(p.name)}"`}>${chip(p.system)}<span class="t">${hide(p.title || p.name)}</span>${p.state === "built" ? "" : `<button class="rename-btn" data-project="${esc(p.name)}" data-title="${esc(p.title || p.name)}">${PEN}</button>`}${eye(p)}</div><div class="meta">Phase ${p.phase ?? "?"}${extra}</div>
     ${ticks(p)}${models(p)}${p.state === "built" ? "" : `<div class="acts">${acts(p)}<button class="ico agents-btn" data-project="${esc(p.name)}" title="Agents" aria-label="Agents">${COG}</button></div>`}</div>`;
 }
 
@@ -766,7 +769,7 @@ function bay(p) {
   const ph = phaseOf(p), f = ph / (PHASES - 1);
   const verb = {pausing:"Pausing after this phase", stopping:"Stopping"}[p.state];
   return `<div class="bay ${esc(p.state)}${p.redact ? " redact" : ""}${arrive(p)}" draggable="${!VIEW}" data-name="${esc(p.name)}">
-    <div class="head"><div class="name"${VIEW ? "" : ` title="${esc(p.name)}"`}>${chip(p.system)}<span class="t">${hide(p.title || p.name)}</span><button class="rename-btn" data-project="${esc(p.name)}" data-title="${esc(p.title || p.name)}">${PEN}</button></div>
+    <div class="head"><div class="name"${VIEW ? "" : ` title="${esc(p.name)}"`}>${chip(p.system)}<span class="t">${hide(p.title || p.name)}</span><button class="rename-btn" data-project="${esc(p.name)}" data-title="${esc(p.title || p.name)}">${PEN}</button>${eye(p)}</div>
       <div class="clock" title="Next: ${esc(p.waiting || p.next || "—")}">${verb ? esc(verb) : p.since ? `Running ${ago(p.since - (p.worked || 0))}` : "Running"}</div></div>
     <div class="track" role="group" aria-label="Phase ${ph} of ${PHASES - 1}">
       <div class="rail"><i style="--f:${f}"></i></div>
@@ -910,6 +913,14 @@ document.addEventListener("click", async e => {
   try { toast((await api(`/api/title?${new URLSearchParams(q)}`, {method: "POST", headers: {...H, "Content-Type": "application/json"},
     body: JSON.stringify({title: t})})).message); }
   catch (err) { toast("Rename: " + err.message); }
+  refresh();
+});
+
+document.addEventListener("click", async e => {
+  const b = e.target.closest(".redact-btn"); if (!b) return;
+  try { toast((await api(`/api/redact?${new URLSearchParams({project: b.dataset.project})}`, {method: "POST",
+    headers: {...H, "Content-Type": "application/json"}, body: JSON.stringify({redact: !b.dataset.on})})).message); }
+  catch (err) { toast("Hide: " + err.message); }
   refresh();
 });
 
