@@ -644,10 +644,6 @@ const PEN = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M11.5 1.5l3 3L
 const chip = s => { const t = {psx:"PS1", ps1:"PS1"}[s] ?? (s || "").toUpperCase();
   return t ? `<span class="chip chip--${esc(t)}">${esc(t)}</span>` : ""; };
 function crate(p, extra = "") {
-  if (VIEW && p.state === "built")  // the view page shows a shipped title's release date, not its phases
-    return `<div class="crate built${arrive(p)}" draggable="false" data-name="${esc(p.name)}">
-    <div class="name" title="${esc(p.name)}">${chip(p.system)}${esc(p.title || p.name)}</div>
-    <div class="meta">${p.released ? `Released ${new Date(p.released * 1000).toLocaleDateString([], {year:"numeric", month:"short", day:"numeric"})}` : "Released"}</div></div>`;
   return `<div class="crate ${esc(p.state)}${arrive(p)}" draggable="${!VIEW}" data-name="${esc(p.name)}">
     <div class="name"${VIEW ? "" : ` title="${esc(p.name)}"`}>${chip(p.system)}<span class="t">${hide(p.title || p.name)}</span>${p.state === "built" ? "" : `<button class="rename-btn" data-project="${esc(p.name)}" data-title="${esc(p.title || p.name)}">${PEN}</button>`}</div><div class="meta">Phase ${p.phase ?? "?"}${extra}</div>
     ${ticks(p)}${models(p)}${p.state === "built" ? "" : `<div class="acts">${acts(p)}<button class="ico agents-btn" data-project="${esc(p.name)}" title="Agents" aria-label="Agents">${COG}</button></div>`}</div>`;
