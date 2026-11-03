@@ -41,8 +41,8 @@ a.back:hover, a.back:focus-visible { color:var(--shu); transform:translateX(-3px
 .mark h1 { margin:0; font-size:22px; letter-spacing:.04em; }
 .gear { width:28px; height:28px; color:var(--hazard); }
 .spin .gear { animation: spin 6s linear infinite; }
-.view #inbox .t span, .view .holding .t span { color:transparent; background:#000; border-radius:2px; user-select:none; padding:0 2px; }  /* view page hides unreleased game names */
-.view #inbox .t, .view .holding .t { line-height:1.6; }  /* gap between wrapped redacted lines */
+.view #inbox .t span, .view .holding .t span, .view #steer .t span { color:transparent; background:#000; border-radius:2px; user-select:none; padding:0 2px; }  /* view page hides unreleased game names */
+.view #inbox .t, .view .holding .t, .view #steer .t { line-height:1.6; }  /* gap between wrapped redacted lines */
 .lamps { display:flex; gap:6px; align-items:center; align-self:flex-start; height:1.4em; font-size:15px; margin-top:3px; }  /* match the h2 line box so dots center on the title, not the 40px header */
 .lamp { width:14px; height:14px; border-radius:50%; background:var(--rivet); box-shadow: inset 0 -2px 0 rgba(0,0,0,.25); }
 .lamp.on { background:var(--ship); box-shadow: 0 0 10px var(--ship); animation: blink 2.4s ease-in-out infinite; }
@@ -83,7 +83,7 @@ a.back:hover, a.back:focus-visible { color:var(--shu); transform:translateX(-3px
 .crate { background:var(--plate); border-radius:5px; padding:8px 10px; border-left:4px solid var(--rivet); position:relative;
   box-shadow: 0 2px 0 rgba(0,0,0,.18); cursor:grab; }
 .crate[draggable=false], .bay[draggable=false] { cursor:default; }
-.view .holding .sub, .view #waiting, .view #parked, .view #hopper, .view .hopper-opts, .view .agents-btn, .view .rename-btn, .view button[data-act], .view #confirm { display:none !important; }
+.view .holding .sub, .view .dock .sub, .view #dock, .view #waiting, .view #parked, .view #hopper, .view .hopper-opts, .view .agents-btn, .view .rename-btn, .view button[data-act], .view #confirm { display:none !important; }
 .view #queue { margin-top:22px !important; flex:1; overflow:auto; }  /* stands in for the hidden bottom lane */
 .crate.dragging { opacity:.4; }
 .crate.drop-before { box-shadow: 0 -3px 0 var(--hazard); } .crate.drop-after { box-shadow: 0 3px 0 var(--hazard); }
@@ -543,7 +543,10 @@ body { padding-bottom:84px; background-color:var(--floor);
 
   <section class="station dock">
     <header><h2>Shipping dock<small lang="ja">出荷</small></h2><span class="num" id="n-ship"></span></header>
-    <div class="lane" id="dock"></div>
+    <div class="sub" style="margin-top:22px"><span>Needs steer</span></div>
+    <div class="lane" id="steer" style="margin-top:6px;min-height:60px"></div>
+    <div class="sub"><span>Published</span></div>
+    <div class="lane" id="dock" style="margin-top:6px"></div>
   </section>
 </div>
 
@@ -577,7 +580,7 @@ let data = {projects: [], slots: {}}, seen = {}, dragging = null, busy = false;
 
 const ALLOWED = {  // state -> actions it can take
   running:["pause","stop"], pausing:["stop"], stopping:[], queued:["resume","pause","stop"],
-  paused:["resume"], stopped:["resume"], idle:["resume"], waiting:["resume"], built:["resume"] };
+  paused:["resume"], stopped:["resume"], idle:["resume"], waiting:["resume"], steer:["resume"], built:["resume"] };
 const LABEL = {resume:"Run", pause:"Pause", stop:"Stop"};
 const BTN = {resume:"btn-go", pause:"btn-pause", stop:"btn-stop"};
 const ICON = {resume:"M5 3l9 5-9 5z", pause:"M4 3h3v10H4zM9 3h3v10H9z", stop:"M4 4h8v8H4z"};
@@ -800,7 +803,7 @@ setInterval(speak, 10000);
 function render() {
   const by = s => data.projects.filter(p => s.includes(p.state));
   const run = by(["running","pausing","stopping"]), q = by(["queued"]), wait = by(["waiting"]),
-        park = by(["paused","stopped","idle"]), ship = by(["built"]);
+        park = by(["paused","stopped","idle"]), ship = by(["built"]), steer = by(["steer"]);
   const max = Object.values(data.slots).reduce((a, s) => a + s.max, 0) || 3;
   const used = Object.values(data.slots).reduce((a, s) => a + s.used, 0);
   $("lamps").title = `${used} of ${max} machines busy`;
@@ -824,8 +827,9 @@ function render() {
   $("parked").innerHTML = park.map(p => crate(p)).join("") || `<div class="hint">Drop a running project to pause it after its phase. Stop now from its machine.</div>`;
   if (VIEW) $("queue").innerHTML = [$("queue"), $("waiting"), $("parked")].map(l => l.innerHTML.includes('class="hint"') ? "" : l.innerHTML).join("")
     || `<div class="hint">Nothing on hold.</div>`;  // the view page shows one Holding lane
+  $("steer").innerHTML = steer.map(p => crate(p)).join("") || `<div class="hint">Built releases you haven't pushed wait here.</div>`;
   $("dock").innerHTML = ship.map(p => crate(p)).join("");
-  $("n-ship").textContent = ship.length || "";
+  $("n-ship").textContent = (VIEW ? steer.length : steer.length + ship.length) || "";
   $("n-hold").textContent = q.length + wait.length + park.length || "";
   seen = Object.fromEntries(data.projects.map(p => [p.name, p.state]));
 }
