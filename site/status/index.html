@@ -221,24 +221,13 @@ a.back:hover, a.back:focus-visible { color:var(--shu); transform:translateX(-3px
 .btn-stop { background:var(--stop); color:#fff; } .btn-go { background:var(--ship); color:#0d2614; } .btn-pause { background:var(--flow); color:#04252a; }
 
 button.ico { width:28px; padding:0; } button.ico svg { width:14px; height:14px; }
-/* run/pause/stop: panel push buttons. The button is the fixed collar; ::before is the cap that travels when pressed */
+/* run/pause/stop: hanko seals in the .fuel plate's materials: flat fill, state-coloured ring, hard lip; hover inks the seal, press drops the lip */
 .acts { align-items:center; }
-button.ico:is(.btn-go, .btn-pause, .btn-stop) { position:relative; isolation:isolate; width:32px; height:32px; border:0; border-radius:50%;
-  background:linear-gradient(#777, #2e2e2e); box-shadow:inset 0 0 0 1px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.12), 0 2px 4px rgba(0,0,0,.5); }
-button.ico:is(.btn-go, .btn-pause, .btn-stop)::before { content:""; position:absolute; inset:3px 4px 5px; z-index:-1; border-radius:50%;
-  background:radial-gradient(circle at 38% 28%, color-mix(in srgb, var(--cap) 65%, #fff) 0 10%, var(--cap) 45%, var(--cap-lo));
-  box-shadow:0 2px 0 color-mix(in srgb, var(--cap-lo) 55%, #000), 0 3px 3px rgba(0,0,0,.55); transition:transform .08s, box-shadow .08s, filter .15s; }
-button.ico:is(.btn-go, .btn-pause, .btn-stop) svg { width:12px; height:12px; transform:translateY(-1px); transition:transform .08s; }
-button.ico:is(.btn-go, .btn-pause, .btn-stop):hover:not(:disabled) { filter:none; }
-button.ico:is(.btn-go, .btn-pause, .btn-stop):hover:not(:disabled)::before { filter:brightness(1.14); }
-button.ico:is(.btn-go, .btn-pause, .btn-stop):active:not(:disabled) { transform:none; box-shadow:inset 0 0 0 1px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.12), 0 2px 4px rgba(0,0,0,.5); }
-button.ico:is(.btn-go, .btn-pause, .btn-stop):active:not(:disabled)::before { transform:translateY(2px); box-shadow:0 0 0 transparent; }
-button.ico:is(.btn-go, .btn-pause, .btn-stop):active:not(:disabled) svg { transform:translateY(1px); }
-button.ico.btn-go { --cap:var(--ship); --cap-lo:#039a73; color:#06291d; }
-button.ico.btn-pause { --cap:var(--hazard); --cap-lo:#c98500; color:#2c1d00; }
-button.ico.btn-stop { --cap:var(--stop); --cap-lo:#b4122f; color:#fff;
-  background:repeating-conic-gradient(var(--hazard) 0 30deg, #222 30deg 60deg); }
-@media (prefers-reduced-motion: reduce) { button.ico:is(.btn-go, .btn-pause, .btn-stop)::before, button.ico:is(.btn-go, .btn-pause, .btn-stop) svg { transition:none; } }
+button.ico:is(.btn-go, .btn-pause, .btn-stop) { width:30px; height:30px; border-radius:50%; color:var(--c); background:var(--floor-2); border:2px solid var(--c);
+  box-shadow:0 3px 0 color-mix(in srgb, var(--c) 62%, #000); transition:background .15s, color .15s, transform .1s, box-shadow .1s; }
+button.ico:is(.btn-go, .btn-pause, .btn-stop):hover:not(:disabled) { filter:none; background:var(--c); color:var(--floor-2); border-color:var(--c); }
+button.ico:is(.btn-go, .btn-pause, .btn-stop):active:not(:disabled) { transform:translateY(3px); box-shadow:0 0 0 transparent; }
+button.ico.btn-go { --c:var(--ship); } button.ico.btn-pause { --c:var(--flow); } button.ico.btn-stop { --c:var(--stop); }
 .rename-btn { background:none; border:0; padding:0 2px; margin-left:4px; color:var(--dim); vertical-align:-2px; line-height:0; }
 .rename-btn svg { width:13px; height:13px; } .rename-btn:hover, .rename-btn:focus-visible { color:var(--shu); filter:none; }
 .dlg label.check { grid-template-columns:auto 1fr; } .dlg label[hidden] { display:none; }
