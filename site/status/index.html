@@ -83,7 +83,7 @@ a.back:hover, a.back:focus-visible { color:var(--shu); transform:translateX(-3px
 .crate { background:var(--plate); border-radius:5px; padding:8px 10px; border-left:4px solid var(--rivet); position:relative;
   box-shadow: 0 2px 0 rgba(0,0,0,.18); cursor:grab; }
 .crate[draggable=false], .bay[draggable=false] { cursor:default; }
-.view .holding .sub, .view .dock .sub, .view #dock, .view #waiting, .view #parked, .view #hopper, .view .hopper-opts, .view .agents-btn, .view .rename-btn, .view button[data-act], .view #confirm { display:none !important; }
+.view .holding .sub, .view .dock .sub, .view #dock, .view #waiting, .view #parked, .view #hopper, .view .hopper-opts, .view .agents-btn, .view .rom-play, .view .rename-btn, .view button[data-act], .view #confirm { display:none !important; }
 .view #queue, .view #steer { margin-top:22px !important; flex:1; overflow:auto; }  /* stands in for the hidden bottom lane */
 .crate.dragging { opacity:.4; }
 .crate.drop-before { box-shadow: 0 -3px 0 var(--hazard); } .crate.drop-after { box-shadow: 0 3px 0 var(--hazard); }
@@ -220,7 +220,6 @@ a.back:hover, a.back:focus-visible { color:var(--shu); transform:translateX(-3px
 
 .btn-stop { background:var(--stop); color:#fff; } .btn-go { background:var(--ship); color:#0d2614; } .btn-pause { background:var(--flow); color:#04252a; }
 
-.rom > .agents-btn { margin-top:6px; }
 button.ico { width:28px; padding:0; } button.ico svg { width:14px; height:14px; }
 .rename-btn { background:none; border:0; padding:0 2px; margin-left:4px; color:var(--dim); vertical-align:-2px; line-height:0; }
 .rename-btn svg { width:13px; height:13px; } .rename-btn:hover, .rename-btn:focus-visible { color:var(--shu); filter:none; }
@@ -852,7 +851,7 @@ function renderInbox(i = inboxData) {
     title="${r.ready ? "Drag onto the machine floor to start now, or onto another ROM to change its place in line" : "Still uploading or settling (60s)"}">
     <b class="pos" title="Place in line">${r.n + 1}</b><div class="name">${chip(r.dir)}<span class="t">${hide(romName(r))}</span><button class="rename-btn" data-dir="${esc(r.dir)}" data-name="${esc(r.name)}" data-title="${esc(romName(r))}">${PEN}</button></div>
     ${r.ready && r.preset === "default" ? "" : `<div class="meta">${[!r.ready && "settling", r.preset !== "default" && esc(r.preset)].filter(Boolean).join(" · ")}</div>`}
-    <button class="ico agents-btn" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}" title="Agents" aria-label="Agents">${COG}</button></div>`).join("")
+    <div class="acts">${r.ready ? `<button class="ico btn-go rom-play" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}" title="Start now" aria-label="Start now">${ico(ICON.resume)}</button>` : ""}<button class="ico agents-btn" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}" title="Agents" aria-label="Agents">${COG}</button></div></div>`).join("")
     || `<div class="hint">${i.items.length ? "No ROMs for this system." : "Inbox empty."}</div>`;
 }
 $("sys").onchange = () => renderInbox();
@@ -907,7 +906,7 @@ $("agents-form").onsubmit = async e => {
   refresh();
 };
 $("default-agents").onclick = () => openAgents();
-$("inbox").onclick = e => { const b = e.target.closest(".agents-btn"); if (b) openAgents(b.dataset.dir, b.dataset.rom); };
+$("inbox").onclick = e => { const b = e.target.closest(".agents-btn, .rom-play"); if (b) (b.matches(".rom-play") ? startRom : openAgents)(b.dataset.dir, b.dataset.rom); };
 document.addEventListener("click", e => { const b = e.target.closest(".agents-btn[data-project]");
   if (b) openAgents(null, null, data.projects.find(p => p.name === b.dataset.project)); });
 
