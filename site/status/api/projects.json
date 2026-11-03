@@ -594,7 +594,7 @@
     ]
    },
    "name": "ginga-sengoku-gunyuuden-rai-en",
-   "next": "1. Finish phase 1 survey: `snes_dmalog.lua` over a wide tour (ROM-source DMAs = raw tiles), catch LZ blocks not referenced by `A2/A9` immediates, decode the word-RLE tilemaps (`$BA:82C8`) enough to find text-shaped maps. Add rows to `docs/re/graphics.md`.\n  2. Phase 2 debug tool: the game is a real-time strategy map (faction select -> intro events -> map at ~frame 12000 of mash-A from boot; state `work/states/map_start_nankyourou.mss`, regenerate from `work/qa/play1` route). Needs RAM for faction, turn/year, planets owned, event flags; scenes: each faction's intro, map menus, planet data, fleet build, battle, capture/recruit, game over, each faction ending, credits.\n  3. Phase 4 needs an event-script parser for bank `$8D` (and others) to list every dialogue block pointer; the blind 24-bit sweep (`tools/find_ptr24.py`) is noisy.",
+   "next": "",
    "phase": 1,
    "released": null,
    "resets_at": null,
@@ -602,8 +602,8 @@
    "state": "running",
    "system": "snes",
    "title": "Ginga Sengoku Gunyuuden Rai (Japan)",
-   "updated": 1793670018.245505,
-   "waiting": "GUI keyboard input in `tools/mesen/Mesen.exe` not hand-tested (headless agent run); scripted input verified. Non-blocking: title logo has no known official English version, so per D5 it gets redrawn in English.",
+   "updated": 1793671840.5626292,
+   "waiting": "GUI keyboard input in `tools/mesen/Mesen.exe` not hand-tested (headless agent run);\n  scripted input verified. Non-blocking: title logo has no known official English version, so per D5 it gets\n  redrawn in English.",
    "worked": 1619.696034193039
   },
   {
