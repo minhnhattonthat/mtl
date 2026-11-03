@@ -221,7 +221,7 @@ a.back:hover, a.back:focus-visible { color:var(--shu); transform:translateX(-3px
 .btn-stop { background:var(--stop); color:#fff; } .btn-go { background:var(--ship); color:#0d2614; } .btn-pause { background:var(--flow); color:#04252a; }
 
 button.ico { width:28px; padding:0; } button.ico svg { width:14px; height:14px; }
-/* feed/run/hold/stop: fuda, wooden tags like the tour board: grain, state-coloured kanji and edge, hard lip; hover inks the tag, press drops the lip */
+/* feed/run/hold/stop: fuda, wooden tags like the tour board: grain, state-coloured text and edge, hard lip; hover inks the tag, press drops the lip */
 .acts { align-items:center; }
 button.fuda { padding:0 8px; font-size:13px; letter-spacing:.12em; text-indent:.12em; color:var(--c); border:2px solid var(--c); border-radius:2px; background-color:var(--floor-2);
   background-image:repeating-linear-gradient(90deg, transparent 0 11px, rgba(255,255,255,.035) 11px 12px); box-shadow:0 2px 0 color-mix(in srgb, var(--c) 62%, #000);
@@ -599,7 +599,6 @@ const ALLOWED = {  // state -> actions it can take
   paused:["resume"], stopped:["resume"], idle:["resume"], waiting:["resume"], steer:["resume"], built:["resume"] };
 const LABEL = {resume:"Run", pause:"Hold", stop:"Stop"};
 const BTN = {resume:"btn-go", pause:"btn-pause", stop:"btn-stop"};
-const JA = {resume:"運転", pause:"保留", stop:"停止"};
 const COG = `<svg aria-hidden="true"><use href="#gear"/></svg>`;
 
 function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.remove("show"); void t.offsetWidth;
@@ -615,7 +614,7 @@ const phaseOf = p => Math.max(0, Math.min(PHASES - 1, p.phase ?? 0));
 const ago = s => { const m = Math.floor((Date.now() / 1000 - s) / 60); return m < 60 ? `${m}m` : `${Math.floor(m / 60)}h ${m % 60}m`; };
 const arrive = p => seen[p.name] && seen[p.name] !== p.state ? " arrive" : "";
 const acts = p => ["resume","pause","stop"].filter(a => ALLOWED[p.state]?.includes(a))
-  .map(a => `<button class="fuda ${BTN[a]}" lang="ja" data-name="${esc(p.name)}" data-act="${a}" title="${LABEL[a]}" aria-label="${LABEL[a]}">${JA[a]}</button>`).join("");
+  .map(a => `<button class="fuda ${BTN[a]}" data-name="${esc(p.name)}" data-act="${a}">${LABEL[a]}</button>`).join("");
 const ticks = p => `<div class="ticks" aria-label="Phase ${p.phase ?? "?"} of ${PHASES - 1}">${
   Array.from({length: PHASES}, (_, i) => `<button type="button" class="tk${i <= phaseOf(p) ? " on" : ""}${i === shown(p) ? " shown" : ""}"
     ${tipAttrs(p, i)}><i></i>${mIcon(p, i)}</button>`).join("")}</div>`;
@@ -858,7 +857,7 @@ function renderInbox(i = inboxData) {
     title="${r.ready ? "Drag onto the machine floor to start now, or onto another ROM to change its place in line" : "Still uploading or settling (60s)"}">
     <b class="pos" title="Place in line">${r.n + 1}</b><div class="name">${chip(r.dir)}<span class="t">${hide(romName(r))}</span><button class="rename-btn" data-dir="${esc(r.dir)}" data-name="${esc(r.name)}" data-title="${esc(romName(r))}">${PEN}</button></div>
     ${r.ready && r.preset === "default" ? "" : `<div class="meta">${[!r.ready && "settling", r.preset !== "default" && esc(r.preset)].filter(Boolean).join(" · ")}</div>`}
-    <div class="acts">${r.ready ? `<button class="fuda btn-go rom-play" lang="ja" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}" title="Feed" aria-label="Feed">投入</button>` : ""}<button class="ico agents-btn" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}" title="Agents" aria-label="Agents">${COG}</button></div></div>`).join("")
+    <div class="acts">${r.ready ? `<button class="fuda btn-go rom-play" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}">Feed</button>` : ""}<button class="ico agents-btn" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}" title="Agents" aria-label="Agents">${COG}</button></div></div>`).join("")
     || `<div class="hint">${i.items.length ? "No ROMs for this system." : "Inbox empty."}</div>`;
 }
 $("sys").onchange = () => renderInbox();
