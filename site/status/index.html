@@ -224,7 +224,7 @@ a.back:hover, a.back:focus-visible { color:var(--shu); transform:translateX(-3px
 button.ico { width:28px; padding:0; } button.ico svg { width:14px; height:14px; }
 .rename-btn { background:none; border:0; padding:0 2px; margin-left:4px; color:var(--dim); vertical-align:-2px; line-height:0; }
 .rename-btn svg { width:13px; height:13px; } .rename-btn:hover, .rename-btn:focus-visible { color:var(--shu); filter:none; }
-.dlg label.check { grid-template-columns:auto 1fr; }
+.dlg label.check { grid-template-columns:auto 1fr; } .dlg label[hidden] { display:none; }
 .dlg { background:var(--plate); color:var(--ink); border:2px solid var(--hazard); border-radius:8px; padding:16px;
   max-width:min(440px, calc(100vw - 32px)); }
 .dlg::backdrop { background:rgba(0,0,0,.5); }
