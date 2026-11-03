@@ -574,7 +574,7 @@
    "worked": 0.0
   },
   {
-   "done": "MesenCE 2.2.1 in `tools/mesen/`; original ROM smoke-boots with `tools/routes/boot.txt` (Start at 550 -> faction select, verified with a shot); Lua `L.log` reaches log.txt; skill guard hook blocks `sed -i` (plugin hook loaded); pre-commit hook (`core.hooksPath tools/hooks`) rejects a failing test; `rom.sha1` pinned; `tools/check.py` + `tests/`; rulings D1-D7 recorded.",
+   "done": "",
    "models": {
     "0": [
      {
@@ -583,20 +583,28 @@
       "last": 1793668623.435759,
       "role": "phase"
      }
+    ],
+    "1": [
+     {
+      "agent": "opencode:opencode-go/deepseek-v4-pro",
+      "calls": 1,
+      "last": 1793670036.8486269,
+      "role": "phase"
+     }
     ]
    },
    "name": "ginga-sengoku-gunyuuden-rai-en",
-   "next": "phase 1 recon: earlier patches/docs, text encoding (likely 2-byte kanji font), pointer tables, compression, free space, graphics-text survey (title logo, faction-select names, menus). Notes go in `docs/re/`.",
-   "phase": 0,
+   "next": "1. Finish phase 1 survey: `snes_dmalog.lua` over a wide tour (ROM-source DMAs = raw tiles), catch LZ blocks not referenced by `A2/A9` immediates, decode the word-RLE tilemaps (`$BA:82C8`) enough to find text-shaped maps. Add rows to `docs/re/graphics.md`.\n  2. Phase 2 debug tool: the game is a real-time strategy map (faction select -> intro events -> map at ~frame 12000 of mash-A from boot; state `work/states/map_start_nankyourou.mss`, regenerate from `work/qa/play1` route). Needs RAM for faction, turn/year, planets owned, event flags; scenes: each faction's intro, map menus, planet data, fleet build, battle, capture/recruit, game over, each faction ending, credits.\n  3. Phase 4 needs an event-script parser for bank `$8D` (and others) to list every dialogue block pointer; the blind 24-bit sweep (`tools/find_ptr24.py`) is noisy.",
+   "phase": 1,
    "released": null,
    "resets_at": null,
-   "since": 1793668623.4062462,
+   "since": 1793670036.79274,
    "state": "running",
    "system": "snes",
    "title": "Ginga Sengoku Gunyuuden Rai (Japan)",
-   "updated": 1793667689.1832037,
-   "waiting": "GUI keyboard input in `tools/mesen/Mesen.exe` not hand-tested (headless agent run); scripted input verified.",
-   "worked": 206.31054019927979
+   "updated": 1793670018.245505,
+   "waiting": "GUI keyboard input in `tools/mesen/Mesen.exe` not hand-tested (headless agent run); scripted input verified. Non-blocking: title logo has no known official English version, so per D5 it gets redrawn in English.",
+   "worked": 1619.696034193039
   },
   {
    "done": "- Recon, extraction, build with relocation, roundtrip/identity/marker tests; debug warp tool (21 scenes,\n    `docs/re/debug.md`, `tools/debug/regen_states.py`); map tour of every map variant (`tools/debug/map_tour.py`,\n    sheets in `work/qa/tour/`).\n  - All text translated and reviewed: 4117 event messages (review pass 1, `tools/review.py split`, 122 fixes) and\n    ~3290 pointer strings (review pass 2, `split-ptr`, 240 fixes). Briefs: `docs/reviewer-brief.md`,\n    `docs/ptr-reviewer-brief.md`.\n  - Engine (`tools/engine.py`, `asm/`): proportional font + VWF in the message window (`vwf.s`; a run-start space\n    keeps 8 px for the choice cursor), draw_menu_string (`vwf_menu.s`; name fields drawn to their 6-cell end via\n    `asm/name6.s`), the typewriter window, the fixed-cell routine; two-letter glyphs for Granbo names; battle HUD\n    names (`asm/hud_name.s`, compact font `tools/font_small.py`); skills list without the per-row cost and an\n    uncut description line (`asm/pad_col.s`); column moves on status/card/save; English name-entry keyboard.\n  - Base+offset strings (docs/re/text.md): `tools/find_rel.py` traces them (adds/subs/word/neg); the build places\n    each group and rewrites the offsets; a test fails if a derived string has no entry.\n  - Graphics (`tools/gfx.py`, docs/re/graphics.md): title logo (`tools/gen_title.py` -> `assets/title_en.png`),\n    battle command labels, element pictograms, \u901a\u4fe1\u4e2d -> Linking, small-font punctuation.\n  - Title redesign: custom angular GRANBO lettering, silver bevels and indigo extrusion; original 240x160\n    indexed palette and 600-tile budget retained. Regeneration is byte-identical; 10 tests, build and cold-boot\n    smoke pass; independent visual review and `title_logo_manifest.tsv` QA gate pass (1 sheet).\n    Before: `work/qa/title_logo_before/final.png`; after: `work/qa/title_logo/final.png`.\n    The local build and the rebuilt v1.0 release archive include this redesign.\n  - Playtest fixes: Yes/No prompt line keeps the JP newline (an {8207} one pushed \"No\" past the canvas at\n    0x03000CC0 into game state 0x03002320: crash at ev1BC98C_012); speaker text starts at x=64 on every line\n    (D8: \u300c tabs there in vwf.s, fit adds it after RAM-slot names); GAP drawn opaque so the choice cursor erases.\n    QA round 2: prompt line stays on the JP's line (\"Got all that?\" {8207}\\n); pointer-table dialogue with a\n    speaker is fitted too (field box x=64; battle box {8A01} gets clear_portrait, x=48); overflowing pages split\n    evenly (no 1-word widow page); continuation pages drop a running-text name code ({9408}); Grisha spelling.\n  - Release tooling: `tools/release.py <ver>` (build, tests, jp_left with `docs/jp_known.txt`, qa_gate, smoke, BPS,\n    README from `docs/README-release.txt`, zip in release/; never publishes).\n  - QA-pass fixes: battle dialogue clears the portrait (`build.clear_portrait`), battle move popup 12 cells in a\n    14-wide box, small-font pair glyphs (Data Ball grids), element icon copies, fit width fixes for name codes.",
