@@ -1,13 +1,6 @@
 {
  "items": [
   {
-   "dir": "snes",
-   "folder": false,
-   "name": "xxxxx xxxxxxx xxxxxxxxx xxx",
-   "preset": "default",
-   "ready": true
-  },
-  {
    "dir": "psx",
    "folder": true,
    "name": "xxxxxxxx xxxx: xxxxxxxx xx xxxxxxx",
