@@ -456,10 +456,10 @@ body { padding-bottom:84px; background-color:var(--floor);
 @keyframes hatin { from { transform:translateY(-10px) scale(.4); opacity:0; } }
 @media (max-width: 960px) {  /* compact before the full board squeezes the mascot's bubble onto two lines: the flag, one kid and the count */
   .tour { gap:5px; padding:4px 7px 4px 6px; } .tour .guests svg:nth-child(n+3), .tour .guests i, .tour small { display:none; } }
-@media (max-width: 440px) {  /* tiniest: one kid wearing the count as a badge */
+@media (max-width: 440px) {  /* tiniest: one kid with the count as a pill beside it (not on it: that hid the face; the board's clipped corners rule out a corner badge) */
   .top { padding-left:40px; padding-right:10px; } .mark h1 { letter-spacing:0; }
-  .tour { padding:3px 5px; } .tour .guests .flag { display:none; }
-  .tour .tl { position:absolute; right:1px; bottom:2px; } .tour b { font-size:10px; min-width:14px; padding:0 3px; border-radius:7px; background:var(--shu); color:#fff; text-align:center; } }
+  .tour { gap:3px; padding:3px 5px; } .tour .guests .flag { display:none; }
+  .tour b { font-size:10px; min-width:14px; padding:0 3px; border-radius:7px; background:var(--shu); color:#fff; text-align:center; } }
 @media (prefers-reduced-motion: reduce) { .tour, .tour .guests svg { animation:none !important; } }
 .fuel::after { content:attr(data-tip); position:absolute; top:calc(100% + 12px); left:50%; z-index:20; width:max-content; white-space:pre; text-align:center;
   padding:6px 12px; background:var(--plate); border:1px solid var(--rivet); color:var(--ink); border-top:3px solid var(--shu); border-radius:4px; box-shadow:0 4px 12px rgba(0,0,0,.4);
