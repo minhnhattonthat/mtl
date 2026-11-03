@@ -343,6 +343,8 @@ body { padding-bottom:84px; background-color:var(--floor);
 /* var() inside keyframes isn't re-read per frame, so the bob animates --b and the gate multiplies it here */
 .walker.trip .w { animation-name:tbob; animation-duration:.16s; translate:0 calc(var(--amp) * var(--b)); }
 .walker.trip .tumble { transform-origin:17px 34px; animation:tumble var(--t) linear infinite; animation-delay:var(--dl); }
+/* fin pivots at the shoulder and counter-rotates the tumble so it keeps hanging down (lags, swings past, settles) */
+.walker.trip .fin1 { transform-origin:9.7px 22.7px; animation:armdrop var(--t) linear infinite; animation-delay:var(--dl); }
 /* eyes swap for > < squeezed shut from the fall until it gets up */
 .walker.trip .eye, .walker.trip .squint { animation:tripeye var(--t) linear infinite; animation-delay:var(--dl); }
 .walker.trip .squint { animation-name:squint; }
@@ -360,6 +362,9 @@ body { padding-bottom:84px; background-color:var(--floor);
   46%, 69% { transform:translateX(calc(var(--tx, 42vw) + 34px)); animation-timing-function:ease-in; } 100% { transform:translateX(calc(100vw + 40px)); } }
 @keyframes tumble { 0%, 38% { transform:rotate(0); animation-timing-function:cubic-bezier(.5,0,.9,.6); } 42.5% { transform:rotate(96deg); }
   44% { transform:translateY(-1px) rotate(84deg); } 45.5%, 64% { transform:rotate(90deg); animation-timing-function:ease-in-out; } 69%, 100% { transform:rotate(0); } }
+/* -76deg = -90 tumble + the fin's own -14 tilt, so it hangs plumb while the body lies flat */
+@keyframes armdrop { 0%, 38% { transform:rotate(0); animation-timing-function:cubic-bezier(.5,0,.9,.6); } 42.5% { transform:rotate(-55deg); }
+  44% { transform:rotate(-98deg); } 45.5% { transform:rotate(-68deg); } 47%, 64% { transform:rotate(-76deg); animation-timing-function:ease-in-out; } 69%, 100% { transform:rotate(0); } }
 /* hover bob switched off from the fall until it is back on its feet */
 @keyframes tripamp { 0%, 37.9%, 69.1%, 100% { --amp:1; } 38%, 69% { --amp:0; } }
 @keyframes tbob { to { --b:-2px; } }
