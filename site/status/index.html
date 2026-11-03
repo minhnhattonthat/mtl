@@ -41,8 +41,8 @@ a.back:hover, a.back:focus-visible { color:var(--shu); transform:translateX(-3px
 .mark h1 { margin:0; font-size:22px; letter-spacing:.04em; }
 .gear { width:28px; height:28px; color:var(--hazard); }
 .spin .gear { animation: spin 6s linear infinite; }
-.view #inbox .t span, .view .holding .t span, .view #steer .t span { color:transparent; background:#000; border-radius:2px; user-select:none; padding:0 2px; }  /* view page hides unreleased game names */
-.view #inbox .t, .view .holding .t, .view #steer .t { line-height:1.6; }  /* gap between wrapped redacted lines */
+.view #inbox .t span, .view .redact .t span { color:transparent; background:#000; border-radius:2px; user-select:none; padding:0 2px; }  /* view page hides unreleased game names */
+.view #inbox .t, .view .redact .t { line-height:1.6; }  /* gap between wrapped redacted lines */
 .lamps { display:flex; gap:6px; align-items:center; align-self:flex-start; height:1.4em; font-size:15px; margin-top:3px; }  /* match the h2 line box so dots center on the title, not the 40px header */
 .lamp { width:14px; height:14px; border-radius:50%; background:var(--rivet); box-shadow: inset 0 -2px 0 rgba(0,0,0,.25); }
 .lamp.on { background:var(--ship); box-shadow: 0 0 10px var(--ship); animation: blink 2.4s ease-in-out infinite; }
@@ -644,7 +644,7 @@ const PEN = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M11.5 1.5l3 3L
 const chip = s => { const t = {psx:"PS1", ps1:"PS1"}[s] ?? (s || "").toUpperCase();
   return t ? `<span class="chip chip--${esc(t)}">${esc(t)}</span>` : ""; };
 function crate(p, extra = "") {
-  return `<div class="crate ${esc(p.state)}${arrive(p)}" draggable="${!VIEW}" data-name="${esc(p.name)}">
+  return `<div class="crate ${esc(p.state)}${p.redact ? " redact" : ""}${arrive(p)}" draggable="${!VIEW}" data-name="${esc(p.name)}">
     <div class="name"${VIEW ? "" : ` title="${esc(p.name)}"`}>${chip(p.system)}<span class="t">${hide(p.title || p.name)}</span>${p.state === "built" ? "" : `<button class="rename-btn" data-project="${esc(p.name)}" data-title="${esc(p.title || p.name)}">${PEN}</button>`}</div><div class="meta">Phase ${p.phase ?? "?"}${extra}</div>
     ${ticks(p)}${models(p)}${p.state === "built" ? "" : `<div class="acts">${acts(p)}<button class="ico agents-btn" data-project="${esc(p.name)}" title="Agents" aria-label="Agents">${COG}</button></div>`}</div>`;
 }
@@ -765,8 +765,8 @@ function bay(p) {
   const seed = [...p.name].reduce((a, c) => a + c.charCodeAt(0), 0);
   const ph = phaseOf(p), f = ph / (PHASES - 1);
   const verb = {pausing:"Pausing after this phase", stopping:"Stopping"}[p.state];
-  return `<div class="bay ${esc(p.state)}${arrive(p)}" draggable="${!VIEW}" data-name="${esc(p.name)}">
-    <div class="head"><div class="name" title="${esc(p.name)}">${chip(p.system)}${esc(p.title || p.name)}<button class="rename-btn" data-project="${esc(p.name)}" data-title="${esc(p.title || p.name)}">${PEN}</button></div>
+  return `<div class="bay ${esc(p.state)}${p.redact ? " redact" : ""}${arrive(p)}" draggable="${!VIEW}" data-name="${esc(p.name)}">
+    <div class="head"><div class="name"${VIEW ? "" : ` title="${esc(p.name)}"`}>${chip(p.system)}<span class="t">${hide(p.title || p.name)}</span><button class="rename-btn" data-project="${esc(p.name)}" data-title="${esc(p.title || p.name)}">${PEN}</button></div>
       <div class="clock" title="Next: ${esc(p.waiting || p.next || "—")}">${verb ? esc(verb) : p.since ? `Running ${ago(p.since - (p.worked || 0))}` : "Running"}</div></div>
     <div class="track" role="group" aria-label="Phase ${ph} of ${PHASES - 1}">
       <div class="rail"><i style="--f:${f}"></i></div>
