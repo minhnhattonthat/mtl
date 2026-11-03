@@ -22,6 +22,13 @@ h2 small { font-size:12px; color:var(--shu); margin-left:6px; letter-spacing:.1e
 button { font-size:13px; font-weight:700; letter-spacing:.02em; cursor:pointer; color:var(--ink); background:var(--rivet);
   border:0; border-radius:4px; padding:4px 10px; }
 button:hover { filter:brightness(1.15); } button:disabled { opacity:.35; cursor:default; filter:none; }
+/* text buttons as wooden name plaques: one height, square-ish corners, a darker lip below, shu edge on hover */
+button:not(.stop-dot, .tk, .rename-btn) { height:28px; display:inline-flex; align-items:center; justify-content:center; gap:4px; padding:0 12px;
+  font-size:12px; letter-spacing:.12em; line-height:1; white-space:nowrap; border-radius:2px;
+  border:1px solid color-mix(in srgb, currentColor 22%, transparent); box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 2px 0 rgba(0,0,0,.45);
+  transition:filter .15s, transform .1s, box-shadow .1s, border-color .15s; }
+button:not(.stop-dot, .tk, .rename-btn):hover:not(:disabled) { border-color:var(--shu); }
+button:not(.stop-dot, .tk, .rename-btn):active:not(:disabled) { transform:translateY(2px); box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 0 0 rgba(0,0,0,.45); }
 :focus-visible { outline:2px solid var(--hazard); outline-offset:2px; }
 
 /* top bar */
@@ -65,7 +72,7 @@ a.back:hover, a.back:focus-visible { color:var(--shu); transform:translateX(-3px
 .hopper.hover { border-color:var(--hazard); transform:scale(1.02); }
 .hopper strong { display:block; font-family:"Zen Maru Gothic"; font-size:15px; }
 .hopper small { color:var(--dim); }
-.hopper-opts { display:flex; gap:6px; margin-top:8px; }
+.hopper-opts { display:flex; gap:6px; margin-top:8px; } .hopper-opts select, .hopper-opts input { height:28px; }
 .hopper-opts select, .hopper-opts input { font:inherit; font-size:12.5px; min-width:0; flex:1; padding:3px 5px; border-radius:4px;
   border:1px solid var(--rivet); background:var(--plate); color:var(--ink); }
 #inbox { display:flex; flex-direction:column; gap:8px; }
@@ -213,7 +220,10 @@ a.back:hover, a.back:focus-visible { color:var(--shu); transform:translateX(-3px
 
 .btn-stop { background:var(--stop); color:#fff; } .btn-go { background:var(--ship); color:#0d2614; } .btn-pause { background:var(--flow); color:#04252a; }
 
-.agents-btn, .rename-btn { margin-top:6px; font-size:12px; padding:2px 8px; }
+.rom > .agents-btn { margin-top:6px; }
+button.ico { width:28px; padding:0; } button.ico svg { width:14px; height:14px; }
+.rename-btn { background:none; border:0; padding:0 2px; margin-left:4px; color:var(--dim); vertical-align:-2px; line-height:0; }
+.rename-btn svg { width:13px; height:13px; } .rename-btn:hover, .rename-btn:focus-visible { color:var(--shu); filter:none; }
 #agents-dlg { background:var(--plate); color:var(--ink); border:2px solid var(--hazard); border-radius:8px; padding:16px;
   max-width:min(440px, calc(100vw - 32px)); }
 #agents-dlg::backdrop { background:rgba(0,0,0,.5); }
@@ -425,6 +435,31 @@ body { padding-bottom:84px; background-color:var(--floor);
 .fuel { display:flex; align-items:center; gap:10px; padding:4px 12px 4px 4px; text-decoration:none; color:var(--ink); background:var(--plate);
   border-radius:22px; border:2px solid var(--shu); box-shadow:0 3px 0 #a84600; transition:filter .15s, transform .1s, box-shadow .1s; }
 .fuel { position:relative; }
+/* viewer count as a factory-tour board: a wooden fuda hung on a cord, a sakura guide flag leading one field-trip kid per visitor */
+.tour { position:relative; display:flex; align-items:center; gap:8px; margin-left:auto; padding:5px 10px 5px 8px; background:var(--plate);
+  clip-path:polygon(7px 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 0 100%, 0 7px); border-bottom:2px solid var(--shu);
+  background-image:repeating-linear-gradient(90deg, transparent 0 11px, rgba(255,255,255,.025) 11px 12px); animation:sway 6s ease-in-out infinite;
+  transform-origin:50% -14px; }
+.tour[hidden] { display:none; }
+.tour::before { content:""; position:absolute; top:3px; left:50%; width:5px; height:5px; margin-left:-2.5px; border-radius:50%; background:var(--floor-2); }
+.tour .guests { display:flex; align-items:flex-end; }
+.tour .guests svg { width:18px; height:24px; margin-left:-3px; filter:drop-shadow(0 1px 0 rgba(0,0,0,.5)); }
+.tour .guests .flag { width:18px; margin:0 1px 0 0; transform-origin:2.5px 24px; animation:wave 2.4s ease-in-out infinite; }
+.tour .guests svg.new { animation:hatin .5s cubic-bezier(.3,1.6,.6,1) both; }
+.tour .guests i { font:700 10px "Zen Maru Gothic", sans-serif; font-style:normal; color:var(--dim); margin-left:2px; }
+.tour .tl { display:flex; flex-direction:column; align-items:center; line-height:1.05; }
+.tour b { font:700 17px "Zen Maru Gothic", system-ui, sans-serif; font-variant-numeric:tabular-nums; }
+.tour small { font-size:10px; letter-spacing:.2em; margin-right:-.2em; color:var(--shu); }
+@keyframes sway { 0%, 100% { rotate:-1.2deg; } 50% { rotate:1.2deg; } }
+@keyframes wave { 50% { rotate:-8deg; } }
+@keyframes hatin { from { transform:translateY(-10px) scale(.4); opacity:0; } }
+@media (max-width: 960px) {  /* compact before the full board squeezes the mascot's bubble onto two lines: the flag, one kid and the count */
+  .tour { gap:5px; padding:4px 7px 4px 6px; } .tour .guests svg:nth-child(n+3), .tour .guests i, .tour small { display:none; } }
+@media (max-width: 440px) {  /* tiniest: one kid wearing the count as a badge */
+  .top { padding-left:40px; padding-right:10px; } .mark h1 { letter-spacing:0; }
+  .tour { padding:3px 5px; } .tour .guests .flag { display:none; }
+  .tour .tl { position:absolute; right:1px; bottom:2px; } .tour b { font-size:10px; min-width:14px; padding:0 3px; border-radius:7px; background:var(--shu); color:#fff; text-align:center; } }
+@media (prefers-reduced-motion: reduce) { .tour, .tour .guests svg { animation:none !important; } }
 .fuel::after { content:attr(data-tip); position:absolute; top:calc(100% + 12px); left:50%; z-index:20; width:max-content; white-space:pre; text-align:center;
   padding:6px 12px; background:var(--plate); border:1px solid var(--rivet); color:var(--ink); border-top:3px solid var(--shu); border-radius:4px; box-shadow:0 4px 12px rgba(0,0,0,.4);
   font:500 12px "Zen Kaku Gothic New", system-ui, sans-serif; opacity:0; transform:translate(-50%, -4px); transition:opacity .15s, transform .15s; pointer-events:none; }
@@ -443,10 +478,11 @@ body { padding-bottom:84px; background-color:var(--floor);
 .fuel:hover .seal, .fuel:focus-visible .seal { background:var(--shu); color:var(--floor-2); transform:rotate(0) scale(.88); }
 .top:has(.fuel:hover) .gear { animation:spin .6s linear infinite; }
 /* too narrow for one row: title + ko-fi keep the top line, mascot drops below; then ko-fi shrinks to its seal */
-@media (max-width: 860px) { .pal { order:1; flex-basis:100%; } .fuel { margin-left:auto; } }
-@media (max-width: 560px) { .top { column-gap:12px; } .mark h1 { letter-spacing:.04em; } .fuel { padding:4px; } .fuel span { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+@media (max-width: 860px) { .pal { order:1; flex-basis:100%; } .tour { margin-left:auto; } .fuel { margin-left:0; } }
+@media (max-width: 640px) { .top { column-gap:12px; } .mark h1 { letter-spacing:.04em; } .fuel { padding:4px; } .fuel span { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
   .fuel::after, .fuel:hover::after, .fuel:focus-visible::after { left:auto; right:0; transform:none; } }
-@media (max-width: 400px) { .mark h1 { font-size:18px; } }
+@media (max-width: 440px) { .mark h1 { font-size:18px; } }
+@media (max-width: 360px) { .top { column-gap:6px; } .mark h1 { font-size:16px; } }
 @media (prefers-reduced-motion: reduce) { .fuel .seal { transition:none; } .top:has(.fuel:hover) .gear { animation:none; } }
 </style>
 </head>
@@ -462,6 +498,8 @@ body { padding-bottom:84px; background-color:var(--floor);
   <div class="mark"><a class="back" href="https://minhnhattonthat.github.io/mtl/"><span aria-hidden="true">‹</span><span class="sr">Back to library</span></a><svg class="gear"><use href="#gear"/></svg><h1>Translation Works<small lang="ja">翻訳工房</small></h1></div>
   <div class="pal"><svg class="mascot"></svg>
   <div class="bubble" aria-hidden="true"><span id="say"></span></div></div>
+  <div class="tour" id="viewers" role="status" hidden><span class="guests" aria-hidden="true"></span>
+    <span class="tl"><b></b><small lang="ja">見学中</small></span></div>
   <a class="fuel" href="https://ko-fi.com/minhnhattonthat" target="_blank" rel="noopener" data-tip="Bots run on coffee ☕&#10;Buy them one on Ko-fi">
     <i class="seal" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h15v7a6 6 0 0 1-6 6H9a6 6 0 0 1-6-6zm15 2v6a3 3 0 0 0 0-6z" fill-rule="evenodd"/><path fill="var(--plate)" d="M10.5 9.6c-1-1.2-3-.5-2.7 1.1.3 1.3 2.7 2.9 2.7 2.9s2.4-1.6 2.7-2.9c.3-1.6-1.7-2.3-2.7-1.1z"/></svg></i><span>Fuel the bots · Ko-fi<small lang="ja">差し入れ</small></span></a></div>
 
@@ -480,7 +518,7 @@ body { padding-bottom:84px; background-color:var(--floor);
       <div class="hopper-opts">
         <select id="sys" aria-label="System: filters the list and sets where uploads go"><option value="">All systems</option></select>
         <input id="folder" type="text" placeholder="Disc folder" aria-label="Disc folder, for cue+bin sets">
-        <button type="button" id="default-agents" title="Edit the default preset: every run without its own preset">Default agents</button>
+        <button type="button" class="ico" id="default-agents" title="Default agents: every run without its own preset" aria-label="Default agents"><svg aria-hidden="true"><use href="#gear"/></svg></button>
       </div>
       <div id="inbox"></div>
     </div>
@@ -527,7 +565,8 @@ body { padding-bottom:84px; background-color:var(--floor);
 
 <script>
 const $ = id => document.getElementById(id);
-const SNAPSHOT = true;  // `harness publish` flips this: a static copy on GitHub Pages reading api/*.json
+const SNAPSHOT = true;  // `harness publish` flips this: a static copy on GitHub Pages fed by the status worker
+const LIVE = "wss://mtl-status.mntt.workers.dev/ws";  // `harness publish` fills in the status worker's wss:// url
 const VIEW = SNAPSHOT || location.pathname === "/view";  // read-only page: no drag, no actions, no hopper
 if (VIEW) document.body.classList.add("view");
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -541,12 +580,15 @@ const ALLOWED = {  // state -> actions it can take
   paused:["resume"], stopped:["resume"], idle:["resume"], waiting:["resume"], built:["resume"] };
 const LABEL = {resume:"Run", pause:"Pause", stop:"Stop"};
 const BTN = {resume:"btn-go", pause:"btn-pause", stop:"btn-stop"};
+const ICON = {resume:"M5 3l9 5-9 5z", pause:"M4 3h3v10H4zM9 3h3v10H9z", stop:"M4 4h8v8H4z"};
+const ico = d => `<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="${d}"/></svg>`;
+const COG = `<svg aria-hidden="true"><use href="#gear"/></svg>`;
 
 function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.remove("show"); void t.offsetWidth;
   t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 3500); }
 
 async function api(path, opts) {
-  const r = await fetch(SNAPSHOT ? `api/${path.split("?")[0].split("/").pop()}.json?t=${Date.now()}` : path, opts);  // ?t= skips the Pages cache
+  const r = await fetch(path, opts);
   const j = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(j.message || j.error || r.statusText); return j;
 }
@@ -555,7 +597,7 @@ const phaseOf = p => Math.max(0, Math.min(PHASES - 1, p.phase ?? 0));
 const ago = s => { const m = Math.floor((Date.now() / 1000 - s) / 60); return m < 60 ? `${m}m` : `${Math.floor(m / 60)}h ${m % 60}m`; };
 const arrive = p => seen[p.name] && seen[p.name] !== p.state ? " arrive" : "";
 const acts = p => ["resume","pause","stop"].filter(a => ALLOWED[p.state]?.includes(a))
-  .map(a => `<button class="${BTN[a]}" data-name="${esc(p.name)}" data-act="${a}">${LABEL[a]}</button>`).join("");
+  .map(a => `<button class="ico ${BTN[a]}" data-name="${esc(p.name)}" data-act="${a}" title="${LABEL[a]}" aria-label="${LABEL[a]}">${ico(ICON[a])}</button>`).join("");
 const ticks = p => `<div class="ticks" aria-label="Phase ${p.phase ?? "?"} of ${PHASES - 1}">${
   Array.from({length: PHASES}, (_, i) => `<button type="button" class="tk${i <= phaseOf(p) ? " on" : ""}${i === shown(p) ? " shown" : ""}"
     ${tipAttrs(p, i)}><i></i>${mIcon(p, i)}</button>`).join("")}</div>`;
@@ -593,6 +635,8 @@ function models(p) {
   return `<div class="models"><b>Phase ${esc(PHASE_LABELS[i])}</b> · ${fmt(usedIn(p, i)) || "no model yet"}${pre.length ? `<br><b>Earlier</b> ${fmt(pre)}` : ""}</div>`;
 }
 
+const PEN = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M11.5 1.5l3 3L5 14H2v-3z M9.5 3.5l3 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg><span class="sr">Rename</span>`;
+
 // platform badge, colors match the public mtl site
 const chip = s => { const t = {psx:"PS1", ps1:"PS1"}[s] ?? (s || "").toUpperCase();
   return t ? `<span class="chip chip--${esc(t)}">${esc(t)}</span>` : ""; };
@@ -602,8 +646,8 @@ function crate(p, extra = "") {
     <div class="name" title="${esc(p.name)}">${chip(p.system)}${esc(p.title || p.name)}</div>
     <div class="meta">${p.released ? `Released ${new Date(p.released * 1000).toLocaleDateString([], {year:"numeric", month:"short", day:"numeric"})}` : "Released"}</div></div>`;
   return `<div class="crate ${esc(p.state)}${arrive(p)}" draggable="${!VIEW}" data-name="${esc(p.name)}">
-    <div class="name"${VIEW ? "" : ` title="${esc(p.name)}"`}>${chip(p.system)}<span class="t">${hide(p.title || p.name)}</span></div><div class="meta">Phase ${p.phase ?? "?"}${extra}</div>
-    ${ticks(p)}${models(p)}${p.state === "built" ? "" : `<div class="acts">${acts(p)}<button class="rename-btn" data-project="${esc(p.name)}" data-title="${esc(p.title || p.name)}">Rename</button></div>`}</div>`;
+    <div class="name"${VIEW ? "" : ` title="${esc(p.name)}"`}>${chip(p.system)}<span class="t">${hide(p.title || p.name)}</span>${p.state === "built" ? "" : `<button class="rename-btn" data-project="${esc(p.name)}" data-title="${esc(p.title || p.name)}">${PEN}</button>`}</div><div class="meta">Phase ${p.phase ?? "?"}${extra}</div>
+    ${ticks(p)}${models(p)}${p.state === "built" ? "" : `<div class="acts">${acts(p)}<button class="ico agents-btn" data-project="${esc(p.name)}" title="Agents" aria-label="Agents">${COG}</button></div>`}</div>`;
 }
 
 // little workers: glossy white bots, round head with a black visor and white oval eyes, ear pods,
@@ -723,14 +767,14 @@ function bay(p) {
   const ph = phaseOf(p), f = ph / (PHASES - 1);
   const verb = {pausing:"Pausing after this phase", stopping:"Stopping"}[p.state];
   return `<div class="bay ${esc(p.state)}${arrive(p)}" draggable="${!VIEW}" data-name="${esc(p.name)}">
-    <div class="head"><div class="name" title="${esc(p.name)}">${chip(p.system)}${esc(p.title || p.name)}</div>
+    <div class="head"><div class="name" title="${esc(p.name)}">${chip(p.system)}${esc(p.title || p.name)}<button class="rename-btn" data-project="${esc(p.name)}" data-title="${esc(p.title || p.name)}">${PEN}</button></div>
       <div class="clock" title="Next: ${esc(p.waiting || p.next || "—")}">${verb ? esc(verb) : p.since ? `Running ${ago(p.since - (p.worked || 0))}` : "Running"}</div></div>
     <div class="track" role="group" aria-label="Phase ${ph} of ${PHASES - 1}">
       <div class="rail"><i style="--f:${f}"></i></div>
       <div class="stops">${Array.from({length: PHASES}, (_, i) =>
         `<button type="button" class="stop-dot ${i < ph ? "done" : i === ph ? "now" : ""}" ${tipAttrs(p, i, true)}${mKey(p, i)}>${i}<span class="pn">${esc(PHASE_LABELS[i].replace(/^\d+ /, ""))}</span><span class="tt" aria-hidden="true">${tipOf(p, i)}</span></button>`).join("")}</div>
     </div>
-    <div class="acts">${acts(p)}<span class="crew">${crew(p, ph, seed)}</span>${scene(ph)}</div></div>`;
+    <div class="acts">${acts(p)}<button class="ico agents-btn" data-project="${esc(p.name)}" title="Agents" aria-label="Agents">${COG}</button><span class="crew">${crew(p, ph, seed)}</span>${scene(ph)}</div></div>`;
 }
 
 // mascot's bubble: a random line for the floor's mood, typed out, swapped every 10s
@@ -797,10 +841,9 @@ function renderInbox(i = inboxData) {
   const romName = r => r.title || (r.folder ? r.name : r.name.trim().replace(/\.[^. ]{1,4}$/, "")).replace(/\s*\(Japan\)/gi, "").trim();
   $("inbox").innerHTML = shown.map(r => `<div class="crate rom" draggable="${r.ready && !VIEW}" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}"
     title="${r.ready ? "Drag onto the machine floor to start now, or onto another ROM to change its place in line" : "Still uploading or settling (60s)"}">
-    <b class="pos" title="Place in line">${r.n + 1}</b><div class="name">${chip(r.dir)}<span class="t">${hide(romName(r))}</span></div>
+    <b class="pos" title="Place in line">${r.n + 1}</b><div class="name">${chip(r.dir)}<span class="t">${hide(romName(r))}</span><button class="rename-btn" data-dir="${esc(r.dir)}" data-name="${esc(r.name)}" data-title="${esc(romName(r))}">${PEN}</button></div>
     ${r.ready && r.preset === "default" ? "" : `<div class="meta">${[!r.ready && "settling", r.preset !== "default" && esc(r.preset)].filter(Boolean).join(" · ")}</div>`}
-    <button class="agents-btn" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}">Agents</button>
-    <button class="rename-btn" data-dir="${esc(r.dir)}" data-name="${esc(r.name)}" data-title="${esc(romName(r))}">Rename</button></div>`).join("")
+    <button class="ico agents-btn" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}" title="Agents" aria-label="Agents">${COG}</button></div>`).join("")
     || `<div class="hint">${i.items.length ? "No ROMs for this system." : "Inbox empty."}</div>`;
 }
 $("sys").onchange = () => renderInbox();
@@ -811,9 +854,12 @@ const PHASE_LABELS = ["0 setup", "1 recon", "2 debug tool", "3 identity", "4 ext
 let agentsFor = null;
 function fillAgents(preset) {
   const map = inboxData.maps[preset];  // custom keeps what is picked
+  const ph = agentsProj?.phase ?? -1, live = ["running", "pausing", "stopping"].includes(agentsProj?.state);
   $("agents-fields").querySelectorAll("select").forEach(i => {
+    const k = +i.dataset.k;  // NaN for review, never locked
+    if (k < ph || (live && k === ph)) { i.disabled = true; i.title = k < ph ? "Already done" : "Running now"; return; }
     if (map) setPick(i, map[i.dataset.k] || "");
-    i.disabled = !!map && !!agentsFor;  // the default preset itself is edited from the Default agents button
+    i.disabled = !!map && !!agentsFor;  // a project's rows stay editable: changing one switches it to custom  // the default preset itself is edited from the Default agents button
   });
 }
 function setPick(sel, v) {  // a spec outside config.CHOICES still shows
@@ -822,12 +868,13 @@ function setPick(sel, v) {  // a spec outside config.CHOICES still shows
 }
 const picks = () => ["", ...inboxData.choices].map(s =>
   `<option value="${esc(s)}" title="${esc(s)}">${s ? esc(nick(s)) : "— config —"}</option>`).join("");
-function openAgents(dir, name) {  // no ROM: edit the default preset
-  const it = dir ? inboxData.items.find(r => r.dir === dir && r.name === name) : {preset: "default", agents: inboxData.maps.default};
+let agentsProj = null;  // a started project: its running phase stays locked
+function openAgents(dir, name, proj) {  // no ROM: edit the default preset
+  const it = proj ? {preset: proj.preset, agents: proj.agents} : dir ? inboxData.items.find(r => r.dir === dir && r.name === name) : {preset: "default", agents: inboxData.maps.default};
   if (!it) return;
-  agentsFor = dir ? {dir, name} : null;
-  $("agents-title").textContent = dir ? name : "Default preset: every run without its own";
-  $("agents-preset").innerHTML = (dir ? inboxData.presets : ["default"]).map(p => `<option ${p === it.preset ? "selected" : ""}>${esc(p)}</option>`).join("");
+  agentsFor = dir ? {dir, name} : null; agentsProj = proj || null;
+  $("agents-title").textContent = proj ? (proj.title || proj.name) : dir ? name : "Default preset: every run without its own";
+  $("agents-preset").innerHTML = (proj || dir ? inboxData.presets : ["default"]).map(p => `<option ${p === it.preset ? "selected" : ""}>${esc(p)}</option>`).join("");
   $("agents-fields").innerHTML = PHASE_LABELS.map((l, i) => {
     const k = i < 10 ? String(i) : "review";
     return `<label>${esc(l)}<select data-k="${k}">${picks()}</select></label>`;
@@ -837,12 +884,14 @@ function openAgents(dir, name) {  // no ROM: edit the default preset
   $("agents-dlg").showModal();
 }
 $("agents-preset").onchange = e => fillAgents(e.target.value);
+$("agents-fields").onchange = () => { if (agentsProj) $("agents-preset").value = "custom"; };
 $("agents-cancel").onclick = () => $("agents-dlg").close();
 $("agents-form").onsubmit = async e => {
   e.preventDefault();
-  const phases = Object.fromEntries([...$("agents-fields").querySelectorAll("select")].map(i => [i.dataset.k, i.value]));
+  const phases = Object.fromEntries([...$("agents-fields").querySelectorAll("select:not(:disabled)")]
+    .filter(i => !agentsProj || i.value !== agentsProj.agents[i.dataset.k]).map(i => [i.dataset.k, i.value]));  // project: only changes, so untouched phases keep following the default preset
   try {
-    toast((await api(agentsFor ? `/api/inbox/agents?${new URLSearchParams(agentsFor)}` : "/api/agents/default", {method: "POST",
+    toast((await api(agentsProj ? `/api/project/agents?${new URLSearchParams({project: agentsProj.name})}` : agentsFor ? `/api/inbox/agents?${new URLSearchParams(agentsFor)}` : "/api/agents/default", {method: "POST",
       headers: {...H, "Content-Type": "application/json"}, body: JSON.stringify({preset: $("agents-preset").value, phases})})).message);
     $("agents-dlg").close();
   } catch (err) { toast("Agents: " + err.message); }
@@ -850,6 +899,8 @@ $("agents-form").onsubmit = async e => {
 };
 $("default-agents").onclick = () => openAgents();
 $("inbox").onclick = e => { const b = e.target.closest(".agents-btn"); if (b) openAgents(b.dataset.dir, b.dataset.rom); };
+document.addEventListener("click", e => { const b = e.target.closest(".agents-btn[data-project]");
+  if (b) openAgents(null, null, data.projects.find(p => p.name === b.dataset.project)); });
 
 // rename: display title only (Hopper ROM sidecar or the project's rom/title.txt); blank resets it
 document.addEventListener("click", async e => {
@@ -869,11 +920,41 @@ async function startRom(dir, name) {
   refresh();
 }
 
+// visitors: a school field trip (社会科見学), chibi kids in yellow safety hats and smocks, led by a sakura guide flag
+const GUEST = (c = "#7cc7ff") => `<svg viewBox="0 0 18 24"><path d="M3.5 24a5.5 6 0 0 1 11 0z" fill="${c}"/><path d="M7 18.6l2 2.2 2-2.2" fill="#fff"/>
+<circle cx="9" cy="12" r="5.6" fill="#ffe3cc"/><path d="M3.6 11.2a5.4 4.6 0 0 1 10.8 0c-2-.9-3.4-.6-5.4.5-2-1.1-3.4-1.4-5.4-.5z" fill="#3a2a22"/>
+<path d="M4 8.4a5 4.6 0 0 1 10 0z" fill="#ffd21f"/><rect x="2" y="7.8" width="14" height="2" rx="1" fill="#ffd21f"/><path d="M5.5 6.4a3.6 3 0 0 1 2.2-1.6" stroke="#fff9" stroke-width=".9" fill="none" stroke-linecap="round"/>
+<circle cx="7" cy="13.3" r=".8" fill="#222"/><circle cx="11" cy="13.3" r=".8" fill="#222"/>
+<ellipse cx="5.7" cy="14.9" rx="1.1" ry=".6" fill="#ff8fa3" opacity=".75"/><ellipse cx="12.3" cy="14.9" rx="1.1" ry=".6" fill="#ff8fa3" opacity=".75"/></svg>`;
+const SMOCKS = ["#7cc7ff", "#ff9ec4", "#8fe0a8", "#c6a8ff", "#ffb37c"];
+const FLAG = `<svg class="flag" viewBox="0 0 18 24"><circle cx="2.5" cy="1.8" r="1.4" fill="var(--hazard)"/><path d="M2.5 2.5V24" stroke="#cfcfcf" stroke-width="1.3" stroke-linecap="round"/>
+<path d="M3.2 3.2h12.3a1 1 0 0 1 .8 1.6l-2 2.7 2 2.7a1 1 0 0 1-.8 1.6H3.2z" fill="var(--shu)"/>
+<g transform="translate(8.6 7.5)" fill="#ffd1dc">${[0, 72, 144, 216, 288].map(a => `<ellipse rx="1.1" ry="1.7" cy="-1.5" transform="rotate(${a})"/>`).join("")}<circle r=".8" fill="var(--hazard)"/></g></svg>`;
+let shownViewers = 0;
+function showViewers(n = 0) {  // up to 5 hats, then +n; a newcomer's hat drops in
+  const v = $("viewers"); v.hidden = !n; if (n === shownViewers) return;
+  const hats = Math.min(n, 5);
+  v.querySelector(".guests").innerHTML = FLAG + Array.from({length: hats}, (_, i) => (i >= shownViewers ? GUEST(SMOCKS[i]).replace("<svg", '<svg class="new"') : GUEST(SMOCKS[i]))).join("")
+    + (n > 5 ? `<i>+${n - 5}</i>` : "");
+  v.querySelector("b").textContent = n;
+  v.title = `${n} ${n === 1 ? "person" : "people"} on the factory tour (viewing now)`;
+  shownViewers = n;
+}
+// public page: the worker pushes each snapshot and the viewer count over one socket, so nothing polls
+function live() {
+  const ws = new WebSocket(LIVE);
+  ws.onmessage = e => { const m = JSON.parse(e.data);
+    if (m.projects) { data = m.projects; render(); renderInbox(m.inbox); }
+    showViewers(m.viewers); };
+  ws.onclose = () => setTimeout(live, 5000);
+}
+const VIEWER = Math.random().toString(36).slice(2);  // randomUUID needs https; LAN viewers are plain http
 async function refresh() {
   if (busy || dragging) return; busy = true;
   try {
-    const [p, i] = await Promise.all([api("/api/projects"), api("/api/inbox")]);
+    const [p, i] = await Promise.all([api("/api/projects?v=" + VIEWER), api("/api/inbox")]);
     data = p; render(); renderInbox(i);
+    showViewers(p.viewers);
   } catch (e) { toast("Can't reach the harness: " + e.message); }
   finally { busy = false; }
 }
@@ -974,7 +1055,7 @@ hop.addEventListener("drop", e => { e.preventDefault(); hop.classList.remove("ho
 window.addEventListener("dragover", e => { if (!dragging) e.preventDefault(); });  // a missed drop must not open the ROM in the tab
 window.addEventListener("drop", e => { if (!dragging) e.preventDefault(); });
 
-refresh(); setInterval(refresh, 5000); setInterval(() => !dragging && render(), 30000);  // tick the run clocks
+if (SNAPSHOT) live(); else { refresh(); setInterval(refresh, 5000); } setInterval(() => !dragging && render(), 30000);  // tick the run clocks
 
 // lightning: a fresh random jagged spark tile every flicker; ends pinned to mid so the tile repeats seamlessly
 // each rail gets its own bolt; root holds one too so freshly rendered rails never show the static fallback
