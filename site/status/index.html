@@ -84,7 +84,7 @@ a.back:hover, a.back:focus-visible { color:var(--shu); transform:translateX(-3px
   box-shadow: 0 2px 0 rgba(0,0,0,.18); cursor:grab; }
 .crate[draggable=false], .bay[draggable=false] { cursor:default; }
 .view .holding .sub, .view .dock .sub, .view #dock, .view #waiting, .view #parked, .view #hopper, .view .hopper-opts, .view .agents-btn, .view .rename-btn, .view button[data-act], .view #confirm { display:none !important; }
-.view #queue { margin-top:22px !important; flex:1; overflow:auto; }  /* stands in for the hidden bottom lane */
+.view #queue, .view #steer { margin-top:22px !important; flex:1; overflow:auto; }  /* stands in for the hidden bottom lane */
 .crate.dragging { opacity:.4; }
 .crate.drop-before { box-shadow: 0 -3px 0 var(--hazard); } .crate.drop-after { box-shadow: 0 3px 0 var(--hazard); }
 .crate .name { font-weight:600; font-size:13px; overflow-wrap:anywhere; }
