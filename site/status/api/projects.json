@@ -587,8 +587,8 @@
     "1": [
      {
       "agent": "opencode:opencode-go/deepseek-v4-pro",
-      "calls": 1,
-      "last": 1793670036.8486269,
+      "calls": 2,
+      "last": 1793672017.9328218,
       "role": "phase"
      }
     ]
@@ -598,13 +598,13 @@
    "phase": 1,
    "released": null,
    "resets_at": null,
-   "since": 1793670036.79274,
+   "since": 1793672017.8722818,
    "state": "running",
    "system": "snes",
    "title": "Ginga Sengoku Gunyuuden Rai (Japan)",
    "updated": 1793671840.5626292,
    "waiting": "GUI keyboard input in `tools/mesen/Mesen.exe` not hand-tested (headless agent run);\n  scripted input verified. Non-blocking: title logo has no known official English version, so per D5 it gets\n  redrawn in English.",
-   "worked": 1619.696034193039
+   "worked": 3600.775575876236
   },
   {
    "done": "- Recon, extraction, build with relocation, roundtrip/identity/marker tests; debug warp tool (21 scenes,\n    `docs/re/debug.md`, `tools/debug/regen_states.py`); map tour of every map variant (`tools/debug/map_tour.py`,\n    sheets in `work/qa/tour/`).\n  - All text translated and reviewed: 4117 event messages (review pass 1, `tools/review.py split`, 122 fixes) and\n    ~3290 pointer strings (review pass 2, `split-ptr`, 240 fixes). Briefs: `docs/reviewer-brief.md`,\n    `docs/ptr-reviewer-brief.md`.\n  - Engine (`tools/engine.py`, `asm/`): proportional font + VWF in the message window (`vwf.s`; a run-start space\n    keeps 8 px for the choice cursor), draw_menu_string (`vwf_menu.s`; name fields drawn to their 6-cell end via\n    `asm/name6.s`), the typewriter window, the fixed-cell routine; two-letter glyphs for Granbo names; battle HUD\n    names (`asm/hud_name.s`, compact font `tools/font_small.py`); skills list without the per-row cost and an\n    uncut description line (`asm/pad_col.s`); column moves on status/card/save; English name-entry keyboard.\n  - Base+offset strings (docs/re/text.md): `tools/find_rel.py` traces them (adds/subs/word/neg); the build places\n    each group and rewrites the offsets; a test fails if a derived string has no entry.\n  - Graphics (`tools/gfx.py`, docs/re/graphics.md): title logo (`tools/gen_title.py` -> `assets/title_en.png`),\n    battle command labels, element pictograms, \u901a\u4fe1\u4e2d -> Linking, small-font punctuation.\n  - Title redesign: custom angular GRANBO lettering, silver bevels and indigo extrusion; original 240x160\n    indexed palette and 600-tile budget retained. Regeneration is byte-identical; 10 tests, build and cold-boot\n    smoke pass; independent visual review and `title_logo_manifest.tsv` QA gate pass (1 sheet).\n    Before: `work/qa/title_logo_before/final.png`; after: `work/qa/title_logo/final.png`.\n    The local build and the rebuilt v1.0 release archive include this redesign.\n  - Playtest fixes: Yes/No prompt line keeps the JP newline (an {8207} one pushed \"No\" past the canvas at\n    0x03000CC0 into game state 0x03002320: crash at ev1BC98C_012); speaker text starts at x=64 on every line\n    (D8: \u300c tabs there in vwf.s, fit adds it after RAM-slot names); GAP drawn opaque so the choice cursor erases.\n    QA round 2: prompt line stays on the JP's line (\"Got all that?\" {8207}\\n); pointer-table dialogue with a\n    speaker is fitted too (field box x=64; battle box {8A01} gets clear_portrait, x=48); overflowing pages split\n    evenly (no 1-word widow page); continuation pages drop a running-text name code ({9408}); Grisha spelling.\n  - Release tooling: `tools/release.py <ver>` (build, tests, jp_left with `docs/jp_known.txt`, qa_gate, smoke, BPS,\n    README from `docs/README-release.txt`, zip in release/; never publishes).\n  - QA-pass fixes: battle dialogue clears the portrait (`build.clear_portrait`), battle move popup 12 cells in a\n    14-wide box, small-font pair glyphs (Data Ball grids), element icon copies, fit width fixes for name codes.",
@@ -1000,8 +1000,8 @@
    "phase": 9,
    "released": 1793326725.837593,
    "resets_at": null,
-   "since": null,
-   "state": "built",
+   "since": 1793275817.900081,
+   "state": "running",
    "system": "psx",
    "title": "Nage Libre: Rasen no Soukoku",
    "updated": 1793326742.8705518,
@@ -1402,7 +1402,7 @@
  "slots": {
   "retro": {
    "max": 3,
-   "used": 2
+   "used": 3
   }
  }
 }
