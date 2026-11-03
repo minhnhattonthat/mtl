@@ -228,7 +228,9 @@ button.fuda { padding:0 8px; font-size:13px; letter-spacing:.12em; text-indent:.
   transition:background-color .15s, color .15s, transform .1s, box-shadow .1s; }
 button.fuda:hover:not(:disabled) { filter:none; background-color:var(--c); color:var(--floor-2); border-color:var(--c); }
 button.fuda:active:not(:disabled) { transform:translateY(2px); box-shadow:0 0 0 transparent; }
-button.fuda.btn-go { --c:var(--ship); } button.fuda.btn-pause { --c:var(--hazard); } button.fuda.btn-stop { --c:var(--stop); }
+button.fuda.btn-go { --c:var(--ship); } button.fuda.btn-pause { --c:var(--hazard); } button.fuda.btn-plain { --c:var(--dim); } button.fuda.ico { padding:0; text-indent:0; }
+.crate .acts { flex-wrap:wrap; }  /* narrow Holding/Hopper columns: a queued card has four tags */
+ button.fuda.btn-stop { --c:var(--stop); }
 .rename-btn { background:none; border:0; padding:0 2px; margin-left:4px; color:var(--dim); vertical-align:-2px; line-height:0; }
 .rename-btn svg { width:13px; height:13px; } .rename-btn:hover, .rename-btn:focus-visible { color:var(--shu); filter:none; }
 .dlg label.check { grid-template-columns:auto 1fr; } .dlg label[hidden] { display:none; }
@@ -526,7 +528,7 @@ body { padding-bottom:84px; background-color:var(--floor);
       <div class="hopper-opts">
         <select id="sys" aria-label="System: filters the list and sets where uploads go"><option value="">All systems</option></select>
         <input id="folder" type="text" placeholder="Disc folder" aria-label="Disc folder, for cue+bin sets">
-        <button type="button" class="ico" id="default-agents" title="Default agents: every run without its own preset" aria-label="Default agents"><svg aria-hidden="true"><use href="#gear"/></svg></button>
+        <button type="button" class="ico fuda btn-plain" id="default-agents" title="Default agents: every run without its own preset" aria-label="Default agents"><svg aria-hidden="true"><use href="#gear"/></svg></button>
       </div>
       <div id="inbox"></div>
     </div>
@@ -599,7 +601,6 @@ const ALLOWED = {  // state -> actions it can take
   paused:["resume"], stopped:["resume"], idle:["resume"], waiting:["resume"], steer:["resume"], built:["resume"] };
 const LABEL = {resume:"Run", pause:"Hold", stop:"Stop"};
 const BTN = {resume:"btn-go", pause:"btn-pause", stop:"btn-stop"};
-const COG = `<svg aria-hidden="true"><use href="#gear"/></svg>`;
 
 function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.remove("show"); void t.offsetWidth;
   t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 3500); }
@@ -660,7 +661,7 @@ const chip = s => { const t = {psx:"PS1", ps1:"PS1"}[s] ?? (s || "").toUpperCase
 function crate(p, extra = "") {
   return `<div class="crate ${esc(p.state)}${p.redact ? " redact" : ""}${arrive(p)}" draggable="${!VIEW}" data-name="${esc(p.name)}">
     <div class="name"${VIEW ? "" : ` title="${esc(p.name)}"`}>${chip(p.system)}<span class="t">${hide(p.title || p.name)}</span><button class="rename-btn" data-project="${esc(p.name)}" data-title="${esc(p.title || p.name)}">${PEN}</button></div><div class="meta">Phase ${p.phase ?? "?"}${extra}</div>
-    ${ticks(p)}${models(p)}${p.state === "built" ? "" : `<div class="acts">${acts(p)}<button class="ico agents-btn" data-project="${esc(p.name)}" title="Agents" aria-label="Agents">${COG}</button></div>`}</div>`;
+    ${ticks(p)}${models(p)}${p.state === "built" ? "" : `<div class="acts">${acts(p)}<button class="fuda btn-plain agents-btn" data-project="${esc(p.name)}">Agents</button></div>`}</div>`;
 }
 
 // little workers: glossy white bots, round head with a black visor and white oval eyes, ear pods,
@@ -787,7 +788,7 @@ function bay(p) {
       <div class="stops">${Array.from({length: PHASES}, (_, i) =>
         `<button type="button" class="stop-dot ${i < ph ? "done" : i === ph ? "now" : ""}" ${tipAttrs(p, i, true)}${mKey(p, i)}>${i}<span class="pn">${esc(PHASE_LABELS[i].replace(/^\d+ /, ""))}</span><span class="tt" aria-hidden="true">${tipOf(p, i)}</span></button>`).join("")}</div>
     </div>
-    <div class="acts">${acts(p)}<button class="ico agents-btn" data-project="${esc(p.name)}" title="Agents" aria-label="Agents">${COG}</button><span class="crew">${crew(p, ph, seed)}</span>${scene(ph)}</div></div>`;
+    <div class="acts">${acts(p)}<button class="fuda btn-plain agents-btn" data-project="${esc(p.name)}">Agents</button><span class="crew">${crew(p, ph, seed)}</span>${scene(ph)}</div></div>`;
 }
 
 // mascot's bubble: a random line for the floor's mood, typed out, swapped every 10s
@@ -857,7 +858,7 @@ function renderInbox(i = inboxData) {
     title="${r.ready ? "Drag onto the machine floor to start now, or onto another ROM to change its place in line" : "Still uploading or settling (60s)"}">
     <b class="pos" title="Place in line">${r.n + 1}</b><div class="name">${chip(r.dir)}<span class="t">${hide(romName(r))}</span><button class="rename-btn" data-dir="${esc(r.dir)}" data-name="${esc(r.name)}" data-title="${esc(romName(r))}">${PEN}</button></div>
     ${r.ready && r.preset === "default" ? "" : `<div class="meta">${[!r.ready && "settling", r.preset !== "default" && esc(r.preset)].filter(Boolean).join(" · ")}</div>`}
-    <div class="acts">${r.ready ? `<button class="fuda btn-go rom-play" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}">Feed</button>` : ""}<button class="ico agents-btn" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}" title="Agents" aria-label="Agents">${COG}</button></div></div>`).join("")
+    <div class="acts">${r.ready ? `<button class="fuda btn-go rom-play" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}">Feed</button>` : ""}<button class="fuda btn-plain agents-btn" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}">Agents</button></div></div>`).join("")
     || `<div class="hint">${i.items.length ? "No ROMs for this system." : "Inbox empty."}</div>`;
 }
 $("sys").onchange = () => renderInbox();
