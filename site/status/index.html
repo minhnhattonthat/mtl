@@ -41,8 +41,8 @@ a.back:hover, a.back:focus-visible { color:var(--shu); transform:translateX(-3px
 .mark h1 { margin:0; font-size:22px; letter-spacing:.04em; }
 .gear { width:28px; height:28px; color:var(--hazard); }
 .spin .gear { animation: spin 6s linear infinite; }
-.view #inbox .t span, .view .redact .t span { color:transparent; background:#000; border-radius:2px; user-select:none; padding:0 2px; }  /* view page hides unreleased game names */
-.view #inbox .t, .view .redact .t { line-height:1.6; }  /* gap between wrapped redacted lines */
+.view .redact .t span { color:transparent; background:#000; border-radius:2px; user-select:none; padding:0 2px; }  /* view page hides unreleased game names */
+.view .redact .t { line-height:1.6; }  /* gap between wrapped redacted lines */
 .lamps { display:flex; gap:6px; align-items:center; align-self:flex-start; height:1.4em; font-size:15px; margin-top:3px; }  /* match the h2 line box so dots center on the title, not the 40px header */
 .lamp { width:14px; height:14px; border-radius:50%; background:var(--rivet); box-shadow: inset 0 -2px 0 rgba(0,0,0,.25); }
 .lamp.on { background:var(--ship); box-shadow: 0 0 10px var(--ship); animation: blink 2.4s ease-in-out infinite; }
@@ -574,7 +574,7 @@ body { padding-bottom:84px; background-color:var(--floor);
   <h2 id="rename-title">Rename</h2>
   <form id="rename-form" method="dialog">
     <label>Display name <input id="rename-input" maxlength="200" placeholder="blank resets to the default"></label>
-    <label class="check" id="rename-redact-row"><input type="checkbox" id="rename-redact"> Hide name on the view page</label>
+    <label class="check"><input type="checkbox" id="rename-redact"> Hide name on the view page</label>
     <div class="row"><button type="button" id="rename-cancel">Cancel</button><button type="submit" class="btn-go">Save</button></div>
   </form>
 </dialog>
@@ -854,7 +854,7 @@ function renderInbox(i = inboxData) {
   $("n-inbox").textContent = i.items.length ? (shown.length < i.items.length ? `${shown.length}/${i.items.length}` : i.items.length) : "";
   // display only: data-rom keeps the real name
   const romName = r => r.title || (r.folder ? r.name : r.name.trim().replace(/\.[^. ]{1,4}$/, "")).replace(/\s*\(Japan\)/gi, "").trim();
-  $("inbox").innerHTML = shown.map(r => `<div class="crate rom" draggable="${r.ready && !VIEW}" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}"
+  $("inbox").innerHTML = shown.map(r => `<div class="crate rom${r.redact ? " redact" : ""}" draggable="${r.ready && !VIEW}" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}"
     title="${r.ready ? "Drag onto the machine floor to start now, or onto another ROM to change its place in line" : "Still uploading or settling (60s)"}">
     <b class="pos" title="Place in line">${r.n + 1}</b><div class="name">${chip(r.dir)}<span class="t">${hide(romName(r))}</span><button class="rename-btn" data-dir="${esc(r.dir)}" data-name="${esc(r.name)}" data-title="${esc(romName(r))}">${PEN}</button></div>
     ${r.ready && r.preset === "default" ? "" : `<div class="meta">${[!r.ready && "settling", r.preset !== "default" && esc(r.preset)].filter(Boolean).join(" · ")}</div>`}
@@ -921,10 +921,9 @@ document.addEventListener("click", e => { const b = e.target.closest(".agents-bt
 let renaming = null;  // {q, p, title}: the open rename dialog's target
 document.addEventListener("click", e => {
   const b = e.target.closest(".rename-btn"); if (!b) return;
-  const p = b.dataset.project && data.projects.find(x => x.name === b.dataset.project);
+  const p = b.dataset.project ? data.projects.find(x => x.name === b.dataset.project) : inboxData.items.find(x => x.dir === b.dataset.dir && x.name === b.dataset.name);
   renaming = {q: b.dataset.project ? {project: b.dataset.project} : {dir: b.dataset.dir, name: b.dataset.name}, p, title: b.dataset.title};
   $("rename-input").value = b.dataset.title;
-  $("rename-redact-row").hidden = !p;  // hopper ROMs are always hidden
   $("rename-redact").checked = !!p?.redact;
   $("rename-dlg").showModal(); $("rename-input").select();
 });
