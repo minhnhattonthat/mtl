@@ -854,7 +854,7 @@ function renderInbox(i = inboxData) {
   $("n-inbox").textContent = i.items.length ? (shown.length < i.items.length ? `${shown.length}/${i.items.length}` : i.items.length) : "";
   // display only: data-rom keeps the real name
   const romName = r => r.title || (r.folder ? r.name : r.name.trim().replace(/\.[^. ]{1,4}$/, "")).replace(/\s*\(Japan\)/gi, "").trim();
-  $("inbox").innerHTML = shown.map(r => `<div class="crate rom${r.redact ? " redact" : ""}" draggable="${r.ready && !VIEW}" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}"
+  $("inbox").innerHTML = shown.map(r => `<div class="crate rom${r.redact !== false ? " redact" : ""}" draggable="${r.ready && !VIEW}" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}"
     title="${r.ready ? "Drag onto the machine floor to start now, or onto another ROM to change its place in line" : "Still uploading or settling (60s)"}">
     <b class="pos" title="Place in line">${r.n + 1}</b><div class="name">${chip(r.dir)}<span class="t">${hide(romName(r))}</span><button class="rename-btn" data-dir="${esc(r.dir)}" data-name="${esc(r.name)}" data-title="${esc(romName(r))}">${PEN}</button></div>
     ${r.ready && r.preset === "default" ? "" : `<div class="meta">${[!r.ready && "settling", r.preset !== "default" && esc(r.preset)].filter(Boolean).join(" · ")}</div>`}
