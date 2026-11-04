@@ -244,6 +244,8 @@ button.fuda.btn-go { --c:var(--ship); } button.fuda.btn-pause { --c:var(--hazard
   border:1px solid var(--rivet); background:var(--floor-2); color:var(--ink); }
 .dlg select:disabled { opacity:.6; }
 .dlg .row { display:flex; gap:8px; justify-content:flex-end; margin-top:10px; }
+#agents-tabs { display:flex; gap:8px; } #agents-tabs[hidden], #agents-all-off[hidden], #agents-reset[hidden] { display:none; }
+#agents-tabs button { flex:1; } #agents-tabs button[aria-pressed="true"] { border-color:var(--hazard); color:var(--hazard); }
 #confirm { position:fixed; inset:auto 16px 16px auto; max-width:min(380px, calc(100vw - 32px)); background:var(--plate); border:2px solid var(--stop);
   border-radius:8px; padding:14px; box-shadow:0 10px 30px rgba(0,0,0,.35); display:none; z-index:10; }
 #confirm.show { display:block; animation: arrive .3s; }
@@ -566,8 +568,9 @@ body { padding-bottom:84px; background-color:var(--floor);
   <h2 id="agents-title"></h2>
   <form id="agents-form" method="dialog">
     <label>Preset <select id="agents-preset"></select></label>
+    <div id="agents-tabs"><button type="button" aria-pressed="true">Phases</button><button type="button" aria-pressed="false">Fallbacks</button></div>
     <div id="agents-fields"></div>
-    <div class="row"><button type="button" id="agents-cancel">Cancel</button><button type="submit" class="btn-go">Save</button></div>
+    <div class="row"><button type="button" id="agents-all-off" title="Stay on each phase's own agent when it makes no progress; Save to apply" hidden>All off</button><button type="button" id="agents-reset" title="Back to config's defaults for every row on this tab; Save to apply" hidden>Reset</button><button type="button" id="agents-cancel">Cancel</button><button type="submit" class="btn-go">Save</button></div>
   </form>
 </dialog>
 <dialog id="rename-dlg" class="dlg" aria-labelledby="rename-title">
@@ -881,19 +884,32 @@ function setPick(sel, v) {  // a spec outside config.CHOICES still shows
   if (![...sel.options].some(o => o.value === v)) sel.add(new Option(nick(v), v));
   sel.value = v;
 }
-const picks = () => ["", ...inboxData.choices].map(s =>
+const picks = () => [...(agentsFor || agentsProj ? [""] : []), ...inboxData.choices].map(s =>  // the default dialog shows real defaults, so needs no blank
   `<option value="${esc(s)}" title="${esc(s)}">${s ? esc(nick(s)) : "— config —"}</option>`).join("");
 let agentsProj = null;  // a started project: its running phase stays locked
+function agentsTab(btn) {  // hidden rows still save: the form reads every select
+  const second = btn === $("agents-tabs").lastElementChild;
+  [...$("agents-tabs").children].forEach(b => b.setAttribute("aria-pressed", b === btn));
+  [...$("agents-fields").children].forEach((l, n) => l.hidden = (n >= PHASE_LABELS.length) !== second);
+  $("agents-all-off").hidden = $("agents-reset").hidden = !second;
+}
+$("agents-reset").onclick = () => $("agents-fields").querySelectorAll("label:not([hidden]) select").forEach(s => setPick(s, inboxData.builtin[s.dataset.k]));
+$("agents-all-off").onclick = () => $("agents-fields").querySelectorAll('select:has(option[value="off"])').forEach(s => s.value = "off");
+$("agents-tabs").onclick = e => { const b = e.target.closest("button"); if (b) agentsTab(b); };
 function openAgents(dir, name, proj) {  // no ROM: edit the default preset
   const it = proj ? {preset: proj.preset, agents: proj.agents} : dir ? inboxData.items.find(r => r.dir === dir && r.name === name) : {preset: "default", agents: inboxData.maps.default};
   if (!it) return;
   agentsFor = dir ? {dir, name} : null; agentsProj = proj || null;
   $("agents-title").textContent = proj ? (proj.title || proj.name) : dir ? name : "Default preset: every run without its own";
   $("agents-preset").innerHTML = (proj || dir ? inboxData.presets : ["default"]).map(p => `<option ${p === it.preset ? "selected" : ""}>${esc(p)}</option>`).join("");
-  $("agents-fields").innerHTML = PHASE_LABELS.map((l, i) => {
-    const k = i < 10 ? String(i) : "review";
-    return `<label>${esc(l)}<select data-k="${k}">${picks()}</select></label>`;
-  }).join("");
+  const rows = PHASE_LABELS.map((l, i) => [i < 10 ? String(i) : "review", l]);
+  if (!proj && !dir) rows.push(["None", "no readable phase"],  // outside every preset, so only the default dialog edits them
+    ...PHASE_LABELS.slice(1, 10).map((l, i) => [`fallback-${i + 1}`, l]),
+    ...["claude", "codex", "opencode"].map(a => [`fallback-${a}`, `after ${a}, no phase fallback`]),
+    ["last-resort", "last resort"]);
+  $("agents-fields").innerHTML = rows.map(([k, l]) => `<label>${esc(l)}<select data-k="${k}">${k.startsWith("fallback-") || k === "last-resort" ? `<option value="off">— off —</option>` : ""}${picks()}</select></label>`).join("");
+  $("agents-tabs").hidden = !!(proj || dir);
+  agentsTab($("agents-tabs").firstElementChild);
   $("agents-fields").querySelectorAll("select").forEach(i => setPick(i, it.agents[i.dataset.k] || ""));
   fillAgents(it.preset);
   $("agents-dlg").showModal();
