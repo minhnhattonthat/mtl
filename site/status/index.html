@@ -13,6 +13,7 @@
   --floor:#2b2b2b; --floor-2:#1f1f1f; --plate:#333; --rivet:#444; --ink:#eee; --dim:#a8a8a8;
   --hazard:#ffb400; --flow:#3fd0ff; --stop:#ff4d6d; --ship:#06d6a0; --wait:#ff4fa0; --shu:#ff6a00;
   --wave: rgba(238,238,238,.035);
+  --m-claude:#d97757; --m-gpt:#10a37f; --m-codex:#6d5cff; --m-deepseek:#4d6bfe; --m-kimi:#9b87f5; --m-glm:#22b8d6; --m-qwen:#615ced; --m-mimo:#ff6900;
 }
 * { box-sizing:border-box; }
 html, body { margin:0; }
@@ -112,59 +113,64 @@ a.back:hover, a.back:focus-visible { color:var(--shu); transform:translateX(-3px
 .bay .name { font-family:"Zen Maru Gothic"; font-weight:700; font-size:17px; overflow-wrap:anywhere; }
 .bay .clock { margin-left:auto; font-family:"Zen Maru Gothic"; color:var(--dim); white-space:nowrap; font-variant-numeric:tabular-nums; }
 .track { position:relative; margin:24px 4px 10px; height:30px; }
-.rail { position:absolute; left:0; right:0; top:11px; height:8px; border-radius:4px; background:var(--rivet); overflow:hidden; }
-/* fill ends at the current dot's centre: --r = dot radius, --f = phase / last phase */
-.rail i { --r:15px; --pct:calc(var(--r) + (100% - 2 * var(--r)) * var(--f)); position:absolute; inset:0 auto 0 0; width:var(--pct); border-radius:4px; transition: width 1s cubic-bezier(.2,.8,.2,1), height 1s cubic-bezier(.2,.8,.2,1);
-  /* electric arc: jagged spark tile over a deep-blue charge; vertical tile + direction on the mobile line */
-  --a:90deg;
-  --spark:var(--spark-h, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='8'%3E%3Cg fill='none'%3E%3Cpolyline points='0,4 5,1 9,6 14,2 19,7 24,3 29,6 34,1 40,4' stroke='rgb(63,208,255)' stroke-width='2.6' opacity='.7'/%3E%3Cpolyline points='0,4 5,1 9,6 14,2 19,7 24,3 29,6 34,1 40,4' stroke='white' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E"));
-  background: var(--spark) 0 0 / 40px 100% repeat-x, linear-gradient(var(--a), #0b2a6b, #1e63d6); }
-.bay.running .rail { box-shadow: 0 0 10px color-mix(in srgb, var(--flow) 60%, transparent); }
-.bay.running .rail i { animation: arc .45s steps(5) infinite, zap 1.3s linear infinite; }
+.rail { --r:15px; position:absolute; left:var(--r); right:var(--r); top:10px; height:10px; border-radius:5px; background:var(--rivet); }
+/* rail runs between the first and last dot's centres: --r = dot radius, --f = phase / last phase */
+.rail i { --pct:calc(100% * var(--f)); position:absolute; inset:0 auto 0 0; width:var(--pct); border-radius:4px; transition: width 1s cubic-bezier(.2,.8,.2,1), height 1s cubic-bezier(.2,.8,.2,1);
+  /* each phase's model colour at its own dot, blending between dots (--stops from railStops); --a etc. flip it on the mobile line */
+  --a:90deg; --bs:280px 100%; --to:280px 0;
+  background:linear-gradient(var(--a), var(--stops, #1e63d6, #1e63d6)); }
+/* while running, a bright streak with a fading tail flows along the fill toward the current phase; wider apart than the dots so it reads as travelling */
+.bay.running .rail i::after { content:""; position:absolute; inset:0;
+  background:linear-gradient(var(--a), transparent 40%, #ffffff55 76%, #fff 92%, transparent 96%) 0 0 / var(--bs); filter:drop-shadow(0 0 4px #fff);
+  animation:flow 1.7s linear infinite; }
+/* glow: a blurred copy of the fill, so it takes each model's colour */
+.bay.running .rail i::before { content:""; position:absolute; inset:-3px 0; border-radius:inherit; background:inherit; filter:blur(7px); animation:railglow 1.7s ease-in-out infinite; }
 .stops { position:absolute; inset:0; display:flex; justify-content:space-between; }
 .stop-dot { width:30px; height:30px; border-radius:50%; display:grid; place-items:center; font-family:"Zen Maru Gothic"; font-size:13px;
   font-weight:700; background:var(--floor-2); border:2px solid var(--rivet); color:var(--dim); position:relative; z-index:1; }
 .stop-dot.done { background:#1e63d6; border-color:var(--flow); color:#fff; box-shadow:0 0 6px color-mix(in srgb, var(--flow) 55%, transparent); }
 .stop-dot.now { background:#0b2a6b; border-color:var(--flow); color:#fff; }
-.bay.running .stop-dot.now::after { content:""; position:absolute; inset:-7px; border-radius:50%; border:2px solid var(--flow);
-  animation: ping 1.8s ease-out infinite; }
 /* model per phase: the dot takes the model family's shape + color, tap one to list its models below */
 .stop-dot { padding:0; cursor:pointer; }
 .stop-dot[data-m] { --mc:var(--flow); border-color:var(--mc); color:#fff; text-shadow:0 1px 2px #000a; transition:border-radius .4s, background .4s;
   --base:var(--mc); --hi:#ffffff40;  /* --pat: per-family motif painted over the base */
-  background:var(--pat, none), var(--base); box-shadow:0 0 8px color-mix(in srgb, var(--mc) 55%, transparent); }
+  background:var(--pat, none), var(--base); box-shadow:0 0 5px color-mix(in srgb, var(--mc) 75%, transparent); }
 .stop-dot.now[data-m] { --base:var(--mc); }  /* current phase: full-strength color, breathing glow while running */
-.bay.running .stop-dot.now[data-m] { animation:mglow 1.6s ease-in-out infinite; }
-@keyframes mglow { 50% { box-shadow:0 0 4px 2px var(--mc), 0 0 16px 4px color-mix(in srgb, var(--mc) 60%, transparent); } }  /* no filter: it would tint the .tt bubble too */
+.bay .stop-dot.now { border:0; }
+.bay.running .stop-dot.now { animation:mglow 1.7s ease-in-out infinite; text-shadow:0 0 2px #000, 0 0 2px #000, 0 0 4px #000, 0 1px 3px #000; }  /* number stays readable through the flare */
+.bay.running .stop-dot.now .pn { color:#fff; font-weight:700; text-shadow:0 0 8px var(--mc, var(--flow)), 0 0 2px var(--mc, var(--flow)); }
+@keyframes mglow { 0%, 100% { box-shadow:inset 0 0 6px color-mix(in srgb, #fff 0%, transparent), 0 0 3px color-mix(in srgb, var(--mc, var(--flow)) 100%, transparent), 0 0 4px color-mix(in srgb, var(--mc, var(--flow)) 100%, transparent), 0 0 7px color-mix(in srgb, var(--mc, var(--flow)) 60%, transparent); } 50% { box-shadow:inset 0 0 9px color-mix(in srgb, #fff 100%, transparent), 0 0 4px color-mix(in srgb, var(--mc, var(--flow)) 100%, transparent), 0 0 5px color-mix(in srgb, var(--mc, var(--flow)) 100%, transparent), 0 0 11px color-mix(in srgb, var(--mc, var(--flow)) 100%, transparent); } }  /* no filter: it would tint the .tt bubble too */
 /* the floor's html is rebuilt every refresh; a negative delay off the page clock keeps these loops from restarting at frame 0 */
-.bay.running .stop-dot.now, .bay.running .stop-dot.now::after, .bay.running .stop-dot.now::before, .bay.running .rail i {
+.bay.running .stop-dot.now, .bay.running .stop-dot.now::after, .bay.running .stop-dot.now::before, .bay.running .rail i::before, .bay.running .rail i::after {
   animation-delay:calc(var(--now, 0) * -1ms) !important; }  /* !important: the animation shorthands above reset delay */
-.bay.running .stop-dot.now[data-m]::after { border-radius:inherit; border-color:var(--mc); }
-/* claude starburst · gpt rings · deepseek waves · kimi crescent · glm grid · qwen scales · mimo split fox face */
-.stop-dot[data-m="claude"]   { --mc:#d97757; border-radius:30%;
-  --pat:repeating-conic-gradient(var(--hi) 0 10deg, transparent 10deg 30deg); }
-.stop-dot[data-m="gpt"]      { --mc:#10a37f; border-radius:50% 50% 50% 50% / 30% 30% 70% 70%;
+/* claude starburst · gpt rings · deepseek whale · kimi crescent · glm grid · qwen scales · mimo split fox face */
+.stop-dot[data-m="claude"] { --mc:var(--m-claude); }
+.stop-dot[data-m="gpt"]      { --mc:var(--m-gpt); border-radius:50% 50% 50% 50% / 30% 30% 70% 70%;
   --pat:repeating-radial-gradient(circle, transparent 0 3px, var(--hi) 3px 4.5px); }
-/* codex: its logo cloud (outline only, from the official svg; the >_ is dropped so the number stays centred),
-   drawn on ::before so the dot keeps its tooltip; the dot's round glow/ring sits under the cloud */
-.stop-dot[data-m="codex"] { --mc:#6d5cff; background:none; border-color:transparent; box-shadow:none !important; animation:none !important; }
-.stop-dot[data-m="codex"]::before { content:""; position:absolute; width:36px; height:36px; left:calc(50% - 18px); top:calc(50% - 18px); z-index:-1;
-  transform:scale(calc(var(--dot, 30) / 30));
+/* codex: its logo cloud (outline only, from the official svg; the >_ is dropped so the number stays centred); deepseek: its whale; claude: its starburst.
+   drawn on ::before so the dot keeps its tooltip; the dot's round glow/ring sits under the logo */
+.stop-dot[data-m="codex"] { --mc:var(--m-codex); }
+.stop-dot[data-m="deepseek"] { --mc:var(--m-deepseek); }
+.stop-dot:is([data-m="claude"], [data-m="codex"], [data-m="deepseek"]) { background:none; border-color:transparent; box-shadow:none !important; }
+.stop-dot:is([data-m="claude"], [data-m="codex"], [data-m="deepseek"])::before { content:""; position:absolute; width:36px; height:36px; left:calc(50% - 18px); top:calc(50% - 18px); z-index:-1;
+  transform:scale(calc(var(--dot, 30) / 30)); }
+.stop-dot[data-m="codex"]::before {
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 250 250'%3E%3ClinearGradient id='g' x2='0' y2='1'%3E%3Cstop stop-color='%23b1a7ff'/%3E%3Cstop offset='.5' stop-color='%237a9dff'/%3E%3Cstop offset='1' stop-color='%233941ff'/%3E%3C/linearGradient%3E%3Cpath fill='url(%23g)' d='m84.3 5.1q3.7-1.5 7.7-2.6 3.9-1 7.9-1.6 4-0.5 8.1-0.6 4 0 8 0.5 20.7 2.4 37.1 17.7 0.1 0.1 0.4 0.3 0.1 0 0.2 0 0 0 0.2 0 0 0 0.1 0 0 0 0.1 0 5.2-1.4 10.7-1.9 5.4-0.4 10.7 0.1 5.5 0.4 10.7 1.9 5.2 1.3 10.1 3.6l0.6 0.4 1.6 0.8q5.2 2.5 9.7 6.1 4.7 3.4 8.6 7.7 3.8 4.3 6.9 9.2 3 4.8 5.2 10.2 4.3 10.5 4.3 22.1 0.2 2.1 0 4.2-0.1 2.2-0.2 4.3-0.3 2.1-0.7 4.3-0.4 2.1-0.9 4.1 0 0.2 0 0.4 0 0.2 0 0.5 0 0.1 0.1 0.4 0.1 0.1 0.3 0.3 12.3 12.6 16.3 30 6 29.7-12.2 53.5l-1.9 2.2q-3 3.5-6.5 6.4-3.4 3.1-7.3 5.5-3.8 2.4-8.1 4.2-4.1 1.9-8.5 3.2-0.3 0-0.4 0.2-0.3 0-0.4 0.1-0.1 0.1-0.3 0.4 0 0.1-0.1 0.3c-2.7 7.7-5.3 14.2-10.2 20.7-12.5 16.5-30.8 25.5-51.5 25.5q-24.6-0.1-43.6-18.1-0.2-0.1-0.4-0.2-0.2-0.1-0.4-0.1-0.2 0-0.3 0-0.3 0-0.4 0c-5.4 1.7-10.9 1.9-16.7 1.9q-3.5 0-7-0.5-3.4-0.4-6.9-1.2-3.3-0.8-6.6-2-3.3-1.2-6.4-2.8-3.3-1.6-6.4-3.6-3-2-5.8-4.3-3-2.3-5.5-5-2.5-2.6-4.6-5.6c-2.2-2.7-4.3-5.4-5.8-8.5q-0.8-1.6-1.6-3.2-0.6-1.7-1.3-3.3-0.7-1.7-1.2-3.4-0.5-1.6-1-3.4-1.1-4-1.6-7.9-0.6-4-0.6-8 0-4 0.6-8 0.4-4 1.4-8 0 0 0-0.1 0-0.1 0-0.1 0.2-0.2 0.2-0.3 0-0.1-0.2-0.1 0-0.2 0-0.3 0-0.1-0.1-0.1 0-0.2 0-0.2-0.1-0.1-0.1-0.1-2.4-2.5-4.6-5.2-2.1-2.7-4-5.4-1.7-3-3.2-6-1.5-3.1-2.6-6.3-0.8-2-1.3-4.1-0.7-2-1.1-4-0.4-2.1-0.7-4.2-0.2-2.2-0.4-4.3-0.2-2.8-0.1-5.6 0-2.8 0.3-5.4 0.1-2.8 0.6-5.6 0.4-2.8 1.1-5.5 7-23.1 26.9-36.3 4.3-2.9 8.2-4.5 4.5-1.9 9-3.2 0.2 0 0.3-0.1 0.1-0.2 0.3-0.3 0.1 0 0.1-0.3 0.1-0.1 0.1-0.2 1-3.1 2.2-6 1-2.9 2.5-5.7 1.5-3 3.2-5.6 1.7-2.7 3.7-5.1 2.5-3.2 5.3-5.9 3-2.8 6.1-5.4 3.2-2.4 6.8-4.4 3.5-2 7.2-3.5z'/%3E%3C/svg%3E") 0 0 / 100% no-repeat; }
-/* glow and running pulse as drop-shadows so they trace the cloud, not a circle */
-.stop-dot[data-m="codex"]::before { filter:drop-shadow(0 0 4px color-mix(in srgb, var(--mc) 55%, transparent)); }
-.bay.running .stop-dot.now[data-m="codex"]::before { animation:cglow 1.6s ease-in-out infinite; }
-@keyframes cglow { 50% { filter:drop-shadow(0 0 3px var(--mc)) drop-shadow(0 0 10px var(--mc)); } }
-.bay.running .stop-dot.now[data-m="codex"]::after { content:none; }  /* round ping ring would not match the cloud */
-.stop-dot[data-m="deepseek"] { --mc:#4d6bfe; border-radius:50% 50% 50% 4px;
-  --pat:radial-gradient(circle at 50% 0, transparent 4px, var(--hi) 4.5px 6px, transparent 6.5px) 0 0 / 8px 6px; }
-.stop-dot[data-m="kimi"]     { --mc:#9b87f5; border-radius:4px 50%;
+/* glow and running pulse as drop-shadows so they trace the logo, not a circle */
+.stop-dot:is([data-m="claude"], [data-m="codex"], [data-m="deepseek"])::before { filter:drop-shadow(0 0 3px color-mix(in srgb, var(--mc) 85%, transparent)) drop-shadow(0 0 0 color-mix(in srgb, var(--mc) 0%, transparent)); }
+.bay.running .stop-dot.now:is([data-m="claude"], [data-m="codex"], [data-m="deepseek"])::before { animation:cglow 1.7s ease-in-out infinite; }
+/* active phase: the logo itself flares once per bar cycle (same 1.7s as flow/railglow); tight radii so the glow keeps its outline; both keyframes list the same filters so they blend */
+@keyframes cglow { 0%, 100% { filter:brightness(1.05) saturate(1) drop-shadow(0 0 2px color-mix(in srgb, var(--mc, var(--flow)) 100%, transparent)) drop-shadow(0 0 2px color-mix(in srgb, var(--mc, var(--flow)) 100%, transparent)) drop-shadow(0 0 5px color-mix(in srgb, var(--mc, var(--flow)) 60%, transparent)); } 50% { filter:brightness(1.75) saturate(1.3) drop-shadow(0 0 3px color-mix(in srgb, var(--mc, var(--flow)) 100%, transparent)) drop-shadow(0 0 3px color-mix(in srgb, var(--mc, var(--flow)) 100%, transparent)) drop-shadow(0 0 9px color-mix(in srgb, var(--mc, var(--flow)) 100%, transparent)); } }
+.stop-dot[data-m="claude"] { text-shadow:0 0 2px #000, 0 0 3px #000, 0 1px 2px #000; }  /* the rays are thin, so the number needs a heavier outline */
+.stop-dot[data-m="claude"]::before { background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23d97757' d='M4.709 15.955l4.72-2.647.08-.23-.08-.128H9.2l-.79-.048-2.698-.073-2.339-.097-2.266-.122-.571-.121L0 11.784l.055-.352.48-.321.686.06 1.52.103 2.278.158 1.652.097 2.449.255h.389l.055-.157-.134-.098-.103-.097-2.358-1.596-2.552-1.688-1.336-.972-.724-.491-.364-.462-.158-1.008.656-.722.881.06.225.061.893.686 1.908 1.476 2.491 1.833.365.304.145-.103.019-.073-.164-.274-1.355-2.446-1.446-2.49-.644-1.032-.17-.619a2.97 2.97 0 01-.104-.729L6.283.134 6.696 0l.996.134.42.364.62 1.414 1.002 2.229 1.555 3.03.456.898.243.832.091.255h.158V9.01l.128-1.706.237-2.095.23-2.695.08-.76.376-.91.747-.492.584.28.48.685-.067.444-.286 1.851-.559 2.903-.364 1.942h.212l.243-.242.985-1.306 1.652-2.064.73-.82.85-.904.547-.431h1.033l.76 1.129-.34 1.166-1.064 1.347-.881 1.142-1.264 1.7-.79 1.36.073.11.188-.02 2.856-.606 1.543-.28 1.841-.315.833.388.091.395-.328.807-1.969.486-2.309.462-3.439.813-.042.03.049.061 1.549.146.662.036h1.622l3.02.225.79.522.474.638-.079.485-1.215.62-1.64-.389-3.829-.91-1.312-.329h-.182v.11l1.093 1.068 2.006 1.81 2.509 2.33.127.578-.322.455-.34-.049-2.205-1.657-.851-.747-1.926-1.62h-.128v.17l.444.649 2.345 3.521.122 1.08-.17.353-.608.213-.668-.122-1.374-1.925-1.415-2.167-1.143-1.943-.14.08-.674 7.254-.316.37-.729.28-.607-.461-.322-.747.322-1.476.389-1.924.315-1.53.286-1.9.17-.632-.012-.042-.14.018-1.434 1.967-2.18 2.945-1.726 1.845-.414.164-.717-.37.067-.662.401-.589 2.388-3.036 1.44-1.882.93-1.086-.006-.158h-.055L4.132 18.56l-1.13.146-.487-.456.061-.746.231-.243 1.908-1.312-.006.006z'/%3E%3C/svg%3E") 0 0 / 100% no-repeat; }
+.stop-dot[data-m="deepseek"]::before { background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23142a8c' d='M23.748 4.482c-.254-.124-.364.113-.512.234-.051.039-.094.09-.137.136-.372.397-.806.657-1.373.626-.829-.046-1.537.214-2.163.848-.133-.782-.575-1.248-1.247-1.548-.352-.156-.708-.311-.955-.65-.172-.241-.219-.51-.305-.774-.055-.16-.11-.323-.293-.35-.2-.031-.278.136-.356.276-.313.572-.434 1.202-.422 1.84.027 1.436.633 2.58 1.838 3.393.137.093.172.187.129.323-.082.28-.18.552-.266.833-.055.179-.137.217-.329.14a5.526 5.526 0 01-1.736-1.18c-.857-.828-1.631-1.742-2.597-2.458a11.365 11.365 0 00-.689-.471c-.985-.957.13-1.743.388-1.836.27-.098.093-.432-.779-.428-.872.004-1.67.295-2.687.684a3.055 3.055 0 01-.465.137 9.597 9.597 0 00-2.883-.102c-1.885.21-3.39 1.102-4.497 2.623C.082 8.606-.231 10.684.152 12.85c.403 2.284 1.569 4.175 3.36 5.653 1.858 1.533 3.997 2.284 6.438 2.14 1.482-.085 3.133-.284 4.994-1.86.47.234.962.327 1.78.397.63.059 1.236-.03 1.705-.128.735-.156.684-.837.419-.961-2.155-1.004-1.682-.595-2.113-.926 1.096-1.296 2.746-2.642 3.392-7.003.05-.347.007-.565 0-.845-.004-.17.035-.237.23-.256a4.173 4.173 0 001.545-.475c1.396-.763 1.96-2.015 2.093-3.517.02-.23-.004-.467-.247-.588z'/%3E%3Cpath fill='%234d6bfe' fill-rule='evenodd' d='M23.748 4.482c-.254-.124-.364.113-.512.234-.051.039-.094.09-.137.136-.372.397-.806.657-1.373.626-.829-.046-1.537.214-2.163.848-.133-.782-.575-1.248-1.247-1.548-.352-.156-.708-.311-.955-.65-.172-.241-.219-.51-.305-.774-.055-.16-.11-.323-.293-.35-.2-.031-.278.136-.356.276-.313.572-.434 1.202-.422 1.84.027 1.436.633 2.58 1.838 3.393.137.093.172.187.129.323-.082.28-.18.552-.266.833-.055.179-.137.217-.329.14a5.526 5.526 0 01-1.736-1.18c-.857-.828-1.631-1.742-2.597-2.458a11.365 11.365 0 00-.689-.471c-.985-.957.13-1.743.388-1.836.27-.098.093-.432-.779-.428-.872.004-1.67.295-2.687.684a3.055 3.055 0 01-.465.137 9.597 9.597 0 00-2.883-.102c-1.885.21-3.39 1.102-4.497 2.623C.082 8.606-.231 10.684.152 12.85c.403 2.284 1.569 4.175 3.36 5.653 1.858 1.533 3.997 2.284 6.438 2.14 1.482-.085 3.133-.284 4.994-1.86.47.234.962.327 1.78.397.63.059 1.236-.03 1.705-.128.735-.156.684-.837.419-.961-2.155-1.004-1.682-.595-2.113-.926 1.096-1.296 2.746-2.642 3.392-7.003.05-.347.007-.565 0-.845-.004-.17.035-.237.23-.256a4.173 4.173 0 001.545-.475c1.396-.763 1.96-2.015 2.093-3.517.02-.23-.004-.467-.247-.588zM11.581 18c-2.089-1.642-3.102-2.183-3.52-2.16-.392.024-.321.471-.235.763.09.288.207.486.371.739.114.167.192.416-.113.603-.673.416-1.842-.14-1.897-.167-1.361-.802-2.5-1.86-3.301-3.307-.774-1.393-1.224-2.887-1.298-4.482-.02-.386.093-.522.477-.592a4.696 4.696 0 011.529-.039c2.132.312 3.946 1.265 5.468 2.774.868.86 1.525 1.887 2.202 2.891.72 1.066 1.494 2.082 2.48 2.914.348.292.625.514.891.677-.802.09-2.14.11-3.054-.614zm1-6.44a.306.306 0 01.415-.287.302.302 0 01.2.288.306.306 0 01-.31.307.303.303 0 01-.304-.308zm3.11 1.596c-.2.081-.399.151-.59.16a1.245 1.245 0 01-.798-.254c-.274-.23-.47-.358-.552-.758a1.73 1.73 0 01.016-.588c.07-.327-.008-.537-.239-.727-.187-.156-.426-.199-.688-.199a.559.559 0 01-.254-.078c-.11-.054-.2-.19-.114-.358.028-.054.16-.186.192-.21.356-.202.767-.136 1.146.016.352.144.618.408 1.001.782.391.451.462.576.685.914.176.265.336.537.445.848.067.195-.019.354-.25.452z'/%3E%3C/svg%3E") 0 0 / 100% no-repeat; }
+.stop-dot[data-m="kimi"]     { --mc:var(--m-kimi); border-radius:4px 50%;
   --pat:radial-gradient(circle at 62% 38%, transparent 42%, #ffffff55 43% 56%, transparent 57%); }
-.stop-dot[data-m="glm"]      { --mc:#22b8d6; border-radius:4px;
+.stop-dot[data-m="glm"]      { --mc:var(--m-glm); border-radius:4px;
   --pat:linear-gradient(var(--hi) 1px, transparent 1px) 0 0 / 6px 6px, linear-gradient(90deg, var(--hi) 1px, transparent 1px) 0 0 / 6px 6px; }
-.stop-dot[data-m="qwen"]     { --mc:#615ced; border-radius:50% 50% 4px 4px;
+.stop-dot[data-m="qwen"]     { --mc:var(--m-qwen); border-radius:50% 50% 4px 4px;
   --pat:radial-gradient(circle at 50% 100%, transparent 3px, var(--hi) 3.5px 4.5px, transparent 5px) 0 0 / 8px 5px; }
-.stop-dot[data-m="mimo"]     { --mc:#ff6900; border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
+.stop-dot[data-m="mimo"]     { --mc:var(--m-mimo); border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
   --pat:linear-gradient(135deg, transparent 50%, #ffffff3a 50%); }
 .ticks .tk { all:unset; display:grid; justify-items:center; align-content:start; gap:3px; cursor:help; font-size:10px; line-height:1; min-height:8px; }
 .ticks .tk:focus-visible { outline:2px solid var(--hazard); }
@@ -175,7 +181,7 @@ a.back:hover, a.back:focus-visible { color:var(--shu); transform:translateX(-3px
 .models { margin-top:6px; color:var(--dim); font-size:12px; line-height:1.6; overflow-wrap:anywhere; }
 .models b { color:var(--ink); font-weight:500; }
 @media (max-width: 400px) {
-  .track { height:24px; } .rail { top:8px; } .rail i { --r:12px; } .stop-dot { width:24px; height:24px; font-size:11px; --dot:24; }
+  .track { height:24px; } .rail { top:7px; --r:12px; } .stop-dot { width:24px; height:24px; font-size:11px; --dot:24; }
 }
 /* dot tooltip, same look as the ko-fi one; the hovered dot lifts over its neighbours so none paint through it */
 .stop-dot .tt { position:absolute; top:calc(100% + 12px); left:50%; z-index:20; width:max-content; max-width:240px; white-space:normal; text-align:center;
@@ -195,10 +201,8 @@ a.back:hover, a.back:focus-visible { color:var(--shu); transform:translateX(-3px
 .stop-dot:first-child .pn { left:0; transform:none; } .stop-dot:last-child .pn { left:auto; right:0; transform:none; }
 @media (max-width: 640px) {
   .track { height:auto; margin:10px 0; }
-  .rail { left:9px; right:auto; top:0; bottom:0; width:8px; height:auto; }
-  .rail i { width:100%; height:var(--pct); --a:180deg; --r:13px;
-    --spark:var(--spark-v, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='40'%3E%3Cg fill='none'%3E%3Cpolyline points='4,0 1,5 6,9 2,14 7,19 3,24 6,29 1,34 4,40' stroke='rgb(63,208,255)' stroke-width='2.6' opacity='.7'/%3E%3Cpolyline points='4,0 1,5 6,9 2,14 7,19 3,24 6,29 1,34 4,40' stroke='white' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E"));
-    background-size: 100% 40px, auto; background-repeat: repeat-y, no-repeat; }
+  .rail { --r:13px; left:9px; right:auto; top:var(--r); bottom:var(--r); width:8px; height:auto; }
+  .rail i { width:100%; height:var(--pct); --a:180deg; --bs:100% 140px; --to:0 140px; }
   .stops { position:relative; flex-direction:column; gap:6px; }
   .stop-dot { width:26px; height:26px; font-size:11px; --dot:26; }
   .stop-dot .pn, .stop-dot:nth-child(n) .pn { font-size:11px; bottom:auto; top:50%; left:calc(100% + 10px); right:auto; transform:translateY(-50%); }
@@ -424,10 +428,8 @@ body { padding-bottom:84px; background-color:var(--floor);
 @keyframes blinkeye { 0%, 94%, 100% { transform:scaleY(1); } 97% { transform:scaleY(.1); } }
 @keyframes spin { to { transform:rotate(360deg); } }
 @keyframes belt { to { background-position: 22px 0; } }
-@keyframes arc { to { background-position: 40px 40px, 0 0; } }
-@keyframes zap { 0%, 100% { filter:none; } 8% { filter:brightness(1.7); } 14% { filter:brightness(.8); } 40% { filter:brightness(1.3); }
-  62% { filter:none; } 70% { filter:brightness(1.9); } 74% { filter:brightness(.85); } }
-@keyframes ping { from { transform:scale(.8); opacity:1; } to { transform:scale(1.5); opacity:0; } }
+@keyframes flow { to { background-position:var(--to); } }
+@keyframes railglow { 0%, 100% { opacity:.6; } 50% { opacity:1; } }
 @keyframes blink { 50% { opacity:.55; } }
 @keyframes nudge { 50% { transform:translateX(4px); } }
 @keyframes arrive { from { transform:translateY(-10px) scale(.96); opacity:0; } }
@@ -644,9 +646,14 @@ const mIcon = (p, i) => { const es = usedIn(p, i);
   return es.length ? esc(nick(es[0].agent).split(" ")[0]) + (es.length > 1 ? "<sup>+</sup>" : "") : ""; };
 // bay dots wear the phase's model family as shape + color (see [data-m] css)
 const FAM = {opus:"claude", sonnet:"claude", haiku:"claude"};
-const mKey = (p, i) => { const es = usedIn(p, i); if (!es.length) return "";
+const famOf = (p, i) => { const es = usedIn(p, i); if (!es.length) return "";
   const b = String(es[0].agent).split(":")[0] === "codex" ? "codex" : brand(es[0].agent);  // codex keeps its own look even on a gpt model
-  return ` data-m="${esc(FAM[b] || b)}"`; };
+  return FAM[b] || b; };
+const mKey = (p, i) => { const f = famOf(p, i); return f && ` data-m="${esc(f)}"`; };
+// rail fill's colour stops up to the current phase: no model yet = the plain blue of an unmarked dot, unknown family = --flow like its dot
+const railStops = p => { const ph = phaseOf(p), c = i => { const f = famOf(p, i).replace(/[^\w-]/g, "");
+    return f ? `var(--m-${f}, var(--flow))` : "#1e63d6"; };
+  return [...Array(ph + 1).keys()].map(i => `${c(i)} ${ph ? i / ph * 100 : 0}%`).concat(`${c(ph)} 100%`).join(","); };
 const tipOf = (p, i) => `Phase ${esc(PHASE_LABELS[i])}: ${fmt(usedIn(p, i)) || "no model yet"}`;
 const tipAttrs = (p, i, own) => { const t = tipOf(p, i);  // own: caller draws its own .tt bubble, so no native title
   return `${own ? "" : `title="${t}" `}aria-label="${t}"`; };
@@ -787,7 +794,7 @@ function bay(p) {
     <div class="head"><div class="name"${VIEW ? "" : ` title="${esc(p.name)}"`}>${chip(p.system)}<span class="t">${hide(p.title || p.name)}</span><button class="rename-btn" data-project="${esc(p.name)}" data-title="${esc(p.title || p.name)}">${PEN}</button></div>
       <div class="clock" title="Next: ${esc(p.waiting || p.next || "—")}">${verb ? esc(verb) : p.since ? `Running ${ago(p.since - (p.worked || 0))}` : "Running"}</div></div>
     <div class="track" role="group" aria-label="Phase ${ph} of ${PHASES - 1}">
-      <div class="rail"><i style="--f:${f}"></i></div>
+      <div class="rail"><i style="--f:${f};--stops:${railStops(p)}"></i></div>
       <div class="stops">${Array.from({length: PHASES}, (_, i) =>
         `<button type="button" class="stop-dot ${i < ph ? "done" : i === ph ? "now" : ""}" ${tipAttrs(p, i, true)}${mKey(p, i)}>${i}<span class="pn">${esc(PHASE_LABELS[i].replace(/^\d+ /, ""))}</span><span class="tt" aria-hidden="true">${tipOf(p, i)}</span></button>`).join("")}</div>
     </div>
@@ -1102,27 +1109,6 @@ window.addEventListener("drop", e => { if (!dragging) e.preventDefault(); });
 
 if (SNAPSHOT) live(); else { refresh(); setInterval(refresh, 5000); } setInterval(() => !dragging && render(), 30000);  // tick the run clocks
 
-// lightning: a fresh random jagged spark tile every flicker; ends pinned to mid so the tile repeats seamlessly
-// each rail gets its own bolt; root holds one too so freshly rendered rails never show the static fallback
-// pool built once: cycling a fixed set lets the browser reuse decoded images instead of decoding a new data: URL every flicker
-const BOLTS = Array.from({ length: 8 }, () => {
-  const pts = [[0, 4]];
-  for (let x = 3 + Math.random() * 3; x < 37; x += 3 + Math.random() * 4) pts.push([+x.toFixed(1), +(1 + Math.random() * 6).toFixed(1)]);
-  pts.push([40, 4]);
-  const sw = (2 + Math.random() * 1.4).toFixed(1);
-  const svg = (w, h, p) => `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${h}'><g fill='none'><polyline points='${p}' stroke='rgb(63,208,255)' stroke-width='${sw}' opacity='.7'/><polyline points='${p}' stroke='white' stroke-width='1'/></g></svg>`)}")`;
-  return [svg(40, 8, pts.map(([x, y]) => `${x},${y}`).join(" ")), svg(8, 40, pts.map(([x, y]) => `${y},${x}`).join(" "))];
-});
-function bolt(el) {
-  const [h, v] = BOLTS[Math.random() * BOLTS.length | 0];
-  el.style.setProperty("--spark-h", h);
-  el.style.setProperty("--spark-v", v);
-}
-function spark() {
-  [document.documentElement, ...document.querySelectorAll(".bay.running .rail i")].forEach(bolt);
-  setTimeout(spark, 150 + Math.random() * 450);
-}
-spark();
 </script>
 </body>
 </html>
