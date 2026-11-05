@@ -102,6 +102,17 @@ function render() {
   $('grid').replaceChildren(...(list.length ? list.map(card) : [el('p', { className: 'empty', textContent: 'No projects match.' })]));
 }
 
+// The build's counts can be hours old (no webhook for downloads); the status worker serves ~5 min fresh ones.
+async function liveDownloads() {
+  try {
+    const r = await fetch('https://mtl-status.mntt.workers.dev/downloads');
+    if (!r.ok) return; // keep the build's counts
+    const live = await r.json();
+    for (const p of projects) if (live[p.repo] != null) p.downloads = live[p.repo];
+    render();
+  } catch {}
+}
+
 $('platform').addEventListener('click', (e) => {
   const b = e.target.closest('button');
   if (!b) return;
@@ -123,6 +134,16 @@ try {
   projects = await res.json();
   renderFeatured();
   render();
+  liveDownloads();
+  // pick up webhook-triggered rebuilds when an old tab comes back; shortcut: grid only, hero keeps its first load
+  document.addEventListener('visibilitychange', async () => {
+    if (document.hidden) return;
+    try {
+      const r = await fetch('projects.json', { cache: 'no-cache' });
+      if (r.ok) { projects = await r.json(); render(); }
+    } catch {}
+    liveDownloads();
+  });
 } catch {
   $('grid').replaceChildren(el('p', { className: 'empty', textContent: "Couldn't load projects." }));
 }
