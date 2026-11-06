@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { findGameById, buildGameQuery, buildSlugQuery, coverUrl, findGame, matchScore, slugify, titleVariants, MIN_SCORE } from './igdb.mjs';
+import { findGameById, buildGameQuery, buildSearchQuery, buildSlugQuery, coverUrl, findGame, matchScore, slugify, titleVariants, MIN_SCORE } from './igdb.mjs';
 
 const F = 'fields name,first_release_date,cover.image_id,alternative_names.name;';
 
@@ -55,7 +55,7 @@ const reply = (games) => ({ ok: true, json: async () => games });
 test('findGame pools all queries and returns the best match with a cover', async () => {
   const bodies = [];
   const fake = async (url, opts) => {
-    assert.equal(url, 'https://api.igdb.com/v4/games');
+    assert.match(url, /^https:\/\/api\.igdb\.com\/v4\/(games|search)$/);
     assert.equal(opts.headers.Authorization, 'Bearer tok');
     bodies.push(opts.body);
     if (opts.body.startsWith('search "Shin Megami Tensei";')) return reply([{ id: 2, ...ice, cover: { image_id: 'ice' } }, { id: 3, ...fire, cover: { image_id: 'fire' }, first_release_date: 1027468800 }]);
@@ -64,7 +64,24 @@ test('findGame pools all queries and returns the best match with a cover', async
   };
   const game = await findGame('Shin Megami Tensei: Devil Children 2 Honoo no Sho / DemiKids Book of Fire', 24, auth, fake, noWait);
   assert.deepEqual({ ...game, score: undefined }, { id: 3, name: fire.name, year: 2002, imageId: 'fire', score: undefined, loose: null });
-  assert.equal(bodies.length, 8); // 4 variants × (search + slug), platform pass only
+  assert.equal(bodies.length, 10); // 2 broad + 4 variants × (search + slug), platform pass only
+});
+
+test('buildSearchQuery nests game fields and filters platform', () => {
+  const N = 'fields game.name,game.first_release_date,game.cover.image_id,game.alternative_names.name;';
+  assert.equal(buildSearchQuery('Time "B"', [19, 58]), `search "Time \\"B\\""; ${N} where game != null & game.platforms = (19,58); limit 50;`);
+  assert.equal(buildSearchQuery('Time', null), `search "Time"; ${N} where game != null; limit 50;`);
+});
+
+test('findGame uses /search rows and picks the right game when only spacing differs', async () => {
+  const g = (id, name) => ({ game: { id, name, cover: { image_id: `c${id}` } } });
+  const fake = async (url) => reply(url.endsWith('/search')
+    ? [{ name: 'no game' }, g(1, 'Time Bokan Series: Bokan Desuyo'), g(2, 'Time Bokan Series: Bokan Go Go Go')]
+    : []);
+  const game = await findGame('Time Bokan Series Bokan Gogogo', 7, auth, fake, noWait);
+  assert.equal(game.id, 2);
+  assert.equal(game.score, 1);
+  assert.equal(game.loose, null);
 });
 
 test('findGame finds by slug when search misses, then any platform (loose)', async () => {
@@ -77,7 +94,7 @@ test('findGame finds by slug when search misses, then any platform (loose)', asy
 });
 
 test('findGame waits and retries when IGDB rate-limits', async () => {
-  const replies = [{ ok: false, status: 429 }, reply([{ id: 3, name: 'Granbo', cover: { image_id: 'co3' } }])];
+  const replies = [{ ok: false, status: 429 }, reply([{ game: { id: 3, name: 'Granbo', cover: { image_id: 'co3' } } }])];
   const waits = [];
   const game = await findGame('Granbo', 24, auth, async () => replies.shift() ?? reply([]), async (ms) => waits.push(ms));
   assert.equal(game.name, 'Granbo');
