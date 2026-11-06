@@ -47,6 +47,9 @@ a.back:hover, a.back:focus-visible { color:var(--shu); transform:translateX(-3px
 .lamps { display:flex; gap:6px; align-items:center; align-self:flex-start; height:1.4em; font-size:15px; margin-top:3px; }  /* match the h2 line box so dots center on the title, not the 40px header */
 .lamp { width:14px; height:14px; border-radius:50%; background:var(--rivet); box-shadow: inset 0 -2px 0 rgba(0,0,0,.25); }
 .lamp.on { background:var(--ship); box-shadow: 0 0 10px var(--ship); animation: blink 2.4s ease-in-out infinite; }
+.issues-link { color:var(--ink); background:var(--plate); border:1px solid var(--rivet); border-radius:2px; padding:4px 12px; font:700 12px "Zen Maru Gothic", system-ui, sans-serif; letter-spacing:.12em; text-transform:uppercase; text-decoration:none; }
+.issues-link:hover { border-color:var(--shu); }
+.view .issues-link { display:none; }
 .lamp-label { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }  /* lamps show it; screen readers still need text */
 
 /* production line */
@@ -510,6 +513,7 @@ body { padding-bottom:84px; background-color:var(--floor);
 
 <div class="top" id="top">
   <div class="mark"><a class="back" href="https://minhnhattonthat.github.io/mtl/"><span aria-hidden="true">‹</span><span class="sr">Back to library</span></a><svg class="gear"><use href="#gear"/></svg><h1>Translation Works<small lang="ja">翻訳工房</small></h1></div>
+  <a class="issues-link" href="/issues">Issues</a>
   <div class="pal"><svg class="mascot"></svg>
   <div class="bubble" aria-hidden="true"><span id="say"></span></div></div>
   <div class="tour" id="viewers" role="status" hidden><span class="guests" aria-hidden="true"></span>
