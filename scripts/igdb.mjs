@@ -8,6 +8,13 @@ export function buildGameQuery(title, platformId) {
   return `search "${title.replace(/[\\"]/g, '\\$&')}"; ${FIELDS}${where} limit 5;`;
 }
 
+// The /search endpoint also matches alternative names; each row nests its game.
+const NESTED = FIELDS.replace('fields ', '').replace(';', '').split(',').map((f) => `game.${f}`).join(',');
+export function buildSearchQuery(term, platformId) {
+  const and = platformId ? ` & game.platforms = (${plats(platformId)})` : '';
+  return `search "${term.replace(/[\\"]/g, '\\$&')}"; fields ${NESTED}; where game != null${and}; limit 50;`;
+}
+
 // IGDB's search index misses some games (e.g. "Eithéa") that a slug lookup finds.
 export function buildSlugQuery(slug, platformId) {
   const and = platformId ? ` & platforms = (${plats(platformId)})` : '';
@@ -29,7 +36,9 @@ export function titleVariants(title) {
 // Word overlap (Dice, 0..1) between our title and the game's closest name or alternative name.
 export function matchScore(title, game) {
   const t = words(title);
+  const squeeze = (s) => fold(s).toLowerCase().replace(/[^a-z0-9]/g, '');
   return Math.max(...[game.name, ...(game.alternative_names ?? []).map((a) => a.name)].map((n) => {
+    if (squeeze(n) === squeeze(title)) return 1; // only spacing differs: "Gogogo" vs "Go Go Go"
     const g = words(n);
     const shared = [...g].filter((w) => t.has(w)).length;
     return (2 * shared) / (t.size + g.size);
@@ -53,10 +62,10 @@ export async function getToken(clientId, clientSecret, fetchFn = fetch) {
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // IGDB allows 4 requests/second: space requests out, and on 429 wait and retry (up to 3 tries).
-async function query(body, { clientId, token }, fetchFn, wait) {
+async function query(body, { clientId, token }, fetchFn, wait, endpoint = 'games') {
   let res;
   for (let tries = 0; tries < 3; tries++) {
-    res = await fetchFn('https://api.igdb.com/v4/games', {
+    res = await fetchFn(`https://api.igdb.com/v4/${endpoint}`, {
       method: 'POST',
       headers: { 'Client-ID': clientId, Authorization: `Bearer ${token}` },
       body,
@@ -69,11 +78,17 @@ async function query(body, { clientId, token }, fetchFn, wait) {
   return res.json();
 }
 
-// Pools results for every title variant (search + slug), then keeps the best-matching game with a cover.
+// Pools results for every title variant (search + slug) and broad /search terms, then keeps the best-matching game with a cover.
+// Broad terms find respelled titles ("Utsuronaru" vs "Utsuro Naru"); matchScore filters the extra results.
 // Tries the project's platform first, then any platform (flagged loose).
 export async function findGame(title, platformId, auth, fetchFn = fetch, wait = sleep) {
+  const titleWords = title.split(/\s+/);
+  const broad = [...new Set([titleWords[0], titleWords.slice(0, 2).join(' ')])];
   for (const plat of platformId ? [platformId, null] : [null]) {
     const pool = new Map();
+    for (const term of broad) {
+      for (const { game: g } of await query(buildSearchQuery(term, plat), auth, fetchFn, wait, 'search')) if (g?.cover?.image_id) pool.set(g.id, g);
+    }
     for (const v of titleVariants(title)) {
       const bodies = [buildGameQuery(v, plat)];
       if (slugify(v)) bodies.push(buildSlugQuery(slugify(v), plat));
