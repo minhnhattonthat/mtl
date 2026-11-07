@@ -496,7 +496,8 @@ body { padding-bottom:84px; background-color:var(--floor);
 .top:has(.fuel:hover) .gear { animation:spin .6s linear infinite; }
 /* too narrow for one row: title + ko-fi keep the top line, mascot drops below; then ko-fi shrinks to its seal */
 @media (max-width: 860px) { .pal { order:1; flex-basis:100%; } .issues-link { margin-left:auto; } body:not(.view) .tour { margin-left:0; } .fuel { margin-left:0; } }
-@media (max-width: 640px) { .top { column-gap:12px; } .mark h1 { letter-spacing:.04em; } .fuel { padding:4px; } .fuel span { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+/* phone: title + viewers + ko-fi on the top line; Issues (a 44px target) shares the mascot's line, too little room beside the title */
+@media (max-width: 640px) { .top { column-gap:12px; } .pal { flex:1 1 calc(100% - 100px); } .issues-link { order:2; margin-left:0; display:flex; align-items:center; min-height:44px; } body:not(.view) .tour, .tour { margin-left:auto; } .tour[hidden] + .fuel { margin-left:auto; } .mark h1 { letter-spacing:.04em; } .fuel { padding:4px; } .fuel span { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
   .fuel::after, .fuel:hover::after, .fuel:focus-visible::after { left:auto; right:0; transform:none; } }
 @media (max-width: 440px) { .mark h1 { font-size:18px; } }
 @media (max-width: 360px) { .top { column-gap:6px; } .mark h1 { font-size:16px; } }
