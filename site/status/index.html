@@ -884,7 +884,7 @@ function render() {
   if (mood + used !== cheerKey) { cheerKey = mood + used; cheerLines = CHEER[mood](used, max - used); speak(); }
   $("line").classList.toggle("flowing", run.some(p => p.state === "running"));
 
-  run.sort((a, b) => (a.since ?? Infinity) - (b.since ?? Infinity));  // oldest on the floor first
+  run.sort((a, b) => (a.started ?? Infinity) - (b.started ?? Infinity));  // oldest on the floor first
   const free = Math.max(0, max - run.length);
   $("floor").style.setProperty("--now", Math.round(performance.now()));  // page clock: rebuilt dots resume their loops mid-cycle
   $("floor").innerHTML = run.map(bay).join("") + Array.from({length: free}, () =>
