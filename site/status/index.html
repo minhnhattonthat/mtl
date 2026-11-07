@@ -65,9 +65,13 @@ a.back:hover, a.back:focus-visible { color:var(--shu); transform:translateX(-3px
 .station h2 { margin:0; font-size:15px; letter-spacing:.03em; }
 .station .num { color:var(--dim); font-size:13px; }
 .lane { margin-top:22px; min-height:120px; border-radius:6px; padding:8px; display:flex; flex-direction:column; gap:8px;
-  background:color-mix(in srgb, var(--floor-2) 70%, transparent); border:2px dashed transparent; transition: border-color .15s, background .15s; }
-.lane.droppable.drag-on { border-color:var(--rivet); }
-.lane.droppable.hover { border-color:var(--hazard); background:color-mix(in srgb, var(--hazard) 10%, var(--floor-2)); }
+  background:color-mix(in srgb, var(--floor-2) 70%, transparent); border:2px dashed transparent; transition: border-color .15s, background .15s, opacity .15s; }
+/* outline, not border: lanes must not shift under the hand. Other lanes dim; a ROM's own hopper stays lit, it reorders there */
+.lane.droppable.drag-on { position:relative; outline:2px dashed var(--hazard); outline-offset:-2px; background-color:color-mix(in srgb, var(--hazard) 12%, var(--floor-2)); }
+.lane.droppable.drag-on::after { content:attr(data-hint); position:absolute; top:8px; left:50%; translate:-50% 0; z-index:1; padding:2px 10px; border-radius:2px; white-space:nowrap;
+  font:700 12px "Zen Maru Gothic", system-ui, sans-serif; letter-spacing:.08em; color:var(--floor-2); background:var(--hazard); }
+.lane.droppable.hover { outline-style:solid; background-color:color-mix(in srgb, var(--hazard) 26%, var(--floor-2)); }
+.line:has(.drag-on) .lane:not(.drag-on, :has(.crate.rom.dragging)) { opacity:.4; }
 .lane .hint { color:var(--dim); font-size:12.5px; text-align:center; padding:14px 6px; }
 .sub { font-family:"Zen Maru Gothic"; font-size:13px; color:var(--dim); margin:4px 2px -2px; display:flex; justify-content:space-between; }
 
@@ -289,7 +293,6 @@ body { padding-bottom:84px; background-color:var(--floor);
 /* lanes are kumiko screens: asanoha lattice under a lacquer rail, the tags hang on it */
 .lane { border:1px solid color-mix(in srgb, var(--ink) 8%, transparent); border-top:3px solid var(--shu); border-radius:2px;
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='41.57' viewBox='0 0 40 69.28'%3E%3Cpath d='M0 0H40M0 34.64H40M0 69.28H40M0 0L40 69.28M40 0L0 69.28M20 11.55L0 0M20 11.55L40 0M20 11.55V34.64M40 23.09V0M40 23.09L20 34.64M40 23.09L60 34.64M0 23.09V0M0 23.09L-20 34.64M0 23.09L20 34.64M20 57.74V34.64M20 57.74L0 69.28M20 57.74L40 69.28M40 46.19L20 34.64M40 46.19L60 34.64M40 46.19V69.28M0 46.19L-20 34.64M0 46.19L20 34.64M0 46.19V69.28' fill='none' stroke='%23fff' stroke-opacity='.05'/%3E%3C/svg%3E"), color-mix(in srgb, var(--floor-2) 92%, transparent); }
-.lane.droppable.drag-on, .lane.droppable.hover { border-style:dashed; border-width:1px; }
 /* crates are kifuda, wooden name tags: left corners cut by gradients, since clip-path would also clip the drop markers */
 .crate { --wood:#3b342c; border:0; border-radius:0; padding:8px 10px 10px 16px; box-shadow:none; display:flow-root;
   background:
@@ -578,7 +581,7 @@ body { padding-bottom:84px; background-color:var(--floor);
   <section class="station floor">
     <header><h2>Machine floor<small lang="ja">工場</small></h2><div class="lamps" id="lamps" aria-live="polite"></div></header>
     <svg class="chev" aria-hidden="true"><use href="#chev"/></svg>
-    <div class="lane droppable floor-lanes" data-drop="resume" id="floor"></div>
+    <div class="lane droppable floor-lanes" data-drop="resume" data-hint="Drop to run" id="floor"></div>
   </section>
 
   <section class="station holding">
@@ -589,7 +592,7 @@ body { padding-bottom:84px; background-color:var(--floor);
     <div class="sub"><span>Waiting on you</span></div>
     <div class="lane" id="waiting" style="margin-top:6px;min-height:60px"></div>
     <div class="sub"><span>Parked</span></div>
-    <div class="lane droppable" data-drop="pause" id="parked" style="margin-top:6px;min-height:70px"></div>
+    <div class="lane droppable" data-drop="pause" data-hint="Drop to hold" id="parked" style="margin-top:6px;min-height:70px"></div>
   </section>
 
   <section class="station dock">
