@@ -105,7 +105,7 @@ function render() {
 // The build's counts can be hours old (no webhook for downloads); the status worker serves ~5 min fresh ones.
 async function liveDownloads() {
   try {
-    const r = await fetch('https://mtl-status.mntt.workers.dev/downloads');
+    const r = await fetch('https://api.mtlgames.org/downloads');
     if (!r.ok) return; // keep the build's counts
     const live = await r.json();
     for (const p of projects) if (live[p.repo] != null) p.downloads = live[p.repo];

@@ -629,7 +629,7 @@ body { padding-bottom:84px; background-color:var(--floor);
 <script>
 const $ = id => document.getElementById(id);
 const SNAPSHOT = true;  // `harness publish` flips this: a static copy on GitHub Pages fed by the status worker
-const LIVE = "wss://mtl-status.mntt.workers.dev/ws";  // `harness publish` fills in the status worker's wss:// url
+const LIVE = "wss://api.mtlgames.org/ws";  // `harness publish` fills in the status worker's wss:// url
 const VIEW = SNAPSHOT || location.pathname === "/view";  // read-only page: no drag, no actions, no hopper
 if (VIEW) document.body.classList.add("view");
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
