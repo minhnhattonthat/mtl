@@ -1,7 +1,7 @@
 # Minh-Nhat Ton-That Localization
 
 Project page for my English fan translations of Japanese retro games:
-https://minhnhattonthat.github.io/mtl/
+https://mtlgames.org/
 
 ## How a project gets listed
 
