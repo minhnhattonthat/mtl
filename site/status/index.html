@@ -495,7 +495,7 @@ body { padding-bottom:84px; background-color:var(--floor);
 .fuel:hover .seal, .fuel:focus-visible .seal { background:var(--shu); color:var(--floor-2); transform:rotate(0) scale(.88); }
 .top:has(.fuel:hover) .gear { animation:spin .6s linear infinite; }
 /* too narrow for one row: title + ko-fi keep the top line, mascot drops below; then ko-fi shrinks to its seal */
-@media (max-width: 860px) { .pal { order:1; flex-basis:100%; } .tour { margin-left:auto; } .fuel { margin-left:0; } }
+@media (max-width: 860px) { .pal { order:1; flex-basis:100%; } .issues-link { margin-left:auto; } body:not(.view) .tour { margin-left:0; } .fuel { margin-left:0; } }
 @media (max-width: 640px) { .top { column-gap:12px; } .mark h1 { letter-spacing:.04em; } .fuel { padding:4px; } .fuel span { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
   .fuel::after, .fuel:hover::after, .fuel:focus-visible::after { left:auto; right:0; transform:none; } }
 @media (max-width: 440px) { .mark h1 { font-size:18px; } }
@@ -513,9 +513,9 @@ body { padding-bottom:84px; background-color:var(--floor);
 
 <div class="top" id="top">
   <div class="mark"><a class="back" href="https://minhnhattonthat.github.io/mtl/"><span aria-hidden="true">‹</span><span class="sr">Back to library</span></a><svg class="gear"><use href="#gear"/></svg><h1>Translation Works<small lang="ja">翻訳工房</small></h1></div>
-  <a class="issues-link" href="/issues">Issues</a>
   <div class="pal"><svg class="mascot"></svg>
   <div class="bubble" aria-hidden="true"><span id="say"></span></div></div>
+  <a class="issues-link" href="/issues">Issues</a>
   <div class="tour" id="viewers" role="status" hidden><span class="guests" aria-hidden="true"></span>
     <span class="tl"><b></b><small lang="ja">見学中</small></span></div>
   <a class="fuel" href="https://ko-fi.com/minhnhattonthat" target="_blank" rel="noopener" data-tip="Bots run on coffee ☕&#10;Buy them one on Ko-fi">
