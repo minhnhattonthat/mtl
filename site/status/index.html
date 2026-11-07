@@ -14,6 +14,7 @@
   --hazard:#ffb400; --flow:#3fd0ff; --stop:#ff4d6d; --ship:#06d6a0; --wait:#ff4fa0; --shu:#ff6a00;
   --wave: rgba(238,238,238,.035);
   --m-claude:#d97757; --m-gpt:#10a37f; --m-codex:#6d5cff; --m-deepseek:#4d6bfe; --m-kimi:#9b87f5; --m-glm:#22b8d6; --m-qwen:#615ced; --m-mimo:#ff6900;
+  --i-watch:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round'%3E%3Ccircle cx='12' cy='14' r='8'/%3E%3Cpath d='M12 14V9.5M9.5 2.5h5M12 2.5V6'/%3E%3C/svg%3E"); --i-tsuzumi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round'%3E%3Cpath fill='black' stroke='none' d='M5 3h14l-5.5 9L19 21H5l5.5-9z'/%3E%3C/svg%3E"); --i-pause:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round'%3E%3Cpath fill='black' stroke='none' d='M6 4h4v16H6zM14 4h4v16h-4z'/%3E%3C/svg%3E"); --i-tomare:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M7.5 12h9'/%3E%3C/svg%3E"); --i-furin:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round'%3E%3Cpath fill='black' stroke='none' d='M12 2a6 6 0 0 0-6 6v7l-2 3h16l-2-3V8a6 6 0 0 0-6-6z'/%3E%3Ccircle fill='black' stroke='none' cx='12' cy='21' r='2'/%3E%3C/svg%3E"); --i-enso:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M15 3.6A9 9 0 1 0 20.6 9'/%3E%3C/svg%3E"); --i-compass:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round'%3E%3Ccircle stroke-width='2.5' cx='12' cy='12' r='9.5'/%3E%3Cpath fill='black' stroke='none' transform='rotate(35 12 12)' d='M12 5l2.8 7-2.8 7-2.8-7z'/%3E%3C/svg%3E"); --i-nijumaru:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round'%3E%3Ccircle stroke-width='2.5' cx='12' cy='12' r='9.5'/%3E%3Ccircle stroke-width='2.5' cx='12' cy='12' r='4'/%3E%3C/svg%3E");
 }
 * { box-sizing:border-box; }
 html, body { margin:0; }
@@ -84,8 +85,7 @@ a.back:hover, a.back:focus-visible { color:var(--shu); transform:translateX(-3px
 .upbar i { display:block; height:100%; width:0; background:var(--hazard); transition: width .2s; }
 
 /* crate: small card */
-.crate { background:var(--plate); border-radius:5px; padding:8px 10px; border-left:4px solid var(--rivet); position:relative;
-  box-shadow: 0 2px 0 rgba(0,0,0,.18); cursor:grab; }
+.crate { --st:var(--rivet); position:relative; cursor:grab; }
 .crate[draggable=false], .bay[draggable=false] { cursor:default; }
 .view .holding .sub, .view .dock .sub, .view #dock, .view #waiting, .view #parked, .view #hopper, .view .hopper-opts, .view .agents-btn, .view .rom-play, .view .rename-btn, .view button[data-act], .view #confirm { display:none !important; }
 .view #queue, .view #steer { margin-top:22px !important; flex:1; overflow:auto; }  /* stands in for the hidden bottom lane */
@@ -94,14 +94,18 @@ a.back:hover, a.back:focus-visible { color:var(--shu); transform:translateX(-3px
 .crate .name { font-weight:600; font-size:13px; overflow-wrap:anywhere; }
 .crate .meta { color:var(--dim); font-size:12px; margin-top:2px; }
 .crate .acts { display:flex; gap:4px; margin-top:6px; }
-.crate.queued { border-left-color:var(--hazard); } .crate.paused, .crate.pausing { border-left-color:var(--flow); }
-.crate.stopped, .crate.stopping { border-left-color:var(--stop); } .crate.waiting { border-left-color:var(--wait); }
+/* state crest: tsuzumi drum (hourglass) queued, bars paused, no-entry stopped, furin bell needs you, enso idle, compass needs steer, double circle published */
+.crate.queued { --st:var(--hazard); --seal:var(--i-tsuzumi); } .crate.paused, .crate.pausing { --st:var(--flow); --seal:var(--i-pause); }
+.crate.stopped, .crate.stopping { --st:var(--stop); --seal:var(--i-tomare); } .crate.waiting { --st:var(--wait); --seal:var(--i-furin); }
+.crate.idle { --st:var(--dim); --seal:var(--i-enso); } .crate.steer { --st:var(--shu); --seal:var(--i-compass); } .crate.built { --st:var(--ship); --seal:var(--i-nijumaru); }
+.crate::before { content:""; float:right; width:22px; height:22px; margin:0 0 2px 6px; background:var(--st); mask:var(--seal) center / contain no-repeat; }
+.crate.rom::before { display:none; }  /* its place-in-line number stands there */
 .chip { display:inline-block; margin-right:6px; padding:0 6px; font:700 10px/1.6 system-ui, sans-serif; color:#fff; background:#666; border-radius:3px; vertical-align:1px; }
 .chip--SNES { background:#6a4c93; } .chip--GBA { background:#3a0ca3; } .chip--NDS { background:#5c677d; }
 .chip--PS1 { background:#003791; } .chip--PSP { background:#111; }
-.crate.built { border-left-color:var(--ship); padding:5px 8px; }
-.crate.rom { border-left-color:var(--hazard); padding-right:40px; }
-.crate.rom .pos { position:absolute; right:10px; top:50%; translate:0 -50%; font:800 22px/1 system-ui, sans-serif; color:var(--hazard); opacity:.8; }
+.crate.rom { --st:var(--hazard); }
+.crate.rom .pos { float:right; width:auto; min-width:22px; height:22px; margin:0 0 2px 6px; padding:0 2px; display:grid; place-items:center; font:700 12px/1 "Zen Maru Gothic", system-ui, sans-serif;
+  color:var(--st); border:1.5px solid var(--st); border-radius:3px; rotate:-5deg; font-variant-numeric:tabular-nums; }
 .ticks { display:grid; grid-template-columns:repeat(10,1fr); gap:2px; margin-top:6px; }
 .ticks i { height:4px; border-radius:1px; background:var(--rivet); }
 .ticks i.on { background:var(--ink); opacity:.7; }
@@ -110,8 +114,6 @@ a.back:hover, a.back:focus-visible { color:var(--shu); transform:translateX(-3px
 /* machine bay: running card */
 .bay { background:var(--plate); border-radius:8px; padding:14px 16px 16px; position:relative; overflow:hidden; cursor:grab;
   border:2px solid var(--rivet); }
-.bay.running { border-color: color-mix(in srgb, var(--ship) 60%, var(--rivet)); }
-.bay.pausing, .bay.stopping { border-color:var(--hazard); }
 .bay .head { display:flex; align-items:center; gap:10px; }
 .bay .name { font-family:"Zen Maru Gothic"; font-weight:700; font-size:17px; overflow-wrap:anywhere; }
 .bay .clock { margin-left:auto; font-family:"Zen Maru Gothic"; color:var(--dim); white-space:nowrap; font-variant-numeric:tabular-nums; }
@@ -204,19 +206,26 @@ a.back:hover, a.back:focus-visible { color:var(--shu); transform:translateX(-3px
 .stop-dot:first-child .pn { left:0; transform:none; } .stop-dot:last-child .pn { left:auto; right:0; transform:none; }
 @media (max-width: 640px) {
   .track { height:auto; margin:10px 0; }
-  .rail { --r:13px; left:9px; right:auto; top:var(--r); bottom:var(--r); width:8px; height:auto; }
+  /* zigzag: the rail box spans both dot columns and is clipped to the stripe; y still grows evenly per phase, so the fill's height lands on the current dot */
+  .rail { --r:13px; left:35%; right:35%; top:var(--r); bottom:var(--r); height:auto; border-radius:0; clip-path:polygon(0% calc(0.00% - 4px), 100% calc(11.11% - 4px), 0% calc(22.22% - 4px), 100% calc(33.33% - 4px), 0% calc(44.44% - 4px), 100% calc(55.56% - 4px), 0% calc(66.67% - 4px), 100% calc(77.78% - 4px), 0% calc(88.89% - 4px), 100% calc(100.00% - 4px), 100% calc(100.00% + 4px), 0% calc(88.89% + 4px), 100% calc(77.78% + 4px), 0% calc(66.67% + 4px), 100% calc(55.56% + 4px), 0% calc(44.44% + 4px), 100% calc(33.33% + 4px), 0% calc(22.22% + 4px), 100% calc(11.11% + 4px), 0% calc(0.00% + 4px)); }
   .rail i { width:100%; height:var(--pct); --a:180deg; --bs:100% 140px; --to:0 140px; }
-  .stops { position:relative; flex-direction:column; gap:6px; }
-  .stop-dot { width:26px; height:26px; font-size:11px; --dot:26; }
+  .stops { position:relative; flex-direction:column; gap:0; }
+  .stop-dot { width:26px; height:26px; font-size:11px; --dot:26; margin-left:calc(35% - 13px); }
+  .stop-dot:nth-child(even) { margin-left:calc(65% - 13px); }
+  .stop-dot + .stop-dot { margin-top:-4px; }
   .stop-dot .pn, .stop-dot:nth-child(n) .pn { font-size:11px; bottom:auto; top:50%; left:calc(100% + 10px); right:auto; transform:translateY(-50%); }
-  /* vertical line: tooltip to the right of the dot (over its label), arrow pointing back at the dot */
+  .stop-dot:nth-child(odd) .pn { left:auto; right:calc(100% + 10px); }  /* labels sit outward, clear of the rail */
+  /* vertical line: tooltip beside the dot on the side with room, arrow pointing back at the dot */
   .stop-dot:nth-child(n) .tt { top:50%; left:calc(100% + 12px); right:auto; transform:translate(-4px, -50%); border-top-width:1px; border-left:3px solid var(--shu); text-align:left; }
   .stop-dot:nth-child(n) .tt::before { top:calc(50% - 6px); left:-9px; right:auto; border:6px solid transparent; border-left:0; border-right-color:var(--shu); }
+  .stop-dot:nth-child(n) .tt { max-width:38vw; }
+  .stop-dot:nth-child(even) .tt { left:auto; right:calc(100% + 12px); transform:translate(4px, -50%); border-left-width:1px; border-right:3px solid var(--shu); text-align:right; }
+  .stop-dot:nth-child(even) .tt::before { left:auto; right:-9px; border:6px solid transparent; border-right:0; border-left-color:var(--shu); }
   .stop-dot:nth-child(n):hover .tt, .stop-dot:nth-child(n):focus .tt { transform:translate(0, -50%); }
 }
 .bay .acts { display:flex; gap:6px; margin-top:8px; }
-.bay.free { cursor:default; border-style:dashed; display:grid; place-items:center; min-height:150px; color:var(--dim); text-align:center;
-  background: repeating-linear-gradient(-45deg, transparent 0 12px, color-mix(in srgb, var(--rivet) 25%, transparent) 12px 24px); }
+.bay.free { cursor:default; padding:14px 16px; border:1px dashed var(--rivet); display:grid; place-items:center; min-height:150px; color:var(--dim); text-align:center; background:none; }
+.bay.free::before { content:""; position:absolute; inset:0; background:rgba(238,238,238,.05); mask:var(--i-enso) center / 96px no-repeat; pointer-events:none; }
 .bay.free strong { font-family:"Zen Maru Gothic"; font-size:16px; color:var(--ink); display:block; }
 .floor-lanes { display:flex; flex-direction:column; gap:12px; }
 
@@ -277,14 +286,36 @@ body { padding-bottom:84px; background-color:var(--floor);
 .mark h1 { letter-spacing:.12em; font-weight:700; }
 .mark h1 small { display:block; font-size:11px; letter-spacing:.5em; color:var(--shu); margin-top:-2px; }
 .station h2 { letter-spacing:.06em; color:var(--ink); padding-left:8px; border-left:3px solid var(--shu); }
-.lane { border:1px solid color-mix(in srgb, var(--ink) 8%, transparent); border-radius:10px;
-  background:color-mix(in srgb, var(--floor-2) 88%, transparent); }
+/* lanes are kumiko screens: asanoha lattice under a lacquer rail, the tags hang on it */
+.lane { border:1px solid color-mix(in srgb, var(--ink) 8%, transparent); border-top:3px solid var(--shu); border-radius:2px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='41.57' viewBox='0 0 40 69.28'%3E%3Cpath d='M0 0H40M0 34.64H40M0 69.28H40M0 0L40 69.28M40 0L0 69.28M20 11.55L0 0M20 11.55L40 0M20 11.55V34.64M40 23.09V0M40 23.09L20 34.64M40 23.09L60 34.64M0 23.09V0M0 23.09L-20 34.64M0 23.09L20 34.64M20 57.74V34.64M20 57.74L0 69.28M20 57.74L40 69.28M40 46.19L20 34.64M40 46.19L60 34.64M40 46.19V69.28M0 46.19L-20 34.64M0 46.19L20 34.64M0 46.19V69.28' fill='none' stroke='%23fff' stroke-opacity='.05'/%3E%3C/svg%3E"), color-mix(in srgb, var(--floor-2) 92%, transparent); }
 .lane.droppable.drag-on, .lane.droppable.hover { border-style:dashed; border-width:1px; }
-.crate { border-radius:8px; transition: transform .2s, box-shadow .2s; box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 10%, transparent); }
-.crate:hover { transform:translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,.12); }
-.bay { border-radius:12px; border-width:1px; }
-.bay.running { box-shadow: 0 6px 22px rgba(0,0,0,.14); }
-.hopper { border-radius:10px; background:transparent; }
+/* crates are kifuda, wooden name tags: left corners cut by gradients, since clip-path would also clip the drop markers */
+.crate { --wood:#3b342c; border:0; border-radius:0; padding:8px 10px 10px 16px; box-shadow:none; display:flow-root;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 11px, rgba(255,255,255,.022) 11px 12px) 8px 0 no-repeat,
+    linear-gradient(135deg, transparent 8px, var(--wood) 8.5px) 0 0 / 100% 51% no-repeat,
+    linear-gradient(45deg, transparent 8px, var(--wood) 8.5px) 0 100% / 100% 51% no-repeat;
+  transition:filter .15s; }
+.crate:hover { filter:brightness(1.12); }
+.crate.built { padding:5px 8px 7px 16px; }
+/* machines are workshop fronts: a noren on its rod names the job, dyed by state (indigo running, turmeric pausing, red stopping) */
+.bay { --noren:#1d3557; --body:#2a2520; padding:0 16px 16px; border-radius:2px; border:1px solid color-mix(in srgb, var(--ink) 10%, transparent);
+  background:repeating-linear-gradient(90deg, transparent 0 15px, rgba(255,255,255,.016) 15px 16px), var(--body); }
+.bay.pausing { --noren:#7d5f0e; } .bay.stopping { --noren:#8c2a1c; } .bay.starting { --noren:#1f5c4d; }
+.bay.starting .clock, .crate.rom.feeding .meta { animation:blink 1.2s ease-in-out infinite; }
+.crate.rom.feeding .meta { color:var(--ship); }
+.bay .head { margin:0 -16px; padding:14px 16px 22px; color:#fff;
+  background:
+    linear-gradient(90deg, transparent calc(25% - 1px), var(--body) 0 calc(25% + 1px), transparent 0 calc(50% - 1px), var(--body) 0 calc(50% + 1px), transparent 0 calc(75% - 1px), var(--body) 0 calc(75% + 1px), transparent 0) 0 100% / 100% 14px no-repeat,
+    linear-gradient(#6b5a45, #6b5a45) 0 0 / 100% 4px no-repeat,
+    var(--noren); }
+.bay .head .rename-btn { color:rgba(255,255,255,.78); }
+.bay .dur { display:inline-flex; align-items:center; gap:5px; }
+.bay .dur::before { content:""; width:14px; height:14px; background:currentColor; mask:var(--i-watch) center / contain no-repeat; }
+/* run time: a washi label stitched onto the noren */
+.bay .clock { padding:2px 9px; font-size:12.5px; font-weight:700; color:var(--body); background:#e8e0cf; border-radius:1px; outline:1px dashed rgba(42,37,32,.45); outline-offset:-3px; }
+.hopper { border-radius:2px; background:transparent; }
 .mark .gear { color:var(--shu); }
 .belt { height:8px; opacity:.8; }
 .pkg { position:absolute; top:-12px; left:0; width:14px; height:11px; border-radius:2px; background:var(--hazard);
@@ -608,10 +639,20 @@ const PHASES = 10;  // status.md phases 0..9
 let data = {projects: [], slots: {}}, seen = {}, dragging = null, busy = false;
 
 const ALLOWED = {  // state -> actions it can take
-  running:["pause","stop"], pausing:["stop"], stopping:[], queued:["resume","pause","stop"],
+  running:["pause","stop"], pausing:["stop"], stopping:[], starting:[], queued:["resume","pause","stop"],
   paused:["resume"], stopped:["resume"], idle:["resume"], waiting:["resume"], steer:["resume"], built:["resume"] };
 const LABEL = {resume:"Run", pause:"Hold", stop:"Stop"};
 const BTN = {resume:"btn-go", pause:"btn-pause", stop:"btn-stop"};
+const RUN = ["running","pausing","stopping"];
+const START_WAIT = 90000;  // a launched terminal takes seconds to take its lock; past this the run gave up, show the real state
+const moving = {};  // project -> {from, to, until}: shown instead of the server's state until the server catches up
+const feeding = new Set();  // "dir/name" of hopper ROMs being started
+function overlay() {  // call once per fresh snapshot: it rewrites p.state
+  for (const p of data.projects) { const m = moving[p.name]; if (!m) continue;
+    // a start can pass through idle or parked before the lock, so only a live state ends it
+    if ((m.to === "starting" ? RUN.includes(p.state) : p.state !== m.from) || Date.now() > m.until) delete moving[p.name];
+    else p.state = m.to; }
+}
 
 function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.remove("show"); void t.offsetWidth;
   t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 3500); }
@@ -795,10 +836,10 @@ const crew = (p, ph, seed) => { const bs = [...new Set(usedIn(p, ph).map(e => br
 function bay(p) {
   const seed = [...p.name].reduce((a, c) => a + c.charCodeAt(0), 0);
   const ph = phaseOf(p), f = ph / (PHASES - 1);
-  const verb = {pausing:"Pausing after this phase", stopping:"Stopping"}[p.state];
+  const verb = {pausing:"Pausing after this phase", stopping:"Stopping", starting:"Starting…"}[p.state];
   return `<div class="bay ${esc(p.state)}${p.redact ? " redact" : ""}${arrive(p)}" draggable="${!VIEW}" data-name="${esc(p.name)}">
     <div class="head"><div class="name"${VIEW ? "" : ` title="${esc(p.name)}"`}>${chip(p.system)}<span class="t">${hide(p.title || p.name)}</span><button class="rename-btn" data-project="${esc(p.name)}" data-title="${esc(p.title || p.name)}">${PEN}</button></div>
-      <div class="clock" title="Next: ${esc(p.waiting || p.next || "—")}">${verb ? esc(verb) : p.since ? `Running ${ago(p.since - (p.worked || 0))}` : "Running"}</div></div>
+      <div class="clock" title="Next: ${esc(p.waiting || p.next || "—")}">${verb ? esc(verb) : `<span class="dur"><span class="sr">Running</span> ${p.since ? ago(p.since - (p.worked || 0)) : ""}</span>`}</div></div>
     <div class="track" role="group" aria-label="Phase ${ph} of ${PHASES - 1}">
       <div class="rail"><i style="--f:${f};--stops:${railStops(p)}"></i></div>
       <div class="stops">${Array.from({length: PHASES}, (_, i) =>
@@ -829,10 +870,10 @@ setInterval(speak, 10000);
 
 function render() {
   const by = s => data.projects.filter(p => s.includes(p.state));
-  const run = by(["running","pausing","stopping"]), q = by(["queued"]), wait = by(["waiting"]),
+  const run = by([...RUN, "starting"]), q = by(["queued"]), wait = by(["waiting"]),
         park = by(["paused","stopped","idle"]), ship = by(["built"]), steer = by(["steer"]);
   const max = Object.values(data.slots).reduce((a, s) => a + s.max, 0) || 3;
-  const used = Object.values(data.slots).reduce((a, s) => a + s.used, 0);
+  const used = Object.values(data.slots).reduce((a, s) => a + s.used, 0) + by(["starting"]).length;
   $("lamps").title = `${used} of ${max} machines busy`;
   $("lamps").innerHTML =Array.from({length: max}, (_, i) => `<span class="lamp ${i < used ? "on" : ""}"></span>`).join("")
     + `<span class="lamp-label">${used} of ${max} machines busy</span>`;
@@ -870,11 +911,12 @@ function renderInbox(i = inboxData) {
   $("n-inbox").textContent = i.items.length ? (shown.length < i.items.length ? `${shown.length}/${i.items.length}` : i.items.length) : "";
   // display only: data-rom keeps the real name
   const romName = r => r.title || (r.folder ? r.name : r.name.trim().replace(/\.[^. ]{1,4}$/, "")).replace(/\s*\(Japan\)/gi, "").trim();
-  $("inbox").innerHTML = shown.map(r => `<div class="crate rom${r.redact !== false ? " redact" : ""}" draggable="${r.ready && !VIEW}" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}"
+  $("inbox").innerHTML = shown.map(r => { const going = feeding.has(`${r.dir}/${r.name}`);
+    return `<div class="crate rom${r.redact !== false ? " redact" : ""}${going ? " feeding" : ""}" draggable="${r.ready && !going && !VIEW}" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}"
     title="${r.ready ? "Drag onto the machine floor to start now, or onto another ROM to change its place in line" : "Still uploading or settling (60s)"}">
     <b class="pos" title="Place in line">${r.n + 1}</b><div class="name">${chip(r.dir)}<span class="t">${hide(romName(r))}</span><button class="rename-btn" data-dir="${esc(r.dir)}" data-name="${esc(r.name)}" data-title="${esc(romName(r))}">${PEN}</button></div>
-    ${r.ready && r.preset === "default" ? "" : `<div class="meta">${[!r.ready && "settling", r.preset !== "default" && esc(r.preset)].filter(Boolean).join(" · ")}</div>`}
-    <div class="acts">${r.ready ? `<button class="fuda btn-go rom-play" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}">Feed</button>` : ""}<button class="fuda btn-plain agents-btn" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}">Agents</button></div></div>`).join("")
+    ${going ? `<div class="meta">Starting…</div>` : r.ready && r.preset === "default" ? "" : `<div class="meta">${[!r.ready && "settling", r.preset !== "default" && esc(r.preset)].filter(Boolean).join(" · ")}</div>`}
+    ${going ? "" : `<div class="acts">${r.ready ? `<button class="fuda btn-go rom-play" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}">Feed</button>` : ""}<button class="fuda btn-plain agents-btn" data-dir="${esc(r.dir)}" data-rom="${esc(r.name)}">Agents</button></div>`}</div>`; }).join("")
     || `<div class="hint">${i.items.length ? "No ROMs for this system." : "Inbox empty."}</div>`;
 }
 $("sys").onchange = () => renderInbox();
@@ -972,9 +1014,15 @@ $("rename-form").onsubmit = async e => {
 };
 
 async function startRom(dir, name) {
+  const key = `${dir}/${name}`;
+  feeding.add(key); renderInbox();
   toast(`Starting ${name}: creating the repo…`);
-  try { toast((await api("/api/inbox/start?" + new URLSearchParams({dir, name}), {method:"POST", headers:H})).message); }
+  try { const {message} = await api("/api/inbox/start?" + new URLSearchParams({dir, name}), {method:"POST", headers:H});
+    toast(message);
+    const made = /^started (.+)/.exec(message);  // web.py's start_rom names the new project
+    if (made) moving[made[1]] = {to: "starting", until: Date.now() + START_WAIT}; }
   catch (e) { toast(`${name}: ${e.message}`); }
+  feeding.delete(key);
   refresh();
 }
 
@@ -1007,14 +1055,17 @@ function live() {
   ws.onclose = () => setTimeout(live, 5000);
 }
 const VIEWER = Math.random().toString(36).slice(2);  // randomUUID needs https; LAN viewers are plain http
+let again = false;
 async function refresh() {
-  if (busy || dragging) return; busy = true;
+  if (busy) { again = true; return; }  // that poll may predate an action: read again after it
+  if (dragging) return;
+  busy = true;
   try {
     const [p, i] = await Promise.all([api("/api/projects?v=" + VIEWER), api("/api/inbox")]);
-    data = p; render(); renderInbox(i);
+    data = p; overlay(); render(); renderInbox(i);
     showViewers(p.viewers);
   } catch (e) { toast("Can't reach the harness: " + e.message); }
-  finally { busy = false; }
+  finally { busy = false; if (again) { again = false; refresh(); } }
 }
 
 // actions
@@ -1027,8 +1078,11 @@ async function act(name, action) {
     $("confirm").classList.add("show"); $("confirm-yes").focus(); return;
   }
   pendingStop = null; $("confirm").classList.remove("show");
+  const to = action === "resume" ? "starting" : p.state === "queued" ? {pause:"paused", stop:"stopped"}[action] : {pause:"pausing", stop:"stopping"}[action];
+  moving[name] = {from: p.state, to, until: Date.now() + START_WAIT};
+  p.state = to; render();
   try { toast(`${name}: ${(await api(`/api/project/${encodeURIComponent(name)}/${action}`, {method:"POST", headers:H})).message}`); }
-  catch (e) { toast(`${name}: ${e.message}`); }
+  catch (e) { toast(`${name}: ${e.message}`); delete moving[name]; }
   refresh();
 }
 $("confirm-yes").onclick = () => act(pendingStop, "stop");
@@ -1045,15 +1099,16 @@ document.addEventListener("dragstart", e => {
   document.querySelectorAll(".lane.droppable").forEach(l => l.classList.toggle("drag-on",
     dragging.rom ? l.dataset.drop === "resume" : !!ALLOWED[p?.state]?.includes(l.dataset.drop)));
 });
-document.addEventListener("dragend", () => {
+function dragDone() {
   document.querySelectorAll(".dragging, .drag-on, .hover, .drop-before, .drop-after")
     .forEach(x => x.classList.remove("dragging", "drag-on", "hover", "drop-before", "drop-after"));
   dragging = null;
-});
+}
+document.addEventListener("dragend", dragDone);
 document.querySelectorAll(".lane.droppable").forEach(l => {
   l.addEventListener("dragover", e => { if (dragging && l.classList.contains("drag-on")) { e.preventDefault(); l.classList.add("hover"); } });
   l.addEventListener("dragleave", e => { if (!l.contains(e.relatedTarget)) l.classList.remove("hover"); });
-  l.addEventListener("drop", e => { e.preventDefault(); const n = dragging; l.classList.remove("hover");
+  l.addEventListener("drop", e => { e.preventDefault(); const n = dragging; dragDone();  // not left to dragend: the rerender removes the dragged element, so dragend never reaches document
     if (n?.rom) startRom(n.dir, n.rom); else if (n) act(n, l.dataset.drop); });
 });
 
