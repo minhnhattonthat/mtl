@@ -500,7 +500,8 @@ body { padding-bottom:84px; background-color:var(--floor);
 @media (max-width: 640px) { .top { column-gap:12px; } .pal { flex:1 1 calc(100% - 100px); } .issues-link { order:2; margin-left:0; display:flex; align-items:center; min-height:44px; } body:not(.view) .tour, .tour { margin-left:auto; } .tour[hidden] + .fuel { margin-left:auto; } .mark h1 { letter-spacing:.04em; } .fuel { padding:4px; } .fuel span { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
   .fuel::after, .fuel:hover::after, .fuel:focus-visible::after { left:auto; right:0; transform:none; } }
 @media (max-width: 440px) { .mark h1 { font-size:18px; } }
-@media (max-width: 360px) { .top { column-gap:6px; } .mark h1 { font-size:16px; } }
+@media (max-width: 360px) { .top { column-gap:6px; } .mark { gap:6px; } .gear { width:22px; height:22px; } .mark h1 { font-size:16px; } .fuel { padding:2px; } .fuel .seal { width:24px; height:24px; } }
+@media (max-width: 640px) { button:not(.stop-dot, .tk, .rename-btn) { height:40px; } }  /* finger-sized */
 @media (prefers-reduced-motion: reduce) { .fuel .seal { transition:none; } .top:has(.fuel:hover) .gear { animation:none; } }
 </style>
 </head>
